@@ -35,16 +35,6 @@
         hardware'.bluetooth.enable = true;
         hardware'.systemd-boot.enable = true;
 
-        boot.loader.systemd-boot.configurationLimit = 2;
-        boot.loader.efi.efiSysMountPoint = "/boot";
-        boot.initrd.systemd.enable = true;
-
-        services.openssh.settings = {
-          PasswordAuthentication = true;
-          KbdInteractiveAuthentication = true;
-          PermitRootLogin = "no";
-        };
-
         time.timeZone = "Asia/Shanghai";
         nixpkgs.config.allowUnfree = true;
 
@@ -54,8 +44,6 @@
         };
 
         preservation.preserveAt."/persistent".directories = [
-          "/etc/nixos"
-          "/var/lib/AccountsService"
           {
             directory = "/home/${username}";
             user = username;
@@ -73,7 +61,7 @@
           vim
         ];
 
-        system.stateVersion = "26.11";
+        system.stateVersion = "26.05";
       }
     )
   ];
