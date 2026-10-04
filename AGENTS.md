@@ -25,7 +25,8 @@ vars/
 
 profiles/
 ├── nixos/
-│   └── server.nix
+│   ├── server.nix
+│   └── desktop.nix
 └── darwin/
     └── default.nix
 
