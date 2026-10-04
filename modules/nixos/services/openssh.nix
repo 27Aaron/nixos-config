@@ -14,8 +14,8 @@ in
 
   config = lib.mkIf cfg.enable {
     services.openssh = {
-      enable = true;
-      ports = [ 22 ];
+      enable = lib.mkDefault true;
+      ports = lib.mkDefault [ 233 ];
       hostKeys = lib.mkDefault [
         {
           path = "/etc/ssh/ssh_host_ed25519_key";
@@ -29,6 +29,8 @@ in
         X11Forwarding = lib.mkDefault false;
       };
     };
+
+    environment.enableAllTerminfo = lib.mkDefault true;
 
     preservation'.os.directories = lib.mkIf persistenceEnabled [ "/etc/ssh" ];
     preservation'.user = lib.mkIf persistenceEnabled {

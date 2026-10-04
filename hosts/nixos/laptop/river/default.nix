@@ -4,7 +4,6 @@
   modules = [
     (
       {
-        hashedPassword,
         nixosHardware,
         pkgs,
         username,
@@ -18,6 +17,7 @@
           ../../../../modules/nixos/hardware/boot/grub.nix
           ../../../../modules/nixos/hardware/boot/systemd-boot.nix
           ../../../../modules/nixos/hardware/bluetooth.nix
+          ../../../../modules/nixos/system/core.nix
           ../../../../modules/nixos/security/firewall.nix
           ../../../../modules/nixos/services/networkmanager.nix
           ../../../../modules/nixos/services/openssh.nix
@@ -39,8 +39,6 @@
         boot.loader.efi.efiSysMountPoint = "/boot";
         boot.initrd.systemd.enable = true;
 
-        networking.hostName = "river";
-
         services.openssh.settings = {
           PasswordAuthentication = true;
           KbdInteractiveAuthentication = true;
@@ -49,14 +47,6 @@
 
         time.timeZone = "Asia/Shanghai";
         nixpkgs.config.allowUnfree = true;
-
-        users.mutableUsers = false;
-        users.users.${username} = {
-          isNormalUser = true;
-          uid = 1000;
-          extraGroups = [ "wheel" ];
-          inherit hashedPassword;
-        };
 
         hardware.apple-t2.firmware = {
           enable = true;
