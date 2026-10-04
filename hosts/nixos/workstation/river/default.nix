@@ -4,6 +4,7 @@
   modules = [
     (
       {
+        config,
         nixosHardware,
         pkgs,
         username,
@@ -24,10 +25,13 @@
 
         preservation.preserveAt."/persistent".directories = [
           {
+            # preservation auto-generates a matching rule for this path from
+            # users.users.<name>.{homeMode,group}; reference the same values
+            # here so the two definitions don't conflict.
             directory = "/home/${username}";
             user = username;
-            group = "users";
-            mode = "0700";
+            group = config.users.users.${username}.group;
+            mode = config.users.users.${username}.homeMode;
           }
         ];
 
