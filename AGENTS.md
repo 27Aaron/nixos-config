@@ -11,8 +11,7 @@ flake.lock
 hosts/
 ├── nixos/
 │   ├── common/
-│   ├── desktop/<hostname>/
-│   ├── laptop/<hostname>/
+│   ├── workstation/<hostname>/
 │   └── server/<hostname>/
 └── darwin/
     ├── common/
