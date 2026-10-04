@@ -2,10 +2,13 @@
   description = "Aaron's Nix configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    };
 
     nixos-hardware = {
-      url = "github:NixOS/nixos-hardware";
+      # url = "github:NixOS/nixos-hardware";
+      url = "github:soopyc/nixos-hardware/apple-t2-updates";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
