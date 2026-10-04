@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
   imports = [
+    ../common/nix.nix
     ./defaults.nix
     ./homebrew.nix
-    ./nix.nix
   ];
 
   # Use Fish as the login shell.

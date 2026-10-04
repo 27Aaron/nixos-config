@@ -18,6 +18,8 @@
           ../../../../modules/nixos/hardware/boot/systemd-boot.nix
           ../../../../modules/nixos/hardware/bluetooth.nix
           ../../../../modules/nixos/system/core.nix
+          ../../../../modules/nixos/system/nix.nix
+          ../../../../modules/common/nix.nix
           ../../../../modules/nixos/security/firewall.nix
           ../../../../modules/nixos/services/networkmanager.nix
           ../../../../modules/nixos/services/openssh.nix
@@ -52,10 +54,6 @@
           }
         ];
 
-        nix.settings.experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
         environment.systemPackages = with pkgs; [
           git
           vim
