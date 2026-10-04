@@ -37,8 +37,7 @@
         hardware'.bluetooth.enable = true;
         hardware'.systemd-boot.enable = true;
 
-        time.timeZone = "Asia/Shanghai";
-        nixpkgs.config.allowUnfree = true;
+        time.timeZone = "Asia/Tokyo";
 
         hardware.apple-t2.firmware = {
           enable = true;
