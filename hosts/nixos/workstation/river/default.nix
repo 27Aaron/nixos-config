@@ -34,15 +34,8 @@
         };
 
         security'.firewall.enable = true;
-        hardware'.bluetooth.enable = true;
-        hardware'.systemd-boot.enable = true;
 
         time.timeZone = "Asia/Tokyo";
-
-        hardware.apple-t2.firmware = {
-          enable = true;
-          version = "sonoma";
-        };
 
         preservation.preserveAt."/persistent".directories = [
           {
