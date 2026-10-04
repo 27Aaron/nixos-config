@@ -22,4 +22,14 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  hardware'.disko = {
+    enable = true;
+    device = "/dev/nvme0n1";
+    espSize = "512M";
+    swapSize = "16385M";
+    tmpfsSize = "2G";
+  };
+
+  hardware'.persistence.enable = true;
 }
