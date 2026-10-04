@@ -21,6 +21,17 @@
           ./hardware.nix
         ];
 
+        # Workaround for NixOS/nixpkgs#568896: rxvt-unicode (pulled in via
+        # enableAllTerminfo) fails to build with GCC 16's libstdc++.
+        # Remove once NixOS/nixpkgs#568978 lands in a nixpkgs update.
+        nixpkgs.overlays = [
+          (final: prev: {
+            rxvt-unicode-unwrapped = prev.rxvt-unicode-unwrapped.override {
+              stdenv = final.gcc15Stdenv;
+            };
+          })
+        ];
+
         time.timeZone = "Asia/Tokyo";
 
         preservation.preserveAt."/persistent".directories = [
