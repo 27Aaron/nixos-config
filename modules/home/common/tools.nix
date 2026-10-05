@@ -23,7 +23,6 @@
     git
     git-lfs
     just
-    neovim
 
     # Networking and diagnostics.
     curl
@@ -34,11 +33,9 @@
     wget
   ];
 
-  # Tools that rewrite their own configuration or keep runtime state.
+  # Tools that rewrite their own configuration.
   persist'.directories = [
     # btop rewrites its config when settings change from the UI.
     ".config/btop"
-    ".local/share/nvim"
-    ".local/state/nvim"
   ];
 }
