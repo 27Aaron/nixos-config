@@ -69,14 +69,13 @@ let
         inherit (inputs) disko preservation;
         nixosHardware = inputs.nixos-hardware;
       };
-      # The platform's Home Manager module stays first, like the hand-written
-      # configurations used to.
+      # The platform's Home Manager module stays first, and the platform modules
+      # reach the system through a single module's `imports`, so the collection
+      # order — and with it the order of packages in the system profile — matches
+      # the hand-written configurations this replaced.
       modules = [
         inputs.home-manager.nixosModules.home-manager
-      ]
-      ++ platformProfiles host
-      ++ host.modules
-      ++ [
+        { imports = platformProfiles host ++ host.modules; }
         ../modules/home
         (hostDefaults host)
         (homeManager host)
@@ -87,12 +86,10 @@ let
     host:
     inputs.nix-darwin.lib.darwinSystem {
       specialArgs = hostArgs host;
+      # Same shape as mkNixos: one module carrying the host's own modules.
       modules = [
         inputs.home-manager.darwinModules.home-manager
-      ]
-      ++ platformProfiles host
-      ++ host.modules
-      ++ [
+        { imports = platformProfiles host ++ host.modules; }
         ../modules/home
         (hostDefaults host)
         (homeManager host)
