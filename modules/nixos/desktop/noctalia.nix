@@ -19,7 +19,7 @@ in
 
     # Noctalia is configured from its own UI, so keep that state across
     # reboots instead of writing it declaratively.
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = ".config/noctalia";
         mode = "0700";

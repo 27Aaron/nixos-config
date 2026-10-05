@@ -60,7 +60,7 @@ in
     };
 
     # Tuigreet remembers the last user and session between logins.
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/var/cache/tuigreet";
         user = "greeter";

@@ -69,7 +69,7 @@ in
           - schema: rime_ice
     '';
 
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".config/fcitx5"
       ".local/share/fcitx5"
     ];

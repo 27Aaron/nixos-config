@@ -37,6 +37,8 @@ in
     desktop'.greetd.autoLogin = lib.mkIf config.desktop'.greetd.enable cfg.autoLogin;
 
     # Niri's configuration is edited on the host, so keep it across reboots.
-    preservation'.user.directories = [ ".config/niri" ];
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
+      ".config/niri"
+    ];
   };
 }
