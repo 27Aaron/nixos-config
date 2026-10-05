@@ -8,6 +8,13 @@ This repository is a Nix flake for NixOS and nix-darwin hosts. Keep the configur
 flake.nix
 flake.lock
 
+parts/                        # flake-parts modules
+├── default.nix               # what the Flake is made of
+├── host-options.nix          # schema for the host data files
+├── inventory.nix             # loads hosts, derives the supported systems
+├── configurations.nix        # contributes the systems to the Flake outputs
+└── dev.nix                   # formatter and development shell (treefmt-nix)
+
 hosts/
 ├── nixos/
 │   └── <name>/               # host data, plus host-local modules
@@ -37,7 +44,8 @@ modules/
 ```
 
 - `hosts/` contains one entry per machine: a data file describing the host, plus any modules specific to it.
-- `hosts/<platform>/<name>/default.nix` is **data, not a module**. It must define `system`, `stateVersion` and `profiles`; it may also define `timeZone`, `home`, `modules`, `hardware` and `homeStateVersion`. The platform is taken from the directory it lives in.
+- The Flake is assembled with flake-parts, which turns it into a module system; `parts/` holds those modules. `parts/host-options.nix` declares the schema for host data, `parts/inventory.nix` loads the hosts and derives the supported systems, `parts/configurations.nix` contributes the systems to the Flake outputs, and `parts/dev.nix` provides the formatter and dev shell.
+- `hosts/<platform>/<name>/default.nix` is **data, not a module**. It must define `system`, `stateVersion` and `profiles`; it may also define `timeZone`, `home`, `modules`, `hardware` and `homeStateVersion`. The allowed fields and their types are declared in `parts/host-options.nix`. The platform is taken from the directory it lives in.
 - `lib/hosts.nix` is the inventory: it loads and validates every host. `lib/configurations.nix` assembles the systems and applies the shared defaults (host platform, state version, effective time zone, Home Manager wiring), so a host only states what makes it different.
 - `profiles/<platform>/default.nix` maps a role name to a list of modules. Profiles may extend each other, so a host only names the roles it plays.
 - `profiles/home/default.nix` maps a name to Home Manager user modules; a host selects those with its `home` field.
