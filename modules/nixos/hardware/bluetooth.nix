@@ -10,11 +10,15 @@ in
   config = {
     hardware.bluetooth.enable = lib.mkIf cfg.enable true;
 
-    preservation'.os.directories = lib.mkIf (cfg.enable && config.hardware'.persistence.enable) [
-      {
-        directory = "/var/lib/bluetooth";
-        mode = "0700";
-      }
-    ];
+    # Pairings live on the ephemeral root, so keep them whenever Bluetooth is
+    # enabled, regardless of which module turned it on.
+    preservation'.os.directories =
+      lib.optionals (config.hardware'.persistence.enable && config.hardware.bluetooth.enable)
+        [
+          {
+            directory = "/var/lib/bluetooth";
+            mode = "0700";
+          }
+        ];
   };
 }
