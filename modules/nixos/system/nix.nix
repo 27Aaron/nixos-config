@@ -8,12 +8,12 @@
 
   programs.nh = {
     enable = true;
-    flake = lib.mkDefault "/home/${username}/nix-config";
+    flake = lib.mkDefault "/home/${username}/nixos-config";
   };
 
   preservation'.user.directories = [
     {
-      directory = "nix-config";
+      directory = "nixos-config";
       mode = "0700";
     }
   ];
