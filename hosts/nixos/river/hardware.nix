@@ -2,11 +2,18 @@
   config,
   lib,
   modulesPath,
+  nixosHardware,
   ...
 }:
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    nixosHardware.nixosModules.apple-t2
+
+    # Machine-level building blocks; the options below configure them.
+    ../../../modules/nixos/hardware/disko.nix
+    ../../../modules/nixos/hardware/persistence.nix
+    ../../../modules/nixos/hardware/boot/systemd-boot.nix
   ];
 
   boot.initrd.availableKernelModules = [
