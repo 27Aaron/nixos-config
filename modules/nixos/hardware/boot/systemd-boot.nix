@@ -14,7 +14,8 @@ in
   config = lib.mkIf cfg.enable {
     assertions = [
       {
-        assertion = !config.hardware'.grub.enable;
+        # Only meaningful when the GRUB module is in the configuration too.
+        assertion = !(config.hardware'.grub.enable or false);
         message = "hardware'.systemd-boot and hardware'.grub are mutually exclusive";
       }
     ];
