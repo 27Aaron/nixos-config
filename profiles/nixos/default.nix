@@ -26,6 +26,7 @@
     ../../modules/nixos/desktop/greetd.nix
     ../../modules/nixos/desktop/niri.nix
     ../../modules/nixos/desktop/noctalia.nix
+    ../../modules/nixos/desktop/themes.nix
   ];
 
   # Ephemeral tmpfs root backed by preservation, plus both boot loaders so the
