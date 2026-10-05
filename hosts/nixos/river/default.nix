@@ -10,6 +10,7 @@
     greetd.enable = true;
     niri.enable = true;
     noctalia.enable = true;
+    themes.enable = true;
   };
 
   security'.firewall.enable = true;
