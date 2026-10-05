@@ -33,4 +33,12 @@
     socat
     wget
   ];
+
+  # Tools that rewrite their own configuration or keep runtime state.
+  persist'.directories = [
+    # btop rewrites its config when settings change from the UI.
+    ".config/btop"
+    ".local/share/nvim"
+    ".local/state/nvim"
+  ];
 }

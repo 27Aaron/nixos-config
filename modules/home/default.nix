@@ -26,6 +26,7 @@
         ./common/development.nix
         ./common/git.nix
         ./common/kitty.nix
+        ./common/persist.nix
         ./common/shell.nix
         ./common/tools.nix
       ];

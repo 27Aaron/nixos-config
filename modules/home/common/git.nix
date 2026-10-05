@@ -43,4 +43,13 @@
     pkgs.gh
     pkgs.git-trim
   ];
+
+  # Runtime state: GitHub CLI accounts and lazygit's recent repositories.
+  persist'.directories = [
+    {
+      directory = ".config/gh";
+      mode = "0700";
+    }
+    ".local/state/lazygit"
+  ];
 }

@@ -81,6 +81,21 @@
     };
   };
 
+  # Runtime state of the shells and history tools above.
+  persist' = {
+    directories = [
+      ".local/share/fish"
+      ".local/share/zoxide"
+      {
+        directory = ".atuin";
+        mode = "0700";
+      }
+      ".local/share/atuin"
+    ];
+
+    files = [ ".zsh_history" ];
+  };
+
   home.shellAliases = {
     cc = "claude --dangerously-skip-permissions";
     cx = "codex --dangerously-bypass-approvals-and-sandbox";
