@@ -9,7 +9,7 @@ let
 in
 {
   options.desktop'.cursors = {
-    enable = lib.mkEnableOption "Bibata cursor theme";
+    enable = lib.mkEnableOption "the Rosé Pine cursor theme";
   };
 
   config = lib.mkIf cfg.enable {
@@ -19,14 +19,14 @@ in
 
     hm'.home.pointerCursor = {
       enable = true;
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Classic";
+      package = pkgs.rose-pine-cursor;
+      name = "BreezeX-RosePine-Linux";
       size = 24;
       gtk.enable = true;
     };
 
     # Cursor theme links managed by home.pointerCursor under ~/.icons.
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".icons"
     ];
   };
