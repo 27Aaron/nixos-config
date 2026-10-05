@@ -1,8 +1,6 @@
 {
-  config,
   nixosHardware,
   pkgs,
-  username,
   ...
 }:
 {
@@ -21,18 +19,6 @@
   environment.enableAllTerminfo = false;
 
   time.timeZone = "Asia/Tokyo";
-
-  preservation.preserveAt."/persistent".directories = [
-    {
-      # preservation auto-generates a matching rule for this path from
-      # users.users.<name>.{homeMode,group}; reference the same values
-      # here so the two definitions don't conflict.
-      directory = "/home/${username}";
-      user = username;
-      group = config.users.users.${username}.group;
-      mode = config.users.users.${username}.homeMode;
-    }
-  ];
 
   environment.systemPackages = with pkgs; [
     git
