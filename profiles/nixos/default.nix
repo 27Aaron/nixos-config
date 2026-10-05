@@ -14,12 +14,18 @@
     ../../modules/nixos/hardware/disable-balloon.nix
   ];
 
-  # What a desktop adds on top of the server set: network management and
-  # Bluetooth. Select both profiles on such a host. The user-facing modules come
-  # from the home profile.
+  # What a desktop adds on top of the server set: network management, Bluetooth
+  # and the Niri session with its greeter, shell and input method. Select both
+  # profiles on such a host. The user-facing modules come from the home profile.
   desktop = [
     ../../modules/nixos/services/networkmanager.nix
     ../../modules/nixos/hardware/bluetooth.nix
+    ../../modules/nixos/desktop/cursors.nix
+    ../../modules/nixos/desktop/fcitx5.nix
+    ../../modules/nixos/desktop/fonts.nix
+    ../../modules/nixos/desktop/greetd.nix
+    ../../modules/nixos/desktop/niri.nix
+    ../../modules/nixos/desktop/noctalia.nix
   ];
 
   # Ephemeral tmpfs root backed by preservation, plus both boot loaders so the
