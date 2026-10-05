@@ -7,6 +7,9 @@
 }:
 let
   cfg = config.hardware'.persistence;
+
+  # Home Manager tools report the state they keep through `persist'`.
+  persist = config.hm'.persist';
 in
 {
   imports = [
@@ -60,6 +63,8 @@ in
       ];
     };
 
+    # Baseline state every user needs. Feature-owned state is declared next to
+    # the feature itself and reaches this option through the `persist'` bridge.
     preservation'.user.directories = [
       {
         directory = ".cache";
@@ -72,7 +77,10 @@ in
         directory = ".gnupg";
         mode = "0700";
       }
-    ];
+    ]
+    ++ persist.directories;
+
+    preservation'.user.files = persist.files;
 
     systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
     systemd.services.systemd-machine-id-commit = {
