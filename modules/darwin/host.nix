@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   username,
   timeZone,
   hostName,
@@ -13,10 +12,7 @@
 
   system.primaryUser = username;
 
-  users.users.${username} = {
-    home = "/Users/${username}";
-    shell = lib.mkDefault pkgs.fish;
-  };
+  users.users.${username}.home = "/Users/${username}";
 
   networking = {
     hostName = hostName;
