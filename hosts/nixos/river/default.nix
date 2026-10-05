@@ -1,3 +1,4 @@
+# MacBook Pro 2018 13-inch (Intel Core i5-8259U, 8 GB RAM, 512 GB SSD)
 { ... }:
 {
   imports = [ ./hardware.nix ];
