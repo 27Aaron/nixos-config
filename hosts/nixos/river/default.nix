@@ -1,13 +1,15 @@
-{ ... }:
+{ profiles, ... }:
 {
-  imports = [
-    ../../../profiles/nixos/desktop.nix
-    ./hardware.nix
+  system = "x86_64-linux";
+  stateVersion = "26.05";
+  timeZone = "Asia/Tokyo";
+
+  profiles = with profiles.nixos; [
+    desktop
+    ephemeral-root
   ];
 
-  environment.enableAllTerminfo = false;
+  home = with profiles.home; [ common ];
 
-  time.timeZone = "Asia/Tokyo";
-
-  system.stateVersion = "26.05";
+  modules = [ ./hardware.nix ];
 }

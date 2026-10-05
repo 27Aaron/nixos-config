@@ -43,39 +43,32 @@
     }:
     let
       inherit (nixpkgs) lib;
+
       vars = import ./vars;
+      profiles = import ./profiles;
 
-      # Discover hosts from the directory tree.
-      hostLib = import ./lib/hosts.nix { inherit lib; };
+      # Hosts are discovered from hosts/<platform>/<name>, and each one is a
+      # small data file rather than a hand-written system configuration.
+      hosts = import ./lib/hosts.nix { inherit lib profiles vars; };
 
-      nixosHosts = hostLib.discover ./hosts/nixos;
-      darwinHosts = hostLib.discover ./hosts/darwin;
-
-      # Build each host from the module (or module list) in its directory.
-      mkNixosConfiguration =
-        hostName: host:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit disko preservation hostName;
-            nixosHardware = nixos-hardware;
-          }
-          // vars;
-          modules = [ home-manager.nixosModules.home-manager ] ++ lib.toList host;
+      configurations = import ./lib/configurations.nix {
+        inherit
+          lib
+          vars
+          profiles
+          hosts
+          ;
+        inputs = {
+          inherit
+            nixpkgs
+            nixos-hardware
+            disko
+            preservation
+            home-manager
+            nix-darwin
+            ;
         };
-
-      mkDarwinConfiguration =
-        hostName: host:
-        nix-darwin.lib.darwinSystem {
-          specialArgs = {
-            inherit hostName;
-          }
-          // vars;
-          modules = [
-            home-manager.darwinModules.home-manager
-            ./profiles/darwin
-          ]
-          ++ lib.toList host;
-        };
+      };
 
       forEachSystem = lib.genAttrs [
         "aarch64-darwin"
@@ -83,8 +76,7 @@
       ];
     in
     {
-      nixosConfigurations = lib.mapAttrs mkNixosConfiguration nixosHosts;
-      darwinConfigurations = lib.mapAttrs mkDarwinConfiguration darwinHosts;
+      inherit (configurations) nixosConfigurations darwinConfigurations;
 
       formatter = forEachSystem (
         system:

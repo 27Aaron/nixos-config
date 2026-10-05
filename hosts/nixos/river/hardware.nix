@@ -27,8 +27,11 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # The Apple T2 terminfo database is large; the SSH module would otherwise pull
+  # it in for the whole system.
+  environment.enableAllTerminfo = false;
 
   hardware'.bluetooth.enable = true;
   hardware'.systemd-boot.enable = true;
