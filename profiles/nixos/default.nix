@@ -1,5 +1,6 @@
 {
-  # Headless machine: base system plus remote access.
+  # Headless machine: base system plus remote access, intrusion prevention
+  # and compressed swap.
   server = [
     ../../modules/common/nix.nix
     ../../modules/nixos/system/core.nix
@@ -8,6 +9,9 @@
     ../../modules/nixos/security/firewall.nix
     ../../modules/nixos/services/openssh.nix
     ../../modules/nixos/services/vnstat.nix
+    ../../modules/nixos/services/fail2ban.nix
+    ../../modules/nixos/services/zram.nix
+    ../../modules/nixos/hardware/disable-balloon.nix
   ];
 
   # What a desktop adds on top of the server set: network management and
