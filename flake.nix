@@ -93,5 +93,20 @@
         }
       );
 
+      devShells = forEachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShellNoCC {
+            packages = with pkgs; [
+              deadnix
+              just
+              nixfmt-rs
+            ];
+          };
+        }
+      );
     };
 }
