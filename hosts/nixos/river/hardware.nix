@@ -36,9 +36,7 @@
       enable = true;
       version = "sonoma";
     };
-
-    # "latest" maps to linux_7_0, which nixpkgs has dropped as end-of-life.
-    kernelChannel = "stable";
+    kernelChannel = "latest";
   };
 
   hardware'.disko = {
