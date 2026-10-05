@@ -22,12 +22,6 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # The Apple T2 terminfo database is large; the SSH module would otherwise pull
-  # it in for the whole system.
-  environment.enableAllTerminfo = false;
-
   hardware'.bluetooth.enable = true;
   hardware'.systemd-boot.enable = true;
 
@@ -48,4 +42,10 @@
   };
 
   hardware'.persistence.enable = true;
+
+  # The T2 controller exposes a USB Ethernet device that never gets a link, so
+  # keep NetworkManager from retrying its automatic connection on every start.
+  networking.networkmanager.unmanaged = [ "interface-name:enp2s0f1u1" ];
+
+  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

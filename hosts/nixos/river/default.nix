@@ -4,10 +4,6 @@
 
   security'.firewall.enable = true;
 
-  # The T2 controller exposes a USB Ethernet device that never gets a link, so
-  # keep NetworkManager from retrying its automatic connection on every start.
-  networking.networkmanager.unmanaged = [ "interface-name:enp2s0f1u1" ];
-
   services' = {
     networkmanager.enable = true;
     openssh.enable = true;
