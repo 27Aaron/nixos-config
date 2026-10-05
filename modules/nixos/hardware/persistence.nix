@@ -8,8 +8,13 @@
 let
   cfg = config.hardware'.persistence;
 
-  # Home Manager tools report the state they keep through `persist'`.
-  persist = config.hm'.persist';
+  # Home Manager tools report the state they keep through `persist'`. A host
+  # that runs no Home Manager user modules leaves the bridge undefined.
+  persist =
+    config.hm'.persist' or {
+      directories = [ ];
+      files = [ ];
+    };
 in
 {
   imports = [
