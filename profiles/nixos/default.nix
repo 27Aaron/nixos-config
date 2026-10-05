@@ -1,35 +1,21 @@
-rec {
-  # Shared base every NixOS host gets.
-  base = [
+{
+  # Headless machine: base system plus remote access.
+  server = [
     ../../modules/common/nix.nix
     ../../modules/nixos/system/core.nix
     ../../modules/nixos/system/nix.nix
     ../../modules/nixos/system/shell.nix
-  ];
-
-  # Headless machine: remote access and network accounting.
-  server = base ++ [
     ../../modules/nixos/security/firewall.nix
-    ../../modules/nixos/services/networkmanager.nix
     ../../modules/nixos/services/openssh.nix
     ../../modules/nixos/services/vnstat.nix
-
-    {
-      security'.firewall.enable = true;
-      services' = {
-        networkmanager.enable = true;
-        openssh.enable = true;
-        vnstat.enable = true;
-      };
-    }
   ];
 
-  # Machine someone sits in front of; the user-facing modules come from the
-  # home profile.
-  desktop = server ++ [
+  # What a desktop adds on top of the server set: network management and
+  # Bluetooth. Select both profiles on such a host. The user-facing modules come
+  # from the home profile.
+  desktop = [
+    ../../modules/nixos/services/networkmanager.nix
     ../../modules/nixos/hardware/bluetooth.nix
-
-    { hardware'.bluetooth.enable = true; }
   ];
 
   # Ephemeral tmpfs root backed by preservation, plus both boot loaders so the
