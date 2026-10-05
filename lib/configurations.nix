@@ -20,7 +20,7 @@ let
     // {
       hostName = host.name;
       inherit host profiles;
-      timeZone = host.timeZone or vars.timeZone;
+      timeZone = if host.timeZone != null then host.timeZone else vars.timeZone;
     };
 
   hostDefaults = host: {

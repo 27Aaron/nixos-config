@@ -1,6 +1,6 @@
 # Host inventory. Each directory under hosts/<platform> describes one machine
-# with a small data file instead of an arbitrary module, so a host states what
-# it is and the flake decides how to build it.
+# with a small data file instead of an arbitrary module; parts/host-options.nix
+# declares the shape that data has to match.
 {
   lib,
   profiles,
@@ -24,14 +24,7 @@ let
     if missing != [ ] then
       throw "host ${platform}/${name}: missing required field(s): ${lib.concatStringsSep ", " missing}"
     else
-      host
-      // {
-        inherit name platform;
-        home = host.home or [ ];
-        modules = host.modules or [ ];
-        hardware = host.hardware or { };
-        homeStateVersion = host.homeStateVersion or "26.05";
-      };
+      host // { inherit name platform; };
 
   loadPlatform =
     platform:
