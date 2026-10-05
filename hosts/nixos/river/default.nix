@@ -3,6 +3,15 @@
 {
   imports = [ ./hardware.nix ];
 
+  desktop' = {
+    cursors.enable = true;
+    fcitx5.enable = true;
+    fonts.enable = true;
+    greetd.enable = true;
+    niri.enable = true;
+    noctalia.enable = true;
+  };
+
   security'.firewall.enable = true;
 
   services' = {
