@@ -3,7 +3,7 @@
 # evaluate.
 { lib, ... }:
 let
-  profileList = lib.types.listOf (lib.types.listOf lib.types.deferredModule);
+  profileNames = lib.types.listOf lib.types.str;
 in
 {
   options.hosts = lib.mkOption {
@@ -47,21 +47,21 @@ in
 
           profiles = {
             nixos = lib.mkOption {
-              type = profileList;
+              type = profileNames;
               default = [ ];
-              description = "NixOS modules this host plays, as a list of module lists.";
+              description = "Names of the NixOS profiles this host plays.";
             };
 
             darwin = lib.mkOption {
-              type = profileList;
+              type = profileNames;
               default = [ ];
-              description = "nix-darwin modules this host plays, as a list of module lists.";
+              description = "Names of the nix-darwin profiles this host plays.";
             };
 
             home = lib.mkOption {
-              type = profileList;
+              type = profileNames;
               default = [ ];
-              description = "Home Manager user modules for this host, as a list of module lists.";
+              description = "Names of the Home Manager profile sets this host plays.";
             };
           };
 

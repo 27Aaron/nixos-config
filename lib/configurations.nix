@@ -2,7 +2,8 @@
 #
 # A host only provides data; the defaults that are the same for every machine
 # (host platform, state version, effective time zone, Home Manager wiring) are
-# applied here.
+# applied here. Profile names are resolved against profiles/ here as well, so a
+# host file never imports anything and needs no arguments.
 {
   lib,
   vars,
@@ -13,16 +14,28 @@
 let
   flatten = builtins.concatLists;
 
+  resolve =
+    axis: names:
+    map (
+      name:
+      if axis ? ${name} then
+        axis.${name}
+      else
+        throw "unknown profile \"${name}\"; available: ${lib.concatStringsSep ", " (lib.attrNames axis)}"
+    ) names;
+
   # The host must name at least one profile for its own platform.
   platformProfiles =
     host:
     let
-      selected = host.profiles.${host.platform};
+      names = host.profiles.${host.platform};
     in
-    if selected == [ ] then
+    if names == [ ] then
       throw "host ${host.name}: profiles.${host.platform} is empty; name the roles the host plays"
     else
-      flatten selected;
+      flatten (resolve profiles.${host.platform} names);
+
+  homeProfiles = host: flatten (resolve profiles.home host.profiles.home);
 
   # Shared values first, then the per-host overrides on top of them.
   hostArgs =
@@ -45,7 +58,7 @@ let
       useUserPackages = true;
       backupFileExtension = "hm-bak";
       extraSpecialArgs = hostArgs host;
-      users.${vars.username}.imports = flatten host.profiles.home ++ [ ../modules/home/base.nix ];
+      users.${vars.username}.imports = homeProfiles host ++ [ ../modules/home/base.nix ];
     };
   };
 
