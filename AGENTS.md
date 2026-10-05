@@ -11,8 +11,7 @@ flake.lock
 hosts/
 ├── nixos/
 │   ├── common/
-│   ├── workstation/<hostname>/
-│   └── server/<hostname>/
+│   └── <hostname>/
 └── darwin/
     ├── common/
     └── <hostname>/
@@ -40,7 +39,7 @@ modules/
 ```
 
 - `hosts/` contains host entry points and host-specific configuration.
-- `hosts/nixos/server/` contains all NixOS servers, including VPS hosts.
+- `hosts/nixos/<hostname>/` contains each NixOS host. Servers and workstations share the same layout; express role differences through profiles.
 - `hosts/nixos/common/` and `hosts/darwin/common/` contain platform-wide configuration. They are not hosts themselves.
 - `profiles/` composes reusable roles such as server and platform defaults.
 - `modules/` contains reusable feature modules. Home Manager is embedded in the NixOS and nix-darwin configurations, so shared Home Manager modules belong under `modules/home/common/` and platform-specific modules belong under `modules/home/<platform>/`.
