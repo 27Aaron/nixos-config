@@ -10,43 +10,42 @@ flake.lock
 
 hosts/
 ├── nixos/
-│   ├── common/
-│   └── <hostname>/
+│   └── <name>/               # host data, plus host-local modules
 └── darwin/
-    ├── common/
-    └── <hostname>/
+    └── <name>/
 
 lib/
-└── hosts.nix                 # host discovery helper
+├── hosts.nix                 # host inventory: discovery and validation
+└── configurations.nix        # turns inventory entries into configurations
 
 vars/
 └── default.nix               # shared non-secret user values
 
 profiles/
-├── nixos/
-│   ├── server.nix
-│   └── desktop.nix
-└── darwin/
-    └── default.nix
+├── default.nix               # re-exports the profile sets below
+├── nixos/default.nix         # named role compositions for NixOS
+├── darwin/default.nix        # named role compositions for nix-darwin
+└── home/default.nix          # named Home Manager module sets
 
 modules/
 ├── nixos/
 ├── darwin/
 └── home/
-    ├── common/
-    ├── darwin/
-    └── nixos/
+    ├── base.nix              # baseline Home Manager user configuration
+    ├── common/               # Home Manager modules shared by both platforms
+    └── darwin/               # Home Manager modules that need nix-darwin or macOS
 ```
 
-- `hosts/` contains host entry points and host-specific configuration.
-- `hosts/nixos/<hostname>/` contains each NixOS host. Servers and workstations share the same layout; express role differences through profiles.
-- `hosts/nixos/common/` and `hosts/darwin/common/` contain platform-wide configuration. They are not hosts themselves.
-- `profiles/` composes reusable roles such as server and platform defaults.
+- `hosts/` contains one entry per machine: a data file describing the host, plus any modules specific to it.
+- `hosts/<platform>/<name>/default.nix` is **data, not a module**. It must define `system`, `stateVersion` and `profiles`; it may also define `timeZone`, `home`, `modules`, `hardware` and `homeStateVersion`. The platform is taken from the directory it lives in.
+- `lib/hosts.nix` is the inventory: it loads and validates every host. `lib/configurations.nix` assembles the systems and applies the shared defaults (host platform, state version, effective time zone, Home Manager wiring), so a host only states what makes it different.
+- `profiles/<platform>/default.nix` maps a role name to a list of modules. Profiles may extend each other, so a host only names the roles it plays.
+- `profiles/home/default.nix` maps a name to Home Manager user modules; a host selects those with its `home` field.
 - `modules/` contains reusable feature modules. Home Manager is embedded in the NixOS and nix-darwin configurations, so shared Home Manager modules belong under `modules/home/common/` and platform-specific modules belong under `modules/home/<platform>/`.
 - `modules/home/darwin/` contains Home Manager modules that depend on nix-darwin options or macOS applications, such as Karabiner and nh.
-- `lib/` contains the host discovery helper used by the Flake.
+- `lib/` contains the host inventory and the code that builds configurations from it.
 - `vars/` contains shared non-secret user values. Keep credentials and other secrets in the separate private repository.
-- Do not add `production`, `staging`, or `lab` directory layers until those environments require different behavior. Host metadata can be added later without changing the layout.
+- Group machines with profiles rather than directory layers. Do not add `production`, `staging`, or `lab` directories until those environments require different behavior.
 - Darwin currently targets `aarch64-darwin`; do not create architecture-specific directories or files for unsupported Darwin systems.
 
 ## Configuration boundaries
@@ -62,11 +61,25 @@ modules/
 
 The Flake discovers hosts from the directory tree instead of maintaining a second manual host list.
 
-- A host directory must contain a `default.nix` entry point returning a host module, or a list of modules.
-- Declare the host platform with `nixpkgs.hostPlatform` inside the host module; the Flake does not pass a `system` argument.
-- The directory name is the host name exposed as `nixosConfigurations.<hostname>` or `darwinConfigurations.<hostname>`.
-- Discovery must ignore `common/`, `profiles/`, `lib/`, and other non-host directories.
-- When adding a host, create its directory and entry point, import the appropriate profile, and let the discovery code expose it. Do not add a duplicate hand-written Flake entry.
+- Every directory under `hosts/<platform>/` is a host. The directory name is the host name exposed as `nixosConfigurations.<name>` or `darwinConfigurations.<name>`.
+- A host entry point is a data file, called with `{ lib, profiles, vars }`; write it as `{ profiles, ... }:`. It must return `system`, `stateVersion` and `profiles`, and `lib/hosts.nix` rejects a host that leaves one out.
+- `profiles` is a list of module lists, normally written as `with profiles.nixos; [ server desktop ]`. `home` works the same way for Home Manager modules.
+- Machine-specific modules, such as `hardware.nix`, are listed in the host's `modules` field.
+- The Flake does not pass a `system` argument; the host states its own platform.
+- Adding a host means creating `hosts/<platform>/<name>/default.nix` and nothing else — no hand-written Flake entry:
+
+  ```nix
+  { profiles, ... }:
+  {
+    system = "x86_64-linux";
+    stateVersion = "26.05";
+    timeZone = "Asia/Tokyo";
+
+    profiles = with profiles.nixos; [ server ];
+
+    modules = [ ./hardware.nix ];
+  }
+  ```
 
 ## Secrets
 
