@@ -22,6 +22,10 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
+  # enableAllTerminfo pulls rxvt-unicode-unwrapped in, which no longer builds
+  # with GCC 16 (its own lerp clashes with std::lerp), so keep it off.
+  environment.enableAllTerminfo = false;
+
   hardware'.bluetooth.enable = true;
   hardware'.systemd-boot.enable = true;
 
