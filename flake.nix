@@ -45,40 +45,36 @@
       inherit (nixpkgs) lib;
       vars = import ./vars;
 
-      # Discover host specifications from the directory tree.
+      # Discover hosts from the directory tree.
       hostLib = import ./lib/hosts.nix { inherit lib; };
 
       nixosHosts = hostLib.discover ./hosts/nixos;
       darwinHosts = hostLib.discover ./hosts/darwin;
 
-      # Build each host from its declared system and module list.
+      # Build each host from the module (or module list) in its directory.
       mkNixosConfiguration =
         hostName: host:
         nixpkgs.lib.nixosSystem {
-          system = host.system;
           specialArgs = {
             inherit disko preservation hostName;
             nixosHardware = nixos-hardware;
           }
-          // vars
-          // (host.specialArgs or { });
-          modules = [ home-manager.nixosModules.home-manager ] ++ host.modules;
+          // vars;
+          modules = [ home-manager.nixosModules.home-manager ] ++ lib.toList host;
         };
 
       mkDarwinConfiguration =
         hostName: host:
         nix-darwin.lib.darwinSystem {
-          system = host.system;
           specialArgs = {
             inherit hostName;
           }
-          // vars
-          // (host.specialArgs or { });
+          // vars;
           modules = [
             home-manager.darwinModules.home-manager
             ./profiles/darwin
           ]
-          ++ host.modules;
+          ++ lib.toList host;
         };
 
       forEachSystem = lib.genAttrs [
