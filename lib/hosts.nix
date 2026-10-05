@@ -13,6 +13,18 @@ let
     "profiles"
   ];
 
+  # Fields the inventory reads; everything else a host file says is applied as a
+  # module, so per-host switches can be written straight into the data file.
+  hostFields = [
+    "system"
+    "stateVersion"
+    "homeStateVersion"
+    "timeZone"
+    "profiles"
+    "imports"
+    "hardware"
+  ];
+
   loadHost =
     platform: name:
     let
@@ -24,7 +36,11 @@ let
     if missing != [ ] then
       throw "host ${platform}/${name}: missing required field(s): ${lib.concatStringsSep ", " missing}"
     else
-      host // { inherit name platform; };
+      lib.filterAttrs (field: _: builtins.elem field hostFields) host
+      // {
+        inherit name platform;
+        settings = builtins.removeAttrs host hostFields;
+      };
 
   loadPlatform =
     platform:

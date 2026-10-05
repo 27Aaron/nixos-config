@@ -75,7 +75,8 @@ let
       # the hand-written configurations this replaced.
       modules = [
         inputs.home-manager.nixosModules.home-manager
-        { imports = platformProfiles host ++ host.modules; }
+        { imports = platformProfiles host ++ host.imports; }
+        host.settings
         ../modules/home
         (hostDefaults host)
         (homeManager host)
@@ -89,7 +90,8 @@ let
       # Same shape as mkNixos: one module carrying the host's own modules.
       modules = [
         inputs.home-manager.darwinModules.home-manager
-        { imports = platformProfiles host ++ host.modules; }
+        { imports = platformProfiles host ++ host.imports; }
+        host.settings
         ../modules/home
         (hostDefaults host)
         (homeManager host)

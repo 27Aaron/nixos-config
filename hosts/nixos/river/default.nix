@@ -1,20 +1,14 @@
 { ... }:
 {
-  modules = [
-    ./hardware.nix
+  imports = [ ./hardware.nix ];
 
-    {
-      security'.firewall.enable = true;
+  security'.firewall.enable = true;
 
-      services' = {
-        networkmanager.enable = true;
-        openssh.enable = true;
-        vnstat.enable = true;
-      };
-    }
-  ];
-
-  timeZone = "Asia/Tokyo";
+  services' = {
+    networkmanager.enable = true;
+    openssh.enable = true;
+    vnstat.enable = true;
+  };
 
   profiles = {
     nixos = [
@@ -28,4 +22,5 @@
 
   system = "x86_64-linux";
   stateVersion = "26.05";
+  timeZone = "Asia/Tokyo";
 }

@@ -65,10 +65,16 @@ in
             };
           };
 
-          modules = lib.mkOption {
+          imports = lib.mkOption {
             type = lib.types.listOf lib.types.deferredModule;
             default = [ ];
-            description = "Modules that apply to this host only.";
+            description = "Modules that apply to this host only, imported alongside its profiles.";
+          };
+
+          settings = lib.mkOption {
+            type = lib.types.attrs;
+            default = { };
+            description = "Everything else in the host file, applied as a module. Filled in by the inventory, so hosts never set it themselves.";
           };
 
           hardware = lib.mkOption {
