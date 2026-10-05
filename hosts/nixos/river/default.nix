@@ -4,13 +4,11 @@
   imports = [ ./hardware.nix ];
 
   desktop' = {
-    cursors.enable = true;
     fcitx5.enable = true;
     fonts.enable = true;
     greetd.enable = true;
     niri.enable = true;
     noctalia.enable = true;
-    themes.enable = true;
   };
 
   security'.firewall.enable = true;
@@ -28,7 +26,10 @@
       "ephemeral-root"
     ];
 
-    home = [ "common" ];
+    home = [
+      "common"
+      "desktop"
+    ];
   };
 
   system = "x86_64-linux";

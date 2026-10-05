@@ -14,4 +14,15 @@
     ../../modules/home/darwin/karabiner.nix
     ../../modules/home/darwin/nh.nix
   ];
+
+  # Home Manager modules for a graphical desktop session: appearance and the
+  # user-facing applications. Mirrors the `desktop` role on the NixOS axis.
+  desktop = [
+    ../../modules/home/nixos/cursors.nix
+    ../../modules/home/nixos/firefox.nix
+    ../../modules/home/nixos/google-chrome.nix
+    ../../modules/home/nixos/telegram.nix
+    ../../modules/home/nixos/themes.nix
+    ../../modules/home/nixos/vscode.nix
+  ];
 }

@@ -15,18 +15,17 @@
   ];
 
   # What a desktop adds on top of the server set: network management, Bluetooth
-  # and the Niri session with its greeter, shell and input method. Select both
-  # profiles on such a host. The user-facing modules come from the home profile.
+  # and the Niri session with its greeter and input method. Select both profiles
+  # on such a host. The appearance and application modules come from the home
+  # profile.
   desktop = [
     ../../modules/nixos/services/networkmanager.nix
     ../../modules/nixos/hardware/bluetooth.nix
-    ../../modules/nixos/desktop/cursors.nix
     ../../modules/nixos/desktop/fcitx5.nix
     ../../modules/nixos/desktop/fonts.nix
     ../../modules/nixos/desktop/greetd.nix
     ../../modules/nixos/desktop/niri.nix
     ../../modules/nixos/desktop/noctalia.nix
-    ../../modules/nixos/desktop/themes.nix
   ];
 
   # Ephemeral tmpfs root backed by preservation, plus both boot loaders so the
