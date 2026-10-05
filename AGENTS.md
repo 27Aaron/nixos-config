@@ -63,8 +63,8 @@ modules/
 
 The Flake discovers hosts from the directory tree instead of maintaining a second manual host list.
 
-- A host directory must contain a `default.nix` entry point returning a host specification with `system` and `modules`, plus optional `specialArgs`.
-- Host modules belong in files such as `configuration.nix`; the host specification selects them through its `modules` list.
+- A host directory must contain a `default.nix` entry point returning a host module, or a list of modules.
+- Declare the host platform with `nixpkgs.hostPlatform` inside the host module; the Flake does not pass a `system` argument.
 - The directory name is the host name exposed as `nixosConfigurations.<hostname>` or `darwinConfigurations.<hostname>`.
 - Discovery must ignore `common/`, `profiles/`, `lib/`, and other non-host directories.
 - When adding a host, create its directory and entry point, import the appropriate profile, and let the discovery code expose it. Do not add a duplicate hand-written Flake entry.
