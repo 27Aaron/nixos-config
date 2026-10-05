@@ -7,8 +7,7 @@
     };
 
     nixos-hardware = {
-      # url = "github:NixOS/nixos-hardware";
-      url = "github:soopyc/nixos-hardware/apple-t2-updates";
+      url = "github:NixOS/nixos-hardware";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
