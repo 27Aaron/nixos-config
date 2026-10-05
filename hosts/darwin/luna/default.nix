@@ -4,10 +4,12 @@
   system = "aarch64-darwin";
   stateVersion = 6;
 
-  profiles = with profiles.darwin; [ workstation ];
+  profiles = {
+    darwin = with profiles.darwin; [ workstation ];
 
-  home = with profiles.home; [
-    common
-    darwin
-  ];
+    home = with profiles.home; [
+      common
+      darwin
+    ];
+  };
 }

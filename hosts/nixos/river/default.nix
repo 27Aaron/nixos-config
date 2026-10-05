@@ -4,12 +4,14 @@
   stateVersion = "26.05";
   timeZone = "Asia/Tokyo";
 
-  profiles = with profiles.nixos; [
-    desktop
-    ephemeral-root
-  ];
+  profiles = {
+    nixos = with profiles.nixos; [
+      desktop
+      ephemeral-root
+    ];
 
-  home = with profiles.home; [ common ];
+    home = with profiles.home; [ common ];
+  };
 
   modules = [ ./hardware.nix ];
 }

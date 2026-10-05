@@ -13,6 +13,17 @@
 let
   flatten = builtins.concatLists;
 
+  # The host must name at least one profile for its own platform.
+  platformProfiles =
+    host:
+    let
+      selected = host.profiles.${host.platform};
+    in
+    if selected == [ ] then
+      throw "host ${host.name}: profiles.${host.platform} is empty; name the roles the host plays"
+    else
+      flatten selected;
+
   # Shared values first, then the per-host overrides on top of them.
   hostArgs =
     host:
@@ -34,7 +45,7 @@ let
       useUserPackages = true;
       backupFileExtension = "hm-bak";
       extraSpecialArgs = hostArgs host;
-      users.${vars.username}.imports = flatten host.home ++ [ ../modules/home/base.nix ];
+      users.${vars.username}.imports = flatten host.profiles.home ++ [ ../modules/home/base.nix ];
     };
   };
 
@@ -50,7 +61,7 @@ let
       modules = [
         inputs.home-manager.nixosModules.home-manager
       ]
-      ++ flatten host.profiles
+      ++ platformProfiles host
       ++ host.modules
       ++ [
         ../modules/home
@@ -66,7 +77,7 @@ let
       modules = [
         inputs.home-manager.darwinModules.home-manager
       ]
-      ++ flatten host.profiles
+      ++ platformProfiles host
       ++ host.modules
       ++ [
         ../modules/home

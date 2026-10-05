@@ -1,5 +1,6 @@
 # Schema for the host data files under hosts/<platform>/<name>/default.nix.
-# A host that leaves a required field out fails to evaluate, naming the option.
+# A host that leaves a required field out, or misspells a profile axis, fails to
+# evaluate.
 { lib, ... }:
 let
   profileList = lib.types.listOf (lib.types.listOf lib.types.deferredModule);
@@ -44,15 +45,24 @@ in
             description = "Per-host time zone; the shared value is used when unset.";
           };
 
-          profiles = lib.mkOption {
-            type = profileList;
-            description = "Platform modules to import, as a list of module lists.";
-          };
+          profiles = {
+            nixos = lib.mkOption {
+              type = profileList;
+              default = [ ];
+              description = "NixOS modules this host plays, as a list of module lists.";
+            };
 
-          home = lib.mkOption {
-            type = profileList;
-            default = [ ];
-            description = "Home Manager user modules, as a list of module lists.";
+            darwin = lib.mkOption {
+              type = profileList;
+              default = [ ];
+              description = "nix-darwin modules this host plays, as a list of module lists.";
+            };
+
+            home = lib.mkOption {
+              type = profileList;
+              default = [ ];
+              description = "Home Manager user modules for this host, as a list of module lists.";
+            };
           };
 
           modules = lib.mkOption {
