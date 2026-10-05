@@ -32,9 +32,14 @@ in
 
     environment.enableAllTerminfo = lib.mkDefault true;
 
-    preservation'.os.directories = lib.mkIf persistenceEnabled [ "/etc/ssh" ];
-    preservation'.user = lib.mkIf persistenceEnabled {
-      directories = [
+    preservation' = lib.mkIf persistenceEnabled {
+      os.directories = [
+        {
+          directory = "/etc/ssh";
+          inInitrd = true;
+        }
+      ];
+      user.directories = [
         {
           directory = ".ssh";
           mode = "0700";
