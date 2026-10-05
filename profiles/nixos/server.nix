@@ -1,8 +1,10 @@
 {
   imports = [
     ../../modules/common/nix.nix
+    ../../modules/home
     ../../modules/nixos/system/core.nix
     ../../modules/nixos/system/nix.nix
+    ../../modules/nixos/system/shell.nix
     ../../modules/nixos/security/firewall.nix
     ../../modules/nixos/services/networkmanager.nix
     ../../modules/nixos/services/openssh.nix
