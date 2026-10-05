@@ -1,6 +1,5 @@
 {
   nixosHardware,
-  pkgs,
   ...
 }:
 {
@@ -19,11 +18,6 @@
   environment.enableAllTerminfo = false;
 
   time.timeZone = "Asia/Tokyo";
-
-  environment.systemPackages = with pkgs; [
-    git
-    vim
-  ];
 
   system.stateVersion = "26.05";
 }
