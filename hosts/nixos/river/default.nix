@@ -10,6 +10,9 @@
     vnstat.enable = true;
   };
 
+  # This host has no use for IPv6.
+  networking.enableIPv6 = false;
+
   profiles = {
     nixos = [
       "server"
