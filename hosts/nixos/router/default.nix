@@ -14,6 +14,7 @@
     vnstat.enable = true;
   };
 
+  environment.enableAllTerminfo = false;
   security'.firewall.enable = true;
 
   profiles = {
@@ -21,6 +22,7 @@
       "server"
       "ephemeral-root"
     ];
+    home = [ "common" ];
   };
 
   system = "x86_64-linux";
