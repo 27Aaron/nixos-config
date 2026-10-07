@@ -26,6 +26,7 @@
   hardware'.disko = {
     enable = true;
     device = "/dev/sda";
+    espSize = "256M";
     tmpfsSize = "512M";
   };
 

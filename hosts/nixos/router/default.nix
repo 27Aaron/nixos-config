@@ -1,4 +1,4 @@
-# Router - NixOS VM on Proxmox (4 vCPU, 1 GB RAM, 32 GB disk)
+# Router - NixOS VM on Proxmox (4 vCPU, 1 GB RAM, 20 GB disk)
 { ... }:
 {
   imports = [
@@ -6,14 +6,12 @@
     ./network.nix
   ];
 
-  # Avoid concurrent local builds exhausting the VM's 1 GB memory limit.
   nix.settings.max-jobs = 1;
 
   services' = {
     fail2ban.enable = true;
     openssh.enable = true;
     vnstat.enable = true;
-    zram.enable = true;
   };
 
   security'.firewall.enable = true;
