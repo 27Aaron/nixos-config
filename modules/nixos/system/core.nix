@@ -30,7 +30,7 @@
   time.timeZone = lib.mkDefault timeZone;
 
   documentation = {
-    man.cache.enable = false;
+    man.enable = false;
     nixos.enable = false;
   };
 }
