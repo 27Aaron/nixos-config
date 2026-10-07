@@ -1,10 +1,12 @@
-{ modulesPath, ... }:
+{ modulesPath, pkgs, ... }:
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
   ];
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_latest;
+
     # net.ifnames=0 gives the NIC a classic eth0 name; audit=0 silences the
     # kernel audit log, which is pure noise on a home router VM.
     kernelParams = [
