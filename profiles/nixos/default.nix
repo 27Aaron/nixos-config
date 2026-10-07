@@ -8,6 +8,7 @@
     ../../modules/nixos/system/shell.nix
     ../../modules/nixos/security/firewall.nix
     ../../modules/nixos/services/openssh.nix
+    ../../modules/nixos/services/dae.nix
     ../../modules/nixos/services/vnstat.nix
     ../../modules/nixos/services/fail2ban.nix
     ../../modules/nixos/services/zram.nix

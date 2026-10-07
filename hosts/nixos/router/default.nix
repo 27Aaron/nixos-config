@@ -9,6 +9,7 @@
   nix.settings.max-jobs = 1;
 
   services' = {
+    dae.enable = true;
     fail2ban.enable = true;
     openssh.enable = true;
     vnstat.enable = true;
