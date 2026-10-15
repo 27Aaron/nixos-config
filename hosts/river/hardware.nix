@@ -14,11 +14,6 @@
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
 
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-
     initrd = {
       # preservation 的硬性需求;同時讓 LUKS 的 crypttab 選項生效。
       systemd.enable = true;
