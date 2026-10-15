@@ -3,6 +3,8 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+    # 載入 .envrc 時隱藏環境變數差異清單(direnv.toml 的 hide_env_diff)。
+    config.global.hide_env_diff = true;
   };
 
   # 啟用 mise,但不在這裡管理它的全域工具版本。
