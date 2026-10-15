@@ -8,6 +8,7 @@
   imports = [
     ./disko.nix
     ./hardware.nix
+    ./persistence.nix
   ];
 
   networking.networkmanager.enable = true;
@@ -55,19 +56,6 @@
     git
     vim
   ];
-
-  preservation.enable = true;
-
-  preservation.preserveAt."/persistent" = {
-    directories = [
-      "/etc/NetworkManager/system-connections"
-      "/etc/ssh"
-      "/var/lib/AccountsService"
-      "/var/lib/nixos"
-      "/var/log"
-    ];
-    files = [ "/etc/machine-id" ];
-  };
 
   system.stateVersion = "26.05";
 }
