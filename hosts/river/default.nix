@@ -41,6 +41,7 @@
   services'.pipewire.enable = true;
   services'.power-profiles-daemon.enable = true;
   services'.upower.enable = true;
+  services'.zram.enable = true;
 
   hardware'.systemd-boot.enable = true;
   hardware'.amdgpu.enable = true;
