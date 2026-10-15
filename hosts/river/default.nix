@@ -8,7 +8,6 @@
   imports = [
     ./disko.nix
     ./hardware.nix
-    ./persistence.nix
   ];
 
   networking.networkmanager.enable = true;
@@ -46,6 +45,11 @@
       KbdInteractiveAuthentication = false;
     };
   };
+
+  hardware'.systemd-boot.enable = true;
+  hardware'.amdgpu.enable = true;
+  hardware'.bluetooth.enable = true;
+  hardware'.persistence.enable = true;
 
   environment.systemPackages = with pkgs; [
     git
