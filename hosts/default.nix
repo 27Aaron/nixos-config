@@ -28,10 +28,6 @@ let
         preservation.nixosModules.preservation
         home-manager.nixosModules.home-manager
         {
-          # 目錄名稱即為主機名稱。
-          networking.hostName = lib.mkDefault name;
-        }
-        {
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;

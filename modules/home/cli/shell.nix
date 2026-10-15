@@ -81,19 +81,35 @@
     };
   };
 
-  # 上述 shell 與歷史工具的執行時狀態。
+  # 上述 shell 與歷史工具的執行時狀態(fish 的狀態目錄由
+  # modules/core/fish.nix 持久化)。
   persist' = {
     directories = [
-      ".local/share/fish"
       ".local/share/zoxide"
       {
         directory = ".atuin";
         mode = "0700";
       }
       ".local/share/atuin"
+
+      # AI agents 的登入態與配置。
+      {
+        directory = ".claude";
+        mode = "0700";
+      }
+      {
+        directory = ".codex";
+        mode = "0700";
+      }
     ];
 
-    files = [ ".zsh_history" ];
+    files = [
+      ".zsh_history"
+      {
+        file = ".claude.json";
+        mode = "0600";
+      }
+    ];
   };
 
   home.shellAliases = {

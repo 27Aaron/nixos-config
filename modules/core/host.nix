@@ -22,6 +22,7 @@
       };
     };
 
+    # 主機名稱來自 hosts/<名稱> 目錄名,由 hosts/default.nix 以 specialArgs 傳入。
     networking.hostName = hostName;
 
     # 各設備在自身配置中覆寫此預設時區。

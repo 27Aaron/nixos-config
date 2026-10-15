@@ -1,6 +1,5 @@
 {
   config,
-  inputs,
   lib,
   vars,
   ...
@@ -18,9 +17,9 @@ let
     };
 in
 {
+  # preservation 模組本體由 hosts/default.nix 統一引入,
+  # 這裡只定義 preservation' 的選項別名。
   imports = [
-    inputs.preservation.nixosModules.default
-
     (lib.mkAliasOptionModule [ "preservation'" "os" ] [ "preservation" "preserveAt" "/persistent" ])
     (lib.mkAliasOptionModule
       [ "preservation'" "user" ]
@@ -33,10 +32,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    boot = {
-      initrd.systemd.enable = true;
-      tmp.cleanOnBoot = true;
-    };
+    # preservation 的 initrd 掛載(tmpfiles 規則)需要 systemd initrd。
+    boot.initrd.systemd.enable = true;
 
     # preservation 需要在 initrd 階段掛載持久分割區,才能讀到 machine-id。
     fileSystems."/persistent".neededForBoot = true;
@@ -104,18 +101,7 @@ in
 
     # systemd-machine-id-commit.service 會執行失敗,
     # 但對這種持久化 machine-id 的配置而言無關緊要,因此予以抑制。
+    # (bind 掛載配方;commit 式改寫僅適用於 symlink 配方。)
     systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
-
-    # 讓服務把臨時 ID 提交到持久卷。
-    systemd.services.systemd-machine-id-commit = {
-      unitConfig.ConditionPathIsMountPoint = [
-        ""
-        "/persistent/etc/machine-id"
-      ];
-      serviceConfig.ExecStart = [
-        ""
-        "systemd-machine-id-setup --commit --root /persistent"
-      ];
-    };
   };
 }

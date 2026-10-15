@@ -136,7 +136,8 @@ in
               ${dataPartitionName} = {
                 priority = 2;
                 size = "100%";
-                type = "8309";
+                # 8309 = Linux LUKS;無加密時為 8300 = Linux filesystem。
+                type = if cfg.luks.enable then "8309" else "8300";
                 content =
                   if cfg.luks.enable then
                     {

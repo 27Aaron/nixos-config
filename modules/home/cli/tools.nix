@@ -22,9 +22,8 @@
     jq
     ripgrep
 
-    # 開發與版本控制。
-    git
-    git-lfs
+    # 開發與版本控制(git、git-lfs 由 modules/home/cli/git.nix 的
+    # programs.git 提供)。
     just
 
     # 網路與診斷。
