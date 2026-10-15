@@ -38,6 +38,9 @@
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
+  services'.pipewire.enable = true;
+  services'.power-profiles-daemon.enable = true;
+  services'.upower.enable = true;
 
   hardware'.systemd-boot.enable = true;
   hardware'.amdgpu.enable = true;
