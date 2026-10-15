@@ -24,14 +24,6 @@
         "nix-command"
         "flakes"
       ];
-      extra-substituters = [
-        "https://cache.soopy.moe"
-        "https://cache.numtide.com"
-      ];
-      extra-trusted-public-keys = [
-        "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
-        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-      ];
       trusted-users = [ vars.username ];
     };
   };
