@@ -1,6 +1,5 @@
 {
   pkgs,
-  vars,
   ...
 }:
 
@@ -12,29 +11,12 @@
 
   time.timeZone = "Asia/Tokyo";
 
-  i18n.defaultLocale = "en_US.UTF-8";
+  core'.firewall.enable = true;
 
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
-  # 根檔案系統為揮發性的 tmpfs,密碼必須由配置宣告。
-  users.mutableUsers = false;
-
-  users.users.${vars.username} = {
-    isNormalUser = true;
-    description = vars.fullName;
-    hashedPassword = vars.hashedPassword;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
-  };
-
-  # root 僅允許金鑰登入,供救援使用。
-  users.users.root.openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
+  hardware'.systemd-boot.enable = true;
+  hardware'.amdgpu.enable = true;
+  hardware'.bluetooth.enable = true;
+  hardware'.persistence.enable = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
@@ -42,11 +24,9 @@
   services'.power-profiles-daemon.enable = true;
   services'.upower.enable = true;
   services'.zram.enable = true;
-
-  hardware'.systemd-boot.enable = true;
-  hardware'.amdgpu.enable = true;
-  hardware'.bluetooth.enable = true;
-  hardware'.persistence.enable = true;
+  services'.btrfs-scrub.enable = true;
+  services'.smartd.enable = true;
+  services'.btrbk.enable = true;
 
   environment.systemPackages = with pkgs; [
     git
