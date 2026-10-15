@@ -13,24 +13,12 @@
 
   nix = {
     channel.enable = false;
-    gc = {
-      automatic = lib.mkDefault true;
-      options = lib.mkDefault "--delete-older-than 7d";
-    };
     optimise.automatic = true;
     settings = {
       builders-use-substitutes = true;
       experimental-features = [
         "nix-command"
         "flakes"
-      ];
-      extra-substituters = [
-        "https://cache.soopy.moe"
-        "https://cache.numtide.com"
-      ];
-      extra-trusted-public-keys = [
-        "cache.soopy.moe-1:0RZVsQeR+GOh0VQI9rvnHz55nVXkFardDqfm4+afjPo="
-        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
       ];
       trusted-users = [ vars.username ];
     };
@@ -40,7 +28,13 @@
 
   programs.nh = {
     enable = true;
-    flake = lib.mkDefault "/home/aaron/nixos-config";
+    flake = lib.mkDefault "/home/${vars.username}/nixos-config";
+
+    # 週期清理取代 nix.gc;兩者同開會觸發 nh 模組的衝突警告。
+    clean = {
+      enable = lib.mkDefault true;
+      extraArgs = lib.mkDefault "--keep 8 --keep-since 14d";
+    };
   };
 
   # nh 讀取的配置倉庫目錄。
