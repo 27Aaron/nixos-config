@@ -5,18 +5,12 @@
 
 {
   imports = [
-    ./disko.nix
     ./hardware.nix
   ];
 
   time.timeZone = "Asia/Tokyo";
 
   core'.firewall.enable = true;
-
-  hardware'.systemd-boot.enable = true;
-  hardware'.amdgpu.enable = true;
-  hardware'.bluetooth.enable = true;
-  hardware'.persistence.enable = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;

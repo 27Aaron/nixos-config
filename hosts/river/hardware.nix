@@ -40,6 +40,18 @@
     kernelParams = [ "resume_offset=269568" ];
   };
 
+  hardware'.disko = {
+    enable = true;
+    device = "/dev/disk/by-id/nvme-CT1000P3PSSD8_24364AD5D8E0";
+    espSize = "1G";
+    swapSize = "32769M";
+    luks.enable = true;
+  };
+  hardware'.systemd-boot.enable = true;
+  hardware'.amdgpu.enable = true;
+  hardware'.bluetooth.enable = true;
+  hardware'.persistence.enable = true;
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
