@@ -66,7 +66,13 @@
       "/var/lib/nixos"
       "/var/log"
     ];
-    files = [ "/etc/machine-id" ];
+    files = [
+      {
+        # Needs to be available very early, per preservation's docs.
+        file = "/etc/machine-id";
+        inInitrd = true;
+      }
+    ];
   };
 
   system.stateVersion = "26.05";
