@@ -36,6 +36,12 @@ let
             useGlobalPkgs = true;
             useUserPackages = true;
             backupFileExtension = "hm-bak";
+
+            # NixOS 的 specialArgs 不會自動傳入 Home Manager 模組,需顯式轉交。
+            extraSpecialArgs = {
+              inherit inputs;
+              vars = import ../vars;
+            };
           };
         }
         ./${name}

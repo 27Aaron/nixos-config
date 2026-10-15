@@ -1,6 +1,7 @@
 {
   username = "aaron";
   fullName = "Aaron";
+  email = "85681241+27Aaron@users.noreply.github.com";
 
   # 由 mkpasswd -m yescrypt 生成
   hashedPassword = "$y$j9T$ssZgTIeq9iObnQ5SWCLoN0$rVag2jJiBbEOgeYcphtYPZ5pbTvpF1ukKcdMBkDK0z0";
