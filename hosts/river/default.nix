@@ -1,7 +1,4 @@
-{
-  pkgs,
-  ...
-}:
+{ ... }:
 
 {
   imports = [
@@ -21,11 +18,6 @@
   services'.btrfs-scrub.enable = true;
   services'.smartd.enable = true;
   services'.btrbk.enable = true;
-
-  environment.systemPackages = with pkgs; [
-    git
-    vim
-  ];
 
   system.stateVersion = "26.05";
 }

@@ -8,6 +8,14 @@
 let
   cfg = config.hardware'.persistence;
   user = vars.username;
+
+  # Home Manager 工具經由 persist' 回報它們保留的狀態。
+  # 沒有載入任何 Home Manager 模組的主機,此橋接為空。
+  persist =
+    config.hm'.persist' or {
+      directories = [ ];
+      files = [ ];
+    };
 in
 {
   imports = [
@@ -41,8 +49,8 @@ in
       ];
     };
 
-    # 每台主機的基礎使用者狀態;功能自身的狀態由各自的模組宣告,
-    # Home Manager 工具日後可再經由 persist' 回報。
+    # 基礎使用者狀態;Home Manager 工具經由 persist'
+    # 回報的狀態會附加在後。
     preservation'.user.directories = [
       # 把快取移出 tmpfs 根目錄,避免佔用過多記憶體。
       {
@@ -60,7 +68,10 @@ in
         directory = ".gnupg";
         mode = "0700";
       }
-    ];
+    ]
+    ++ persist.directories;
+
+    preservation'.user.files = persist.files;
 
     # 基礎系統所需的通用 NixOS 狀態。
     preservation'.os = {
