@@ -1,57 +1,40 @@
-# Default host is the machine's own hostname.
+# 預設主機為本機的主機名稱。
 host := env("HOST", `hostname -s`)
 
-# List available recipes.
+# 列出所有可用的配方。
 default:
     @just --list
 
-# Format all Nix files.
+# 格式化所有 Nix 檔案。
 fmt:
     @nix fmt .
 
-# Check dead code, evaluate every host, and fail if formatting is off.
-# Note: treefmt has no read-only mode, so it reformats files in place first.
+# 檢查格式與死碼,並求值所有主機。
 check:
-    @nix fmt . -- --fail-on-change
+    @nix fmt . -- --check
     @deadnix --fail .
     @nix flake check --no-build --all-systems
 
-# Build a host configuration without activating it.
-[macos]
-build target=host:
-    @darwin-rebuild build --flake .#{{target}}
-
-[linux]
+# 建置主機設定,不啟用。
 build target=host:
     @nixos-rebuild build --flake .#{{target}}
 
-# Build and activate a host configuration.
-[macos]
-switch target=host:
-    @nh darwin switch path:. -H {{target}}
-
-[linux]
+# 建置並啟用主機設定。
 switch target=host:
     @nh os switch path:. -H {{target}}
 
-# Deploy a remote NixOS host, building locally.
-[linux]
+# 部署遠端 NixOS 主機,於本機建置。
 deploy target remote:
     @nixos-rebuild switch --flake .#{{target}} --target-host {{remote}}
 
-# Update all flake inputs.
+# 更新所有 flake 輸入。
 update:
     @nix flake update
 
-# Update a single flake input.
+# 更新單一 flake 輸入。
 update-input input:
     @nix flake update {{input}}
 
-# Clean old generations and unreachable store paths.
+# 清理舊的 generations 與不再被引用的 store 路徑。
 gc:
     @nh clean all --keep 8 --keep-since 14d --ask
-
-# Install nix-darwin on a fresh macOS host.
-[macos]
-install target=host:
-    @sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake path:.#{{target}}

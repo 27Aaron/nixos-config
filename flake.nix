@@ -24,7 +24,6 @@
 
   outputs =
     inputs@{
-      self,
       nixpkgs,
       ...
     }:
