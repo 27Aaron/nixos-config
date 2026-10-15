@@ -10,8 +10,6 @@
     ./hardware.nix
   ];
 
-  networking.networkmanager.enable = true;
-
   time.timeZone = "Asia/Tokyo";
 
   i18n.defaultLocale = "en_US.UTF-8";
@@ -38,13 +36,8 @@
   # root 僅允許金鑰登入,供救援使用。
   users.users.root.openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-  };
+  services'.openssh.enable = true;
+  services'.networkmanager.enable = true;
 
   hardware'.systemd-boot.enable = true;
   hardware'.amdgpu.enable = true;
