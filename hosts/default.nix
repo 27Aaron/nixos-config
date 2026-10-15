@@ -1,7 +1,9 @@
 {
+  inputs,
   nixpkgs,
   disko,
   preservation,
+  home-manager,
   ...
 }:
 
@@ -16,14 +18,25 @@ let
     name: _:
     lib.nixosSystem {
       specialArgs = {
+        hostName = name;
+        inherit inputs;
         vars = import ../vars;
       };
       modules = [
+        ../modules
         disko.nixosModules.default
         preservation.nixosModules.preservation
+        home-manager.nixosModules.home-manager
         {
-          # The directory name is the hostname.
+          # 目錄名稱即為主機名稱。
           networking.hostName = lib.mkDefault name;
+        }
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            backupFileExtension = "hm-bak";
+          };
         }
         ./${name}
       ];

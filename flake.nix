@@ -33,6 +33,12 @@
         "aarch64-darwin"
       ] (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
 
-      nixosConfigurations = import ./hosts inputs;
+      nixosConfigurations = import ./hosts {
+        inputs = inputs;
+        nixpkgs = inputs.nixpkgs;
+        disko = inputs.disko;
+        preservation = inputs.preservation;
+        home-manager = inputs.home-manager;
+      };
     };
 }
