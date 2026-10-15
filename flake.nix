@@ -1,25 +1,9 @@
 {
-  description = "Aaron's Nix configuration";
+  description = "Aaron's NixOS configuration";
 
   inputs = {
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-unstable";
-    };
-
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixos-hardware = {
-      # url = "github:NixOS/nixos-hardware";
-      url = "github:soopyc/nixos-hardware/apple-t2-updates";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     disko = {
@@ -35,16 +19,20 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ ./parts ];
+    inputs@{
+      self,
+      nixpkgs,
+      ...
+    }:
+    {
+      formatter = nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ] (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
+
+      nixosConfigurations = import ./hosts inputs;
     };
 }
