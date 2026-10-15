@@ -7,7 +7,7 @@ let
   user = vars.username;
 in
 {
-  # Preservation needs the persistent storage in the initrd for machine-id.
+  # preservation 需要在 initrd 階段掛載持久分割區,才能讀到 machine-id。
   fileSystems."/persistent".neededForBoot = true;
 
   preservation = {
@@ -30,7 +30,7 @@ in
         "/var/lib/lastlog"
         "/var/lib/systemd"
         {
-          # Systemd-managed state of dynamic users (StateDirectory services).
+          # 動態使用者的 systemd 狀態(StateDirectory 服務)。
           directory = "/var/lib/private";
           mode = "0700";
         }
@@ -43,7 +43,7 @@ in
 
       files = [
         {
-          # Needs to be populated/read very early.
+          # 需要在極早期寫入或讀取。
           file = "/etc/machine-id";
           inInitrd = true;
         }
@@ -65,7 +65,7 @@ in
     };
   };
 
-  # systemd-machine-id-commit.service would fail against the bind-mounted
-  # persistent machine-id, which is not relevant in this setup.
+  # systemd-machine-id-commit.service 對 bind mount 的持久 machine-id 會
+  # 執行失敗,在此配置中無關緊要,故予以抑制。
   systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
 }

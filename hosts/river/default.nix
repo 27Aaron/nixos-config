@@ -22,7 +22,7 @@
     "flakes"
   ];
 
-  # The root filesystem is volatile; passwords must come from configuration.
+  # 根檔案系統為揮發性的 tmpfs,密碼必須由配置宣告。
   users.mutableUsers = false;
 
   users.users.${vars.username} = {
@@ -36,7 +36,7 @@
     openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
   };
 
-  # Key-only root login for rescue access.
+  # root 僅允許金鑰登入,供救援使用。
   users.users.root.openssh.authorizedKeys.keys = vars.sshAuthorizedKeys;
 
   services.openssh = {
@@ -46,11 +46,6 @@
       KbdInteractiveAuthentication = false;
     };
   };
-
-  #   services.xserver.enable = true;
-  #
-  #   services.displayManager.gdm.enable = true;
-  #   services.desktopManager.gnome.enable = true;
 
   environment.systemPackages = with pkgs; [
     git

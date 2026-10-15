@@ -20,7 +20,7 @@
     };
 
     initrd = {
-      # Required by preservation; also makes LUKS crypttab options take effect.
+      # preservation 的硬性需求;同時讓 LUKS 的 crypttab 選項生效。
       systemd.enable = true;
 
       availableKernelModules = [
@@ -36,11 +36,13 @@
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
 
-    # Hibernation: after installation, get the offset with
-    #   filefrag -v /swap/swapfile | awk '$1=="0:" {gsub("\\.", "", $4); print $4}'
-    # then fill it in below.
-    # resumeDevice = "/dev/mapper/crypted";
-    # kernelParams = [ "resume_offset=N" ];
+    # 休眠:從 LUKS 加密的 swapfile 恢復。偏移量是 /swap/swapfile 在設備上
+    # 以 4K 塊計的物理起點。若 swapfile 被搬動過(btrfs balance/defrag、重建),
+    # 用以下命令重新測量:
+    #   sudo "$(nix build nixpkgs#e2fsprogs --no-link --print-out-paths | head -1)/bin/filefrag" \
+    #     -v /swap/swapfile | awk '$1=="0:" {gsub("\\.", "", $4); print $4}'
+    resumeDevice = "/dev/mapper/crypted";
+    kernelParams = [ "resume_offset=269568" ];
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
