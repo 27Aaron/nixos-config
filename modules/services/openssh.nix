@@ -36,7 +36,16 @@ in
       };
     };
 
-    preservation'.os.directories = [ "/etc/ssh" ];
+    # 只持久化主機金鑰本身。持久化整個 /etc/ssh 目錄會在開機掛載後遮住
+    # NixOS 生成的 sshd_config 與 authorized_keys.d,使 sshd 無法認證;
+    # 配方取自 preservation 的 impermanence 遷移指南。
+    preservation'.os.files = [
+      {
+        file = "/etc/ssh/ssh_host_ed25519_key";
+        how = "symlink";
+        configureParent = true;
+      }
+    ];
 
     # 客戶端金鑰與 known_hosts;sshd 也會從這裡讀取 authorized_keys。
     preservation'.user.directories = [

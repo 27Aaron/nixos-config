@@ -44,13 +44,14 @@
       kernelModules = [ ];
     };
 
-    # 休眠:從 LUKS 加密的 swapfile 恢復。偏移量是 /swap/swapfile 在設備上
-    # 以 4K 塊計的物理起點。若 swapfile 被搬動過(btrfs balance/defrag、重建),
-    # 用以下命令重新測量:
-    #   sudo "$(nix build nixpkgs#e2fsprogs --no-link --print-out-paths | head -1)/bin/filefrag" \
-    #     -v /swap/swapfile | awk '$1=="0:" {gsub("\\.", "", $4); print $4}'
+    # 休眠:從 LUKS 加密的 swapfile 恢復。偏移量是 /swap/swapfile 的物理頁起點。
+    # Btrfs 上 filefrag 回報的是虛擬位址而非物理偏移,不可使用;必須用以下
+    # 命令測量(Arch Wiki: Acquire swap file offset)。swapfile 重建或 balance
+    # 過後數值會改變,需重新測量:
+    #   sudo btrfs inspect-internal map-swapfile -r /swap/swapfile
+    # 2026-10-15 實測為 533760(舊值 269568 為 filefrag 誤測,已更正)。
     resumeDevice = "/dev/mapper/crypted";
-    kernelParams = [ "resume_offset=269568" ];
+    kernelParams = [ "resume_offset=533760" ];
   };
 
   # 韌體與週邊驅動。
