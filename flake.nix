@@ -27,11 +27,30 @@
       nixpkgs,
       ...
     }:
-    {
-      formatter = nixpkgs.lib.genAttrs [
+    let
+      systems = [
         "x86_64-linux"
         "aarch64-darwin"
-      ] (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs systems;
+    in
+    {
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
+
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.deadnix
+              pkgs.nixfmt-rs
+            ];
+          };
+        }
+      );
 
       nixosConfigurations = import ./hosts {
         inputs = inputs;
