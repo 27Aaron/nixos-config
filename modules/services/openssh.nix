@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   ...
 }:
@@ -7,10 +8,7 @@ let
   cfg = config.services'.openssh;
 
   # 客戶端的主機別名清單,來自 nix-secrets。不含金鑰,可直接引用。
-  # secrets 由 hosts/default.nix 以 specialArgs 傳入。模組系統在參數未提供時
-  # 會改查 config._module.args,因此從這裡讀取;尚未接入,或檔案不存在時跳過。
-  secrets = config._module.args.secrets or null;
-  sshConfig = if secrets == null then null else "${secrets}/openssh/config";
+  sshConfig = inputs.secrets + "/openssh/config";
 in
 {
   options.services'.openssh = {
@@ -18,7 +16,7 @@ in
   };
 
   config = lib.mkMerge [
-    (lib.mkIf (sshConfig != null && builtins.pathExists sshConfig) {
+    (lib.mkIf (builtins.pathExists sshConfig) {
       hm'.home.file.".ssh/config".source = sshConfig;
     })
 
