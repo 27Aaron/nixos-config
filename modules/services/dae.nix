@@ -3,17 +3,22 @@
   inputs,
   lib,
   pkgs,
-  hostName,
   ...
 }:
 let
   cfg = config.services'.dae;
 
-  # 節點與訂閱含憑據,單獨加密。dae 只允許 include 入口配置所在目錄下的
-  # 檔案,因此把各片段歸集到同一目錄再交給 dae。
-  nodeFile = "${inputs.secrets}/hosts/${hostName}/node.dae";
+  # 節點、訂閱與出口組的憑據在 nix-secrets 的 services/dae.yaml,以同名鍵存放。
+  # sops 逐鍵解密為 .dae,並與其他片段歸集到同一目錄供 dae include。
+  secretFile = "${inputs.secrets}/services/dae.yaml";
 
-  configDir = pkgs.linkFarm "dae-config" [
+  secretFragments = [
+    "node"
+    "subscription"
+    "group"
+  ];
+
+  configEntries = [
     {
       name = "config.dae";
       path = pkgs.writeText "config.dae" ''
@@ -104,11 +109,13 @@ let
         }
       '';
     }
-    {
-      name = "config.d/node.dae";
-      path = config.sops.secrets."node.dae".path;
-    }
-  ];
+  ]
+  ++ map (name: {
+    name = "config.d/${name}.dae";
+    path = config.sops.secrets."${name}.dae".path;
+  }) secretFragments;
+
+  configDir = pkgs.linkFarm "dae-config" configEntries;
 in
 {
   options.services'.dae = {
@@ -119,15 +126,15 @@ in
     # 解密依賴 core'.sops 提供的 age 私鑰。
     core'.sops.enable = true;
 
-    sops.secrets."node.dae" = {
-      sopsFile = nodeFile;
-      format = "binary";
-    };
+    sops.secrets = lib.genAttrs (map (name: "${name}.dae") secretFragments) (name: {
+      sopsFile = secretFile;
+      key = lib.removeSuffix ".dae" name;
+    });
 
     services.dae = {
       enable = true;
       package = pkgs.dae;
-      configFile = "${configDir}/config.dae";
+      configFile = "${configDir.outPath}/config.dae";
 
       openFirewall = {
         enable = true;
@@ -135,18 +142,17 @@ in
       };
     };
 
-    # 上游以 LoadCredential 把入口配置複製進憑據目錄,並從那裡啟動。但該目錄
-    # 只有 config.dae,而 include 按入口檔案所在目錄解析 config.d。改為直接讀取
-    # 歸集後的配置目錄,validate 與 run 都要一起改。
+    # 上游只把入口配置複製進憑據目錄,include 的 config.d 會找不到。改為直接讀取
+    # 歸集後的目錄,validate 與 run 一起改。
     systemd.services.dae.serviceConfig = {
       LoadCredential = lib.mkForce [ ];
       ExecStartPre = lib.mkForce [
         ""
-        "${lib.getExe pkgs.dae} validate -c ${configDir}/config.dae"
+        "${lib.getExe pkgs.dae} validate -c ${configDir.outPath}/config.dae"
       ];
       ExecStart = lib.mkForce [
         ""
-        "${lib.getExe pkgs.dae} run --disable-timestamp -c ${configDir}/config.dae"
+        "${lib.getExe pkgs.dae} run --disable-timestamp -c ${configDir.outPath}/config.dae"
       ];
     };
   };
