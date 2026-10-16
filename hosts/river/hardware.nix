@@ -48,8 +48,7 @@
     # Btrfs 上 filefrag 回報的是虛擬位址而非物理偏移,不可使用;必須用以下
     # 命令測量(Arch Wiki: Acquire swap file offset)。swapfile 重建或 balance
     # 過後數值會改變,需重新測量:
-    #   sudo btrfs inspect-internal map-swapfile -r /swap/swapfile
-    # 2026-10-15 實測為 533760(舊值 269568 為 filefrag 誤測,已更正)。
+    # sudo btrfs inspect-internal map-swapfile -r /swap/swapfile
     resumeDevice = "/dev/mapper/crypted";
     kernelParams = [ "resume_offset=533760" ];
   };
