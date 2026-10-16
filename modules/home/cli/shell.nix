@@ -91,30 +91,14 @@
         mode = "0700";
       }
       ".local/share/atuin"
-
-      # AI agents 的登入態與配置。
-      {
-        directory = ".claude";
-        mode = "0700";
-      }
-      {
-        directory = ".codex";
-        mode = "0700";
-      }
     ];
 
     files = [
       ".zsh_history"
-      {
-        file = ".claude.json";
-        mode = "0600";
-      }
     ];
   };
 
   home.shellAliases = {
-    cc = "claude --dangerously-skip-permissions";
-    cx = "codex --dangerously-bypass-approvals-and-sandbox";
     ll = "eza -lah";
     gs = "git status";
   };
