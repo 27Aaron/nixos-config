@@ -11,6 +11,7 @@
   desktop'.niri.enable = true;
   desktop'.niri.autoLogin = true;
   desktop'.fcitx5.enable = true;
+  desktop'.noctalia.enable = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
