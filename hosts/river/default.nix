@@ -12,6 +12,7 @@
   desktop'.niri.autoLogin = true;
   desktop'.fcitx5.enable = true;
   desktop'.noctalia.enable = true;
+  desktop'.fonts.enable = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
