@@ -84,6 +84,11 @@ in
           directory = "/var/lib/private";
           mode = "0700";
         }
+        # 容器與虛擬機器映像。
+        {
+          directory = "/var/lib/machines";
+          mode = "0700";
+        }
         "/var/log"
         {
           directory = "/var/tmp";
@@ -98,6 +103,12 @@ in
         }
       ];
     };
+
+    # preservation 已建立並掛載 /var/lib/lastlog,遮住 lastlog2 套件
+    # 針對同一目錄的 tmpfiles 規則,避免兩者衝突。
+    environment.etc."tmpfiles.d/lastlog2-tmpfiles.conf".text = ''
+      # Managed by Preservation.
+    '';
 
     # systemd-machine-id-commit.service 會執行失敗,
     # 但對這種持久化 machine-id 的配置而言無關緊要,因此予以抑制。

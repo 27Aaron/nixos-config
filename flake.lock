@@ -191,7 +191,46 @@
         "llm-agents": "llm-agents",
         "nagram": "nagram",
         "nixpkgs": "nixpkgs_2",
-        "preservation": "preservation"
+        "preservation": "preservation",
+        "secrets": "secrets",
+        "sops-nix": "sops-nix"
+      }
+    },
+    "secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786003969,
+        "narHash": "sha256-46DGBOWq0AjoYgqBwOZqGHLRWl/B+AY0No/+vZix0Rw=",
+        "ref": "refs/heads/main",
+        "rev": "a1c09f2e93a2fc81569301956f03f81472b7e56e",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/27Aaron/nix-secrets.git"
+      },
+      "original": {
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/27Aaron/nix-secrets.git"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792056300,
+        "narHash": "sha256-YU1LjDe1o2Ymg5zEiCHbmMXLkDCtxHQRiVqZ3nC5GGk=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "44931708c62937c2b1bf7953902989fa5bb9ee1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
       }
     },
     "systems": {

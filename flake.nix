@@ -26,8 +26,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nagram = {
       url = "github:NextAlone/Nagram-Qt";
+    };
+
+    secrets = {
+      url = "git+ssh://git@github.com/27Aaron/nix-secrets.git?shallow=1";
+      flake = false;
     };
   };
 
@@ -67,6 +77,7 @@
         disko = inputs.disko;
         preservation = inputs.preservation;
         home-manager = inputs.home-manager;
+        sops-nix = inputs.sops-nix;
       };
     };
 }
