@@ -25,6 +25,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nagram = {
+      url = "github:NextAlone/Nagram-Qt";
+    };
   };
 
   outputs =

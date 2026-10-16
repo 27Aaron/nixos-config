@@ -36,8 +36,8 @@ in
       "application/json" = editor;
       "x-scheme-handler/vscode" = [ "code-url-handler.desktop" ];
 
-      # Telegram 連結。
-      "x-scheme-handler/tg" = [ "org.telegram.desktop.desktop" ];
+      # Nagram 連結。
+      "x-scheme-handler/tg" = [ "xyz.nextalone.nagram.desktop.desktop" ];
 
       # 目錄用 Nautilus,由 niri 的入口帶入。
       "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
