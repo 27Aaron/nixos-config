@@ -78,6 +78,8 @@ in
     ./desktop/browsers.nix
     ./desktop/cursor.nix
     ./desktop/kitty.nix
+    ./desktop/mime-apps.nix
     ./desktop/theme.nix
+    ./desktop/user-dirs.nix
   ];
 }
