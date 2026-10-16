@@ -74,6 +74,7 @@ in
 
     ./llm
 
+    ./desktop/browsers.nix
     ./desktop/kitty.nix
     ./desktop/theme.nix
   ];
