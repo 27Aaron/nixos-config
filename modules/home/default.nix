@@ -74,6 +74,7 @@ in
 
     ./llm
 
+    ./desktop/apps.nix
     ./desktop/browsers.nix
     ./desktop/cursor.nix
     ./desktop/kitty.nix
