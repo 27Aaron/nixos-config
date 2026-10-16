@@ -2,8 +2,8 @@
   programs.kitty = {
     enable = true;
 
-    # Rosé Pine 主色;另有 rose-pine-moon 與 rose-pine-dawn。
-    themeFile = "rose-pine";
+    # Catppuccin Mocha;另有 Frappe、Macchiato 與淺色的 Latte。
+    themeFile = "Catppuccin-Mocha";
 
     # 字型由 desktop'.fonts 安裝,這裡只指定家族名。
     font = {
