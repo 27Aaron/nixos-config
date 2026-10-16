@@ -9,6 +9,7 @@ in
     llm.claude-desktop
     llm.chatgpt
     llm.codex
+    llm.dsh
   ];
 
   # 登入態與配置由程式自行寫入,只保留跨重啟。
@@ -20,6 +21,11 @@ in
       }
       {
         directory = ".codex";
+        mode = "0700";
+      }
+      # dsh 的設定、憑證與工作階段都在 DSH_HOME,預設 ~/.dsh。
+      {
+        directory = ".dsh";
         mode = "0700";
       }
     ];
