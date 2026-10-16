@@ -15,6 +15,7 @@
   desktop'.noctalia.enable = true;
   desktop'.fonts.enable = true;
 
+  services'.dae.enable = true;
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
   services'.pipewire.enable = true;
