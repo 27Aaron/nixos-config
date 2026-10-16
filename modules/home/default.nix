@@ -68,5 +68,7 @@ in
     ./cli/git.nix
     ./cli/shell.nix
     ./cli/tools.nix
+
+    ./desktop/kitty.nix
   ];
 }
