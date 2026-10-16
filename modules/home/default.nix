@@ -72,6 +72,8 @@ in
     ./cli/shell.nix
     ./cli/tools.nix
 
+    ./llm
+
     ./desktop/kitty.nix
     ./desktop/theme.nix
   ];
