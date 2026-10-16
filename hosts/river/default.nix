@@ -7,10 +7,9 @@
 
   core'.firewall.enable = true;
 
-  desktop' = {
-    greetd.enable = true;
-    niri.enable = true;
-  };
+  desktop'.greetd.enable = true;
+  desktop'.niri.enable = true;
+  desktop'.niri.autoLogin = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
