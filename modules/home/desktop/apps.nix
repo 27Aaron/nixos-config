@@ -1,8 +1,8 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 {
   home.packages = [
     pkgs.vscode
-    pkgs.telegram-desktop
+    inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop
   ];
 
   # 設定與登入態由程式自行寫入,只保留跨重啟。
@@ -11,7 +11,7 @@
     ".config/Code"
     ".vscode"
 
-    # Telegram Desktop 的工作階段與設定,含 tdata。
-    ".local/share/TelegramDesktop"
+    # Nagram 的工作階段與設定,含 tdata。沒有舊資料時寫在這裡。
+    ".local/share/NagramDesktop"
   ];
 }
