@@ -4,6 +4,7 @@
   disko,
   preservation,
   home-manager,
+  sops-nix,
   ...
 }:
 
@@ -20,6 +21,7 @@ let
       specialArgs = {
         hostName = name;
         inherit inputs;
+        secrets = inputs.secrets;
         vars = import ../vars;
       };
       modules = [
@@ -27,6 +29,7 @@ let
         disko.nixosModules.default
         preservation.nixosModules.preservation
         home-manager.nixosModules.home-manager
+        sops-nix.nixosModules.sops
         {
           home-manager = {
             useGlobalPkgs = true;

@@ -6,6 +6,7 @@
   ];
 
   core'.firewall.enable = true;
+  core'.sops.enable = true;
 
   desktop'.greetd.enable = true;
   desktop'.niri.enable = true;
