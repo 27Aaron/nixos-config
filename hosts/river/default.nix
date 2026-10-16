@@ -10,6 +10,7 @@
   desktop'.greetd.enable = true;
   desktop'.niri.enable = true;
   desktop'.niri.autoLogin = true;
+  desktop'.fcitx5.enable = true;
 
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;

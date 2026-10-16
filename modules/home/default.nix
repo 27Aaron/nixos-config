@@ -20,6 +20,9 @@ let
     };
 in
 {
+  # Home Manager 寫入 dconf 需要系統側的 dconf 支援。
+  programs.dconf.enable = true;
+
   home-manager.users.${vars.username}.imports = [
     # 使用者基準:persist' 選項與家目錄、stateVersion 等基礎值。
     # osConfig 與 vars 由 Home Manager 提供給使用者模組。
@@ -70,5 +73,6 @@ in
     ./cli/tools.nix
 
     ./desktop/kitty.nix
+    ./desktop/theme.nix
   ];
 }
