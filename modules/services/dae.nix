@@ -115,7 +115,23 @@ let
     path = config.sops.secrets."${name}.dae".path;
   }) secretFragments;
 
+  # linkFarm 只是指向 store 與 /run/secrets 的符號連結。dae 要求被 include 的檔案
+  # 位於入口配置所在目錄之下,且不能被同組寫入或被其他人讀取;store 檔案是 0444,
+  # 直接交給 dae 會被拒絕。組裝目錄只作為複製來源。
   configDir = pkgs.linkFarm "dae-config" configEntries;
+
+  # 入口固定為 /etc/dae/config.dae。/etc 由啟動時從 store 組成,不能就地收權限,
+  # 所以在執行時把入口與片段複製到 /etc/dae,以 0600 交給 dae。
+  runtimeConfig = "/etc/dae/config.dae";
+
+  assembleConfig = pkgs.writeShellScript "assemble-dae-config" ''
+    set -euo pipefail
+    # /etc/dae 可能是指向 store 的符號連結,先換成可寫目錄再複製。
+    rm -rf /etc/dae
+    install -d -m 0700 /etc/dae/config.d
+    install -m 0600 ${configDir}/config.dae /etc/dae/config.dae
+    install -m 0600 ${configDir}/config.d/*.dae /etc/dae/config.d/
+  '';
 in
 {
   options.services'.dae = {
@@ -129,12 +145,13 @@ in
     sops.secrets = lib.genAttrs (map (name: "${name}.dae") secretFragments) (name: {
       sopsFile = secretFile;
       key = lib.removeSuffix ".dae" name;
+      restartUnits = [ "dae.service" ];
     });
 
     services.dae = {
       enable = true;
       package = pkgs.dae;
-      configFile = "${configDir.outPath}/config.dae";
+      configFile = "${configDir}/config.dae";
 
       openFirewall = {
         enable = true;
@@ -142,18 +159,22 @@ in
       };
     };
 
-    # 上游只把入口配置複製進憑據目錄,include 的 config.d 會找不到。改為直接讀取
-    # 歸集後的目錄,validate 與 run 一起改。
-    systemd.services.dae.serviceConfig = {
-      LoadCredential = lib.mkForce [ ];
-      ExecStartPre = lib.mkForce [
-        ""
-        "${lib.getExe pkgs.dae} validate -c ${configDir.outPath}/config.dae"
-      ];
-      ExecStart = lib.mkForce [
-        ""
-        "${lib.getExe pkgs.dae} run --disable-timestamp -c ${configDir.outPath}/config.dae"
-      ];
+    systemd.services.dae = {
+      # 片段在 sops 解密後才存在,組裝必須排在它後面。
+      after = [ "sops-install-secrets.service" ];
+      serviceConfig = {
+        # 上游只把入口配置複製進憑據目錄,include 的 config.d 會找不到。
+        LoadCredential = lib.mkForce [ ];
+        ExecStartPre = lib.mkForce [
+          ""
+          assembleConfig
+          "${lib.getExe pkgs.dae} validate -c ${runtimeConfig}"
+        ];
+        ExecStart = lib.mkForce [
+          ""
+          "${lib.getExe pkgs.dae} run --disable-timestamp -c ${runtimeConfig}"
+        ];
+      };
     };
   };
 }
