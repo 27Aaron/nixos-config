@@ -99,7 +99,6 @@ let
           domain(geosite:category-ai-!cn) -> ai
 
           domain(geosite:telegram) -> tg
-          dip(geoip:telegram) -> tg
           domain(geosite:google) -> google
 
           domain(geosite:cn) -> direct
