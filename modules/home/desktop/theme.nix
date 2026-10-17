@@ -38,15 +38,14 @@ in
   gtk = {
     enable = true;
 
-    # 未指定 tweaks 時,主題目錄名是 catppuccin-<風味>-<強調色>-standard。
     theme = {
       package = gtkTheme;
-      name = "catppuccin-${flavor}-${accent}-standard-dark";
+      name = "catppuccin-${flavor}-${accent}-standard";
     };
 
     gtk4.theme = {
       package = gtkTheme;
-      name = "catppuccin-${flavor}-${accent}-standard-dark";
+      name = "catppuccin-${flavor}-${accent}-standard";
     };
 
     iconTheme = {
