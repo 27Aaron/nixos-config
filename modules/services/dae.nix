@@ -67,7 +67,7 @@ let
         routing {
           dip(geoip:private) -> direct
 
-          pname(claude, claude-desktop, chrome) -> ai
+          pname(claude, .claude-wrapped, claude-desktop, chrome) -> ai
 
           # Anthropic 與 Claude 的主域名,以及 API、認證、CDN 等子域名。
           domain(suffix: anthropic.com, suffix: clau.de, suffix: claude.ai,
