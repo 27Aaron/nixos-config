@@ -8,8 +8,8 @@
 let
   cfg = config.services'.dae;
 
-  # 節點、訂閱與出口組的憑據在 nix-secrets 的 services/dae.yaml,以同名鍵存放。
-  # sops 逐鍵解密為 .dae,並與其他片段歸集到同一目錄供 dae include。
+  # 節點、訂閱與出口組的憑據在 nix-secrets 的 services/dae.yaml,鍵名與片段同名。
+  # sops 逐鍵解密為 .dae,再與其他片段歸到同一目錄,供 dae include。
   secretFile = "${inputs.secrets}/services/dae.yaml";
 
   secretFragments = [
@@ -31,7 +31,10 @@ let
           check_interval: 30s
           check_tolerance: 50ms
           wan_interface: auto
-          dial_mode: domain
+          # domain 在快取未命中時會明文直連探測域名,不經代理。
+          # 引導解析器未設定時預設為 119.29.29.29 與 223.5.5.5。
+          # domain++ 跳過這次探測,仍按嗅探到的域名重分流。
+          dial_mode: domain++
           auto_config_kernel_parameter: true
           tls_implementation: utls
           utls_imitate: ios_auto
@@ -44,19 +47,15 @@ let
         dns {
           ipversion_prefer: 4
           upstream {
-            alidns: 'https://dns.alidns.com/dns-query'
-            remote: 'https://dns.google/dns-query'
-            pollution: 'https://unfiltered.adguard-dns.com/dns-query'
+            alidns: 'https://223.5.5.5/dns-query'
+            remote: 'https://1.1.1.1/dns-query'
           }
           routing {
             request {
+              qtype(https) -> reject
+              qname(geosite:category-ads-all) -> reject
               qname(geosite:cn) -> alidns
               fallback: remote
-            }
-            response {
-              upstream(pollution) -> accept
-              !qname(geosite:cn) && ip(geoip:private) -> pollution
-              fallback: accept
             }
           }
         }
@@ -68,32 +67,31 @@ let
         routing {
           dip(geoip:private) -> direct
 
-          # 命令列與桌面版的全部連接都走 ai,兜住域名規則沒列到的端點。
-          pname(claude, claude-desktop) -> ai
+          pname(claude, claude-desktop, chrome) -> ai
 
-          # Anthropic 與 Claude 的主要域名及其 API、認證、CDN 等子域名。
+          # Anthropic 與 Claude 的主域名,以及 API、認證、CDN 等子域名。
           domain(suffix: anthropic.com, suffix: clau.de, suffix: claude.ai,
             suffix: claude.app, suffix: claude.com, suffix: claudemcpclient.com,
             suffix: claudemcpcontent.com, suffix: claudeusercontent.com) -> ai
 
-          # Anthropic 網頁使用的獨立 CDN 主機,不屬於上面的主域名。
+          # 網頁使用的獨立 CDN,不在上面的主域名之下。
           domain(full: servd-anthropic-website.b-cdn.net,
             full: anthropic.com.cdn.cloudflare.net) -> ai
 
-          # Anthropic 網頁引用的認證與內容服務。
+          # 網頁引用的認證與內容服務。
           domain(full: anthropic.auth0.com, full: anthropic-com.ghost.io) -> ai
 
-          # Claude Code 的遙測、錯誤回報與反欺詐服務,關鍵詞用於涵蓋新增端點。
+          # Claude Code 的遙測、錯誤回報與反欺詐。關鍵詞用來罩住後來新增的端點。
           domain(full: http-intake.logs.us5.datadoghq.com,
             full: browser-intake-us5-datadoghq.com,
             suffix: sentry.io, suffix: statsigapi.net,
             keyword: datadog, keyword: sentry, keyword: sift) -> ai
 
-          # Anthropic 網頁客戶端使用的客服與統計依賴。
+          # 網頁客戶端使用的客服與統計服務。
           domain(suffix: intercom.io, suffix: intercomcdn.com,
             full: cdn.usefathom.com) -> ai
 
-          # Anthropic 自有的地址段,只保留已包含較窄網段的範圍。
+          # Anthropic 自有地址段。較窄網段已被涵蓋,不再單列。
           dip(160.79.104.0/21, '2607:6bc0::/32') -> ai
 
           domain(geosite:category-ai-!cn) -> ai
@@ -114,13 +112,13 @@ let
     path = config.sops.secrets."${name}.dae".path;
   }) secretFragments;
 
-  # linkFarm 只是指向 store 與 /run/secrets 的符號連結。dae 要求被 include 的檔案
-  # 位於入口配置所在目錄之下,且不能被同組寫入或被其他人讀取;store 檔案是 0444,
-  # 直接交給 dae 會被拒絕。組裝目錄只作為複製來源。
+  # linkFarm 只是指向 store 與 /run/secrets 的符號連結。dae 要求 include 的檔案
+  # 位於入口配置目錄下,且同組不可寫、其他人不可讀。store 檔案是 0444,直接交給
+  # dae 會被拒絕,因此這裡只作複製來源。
   configDir = pkgs.linkFarm "dae-config" configEntries;
 
-  # 入口固定為 /etc/dae/config.dae。/etc 由啟動時從 store 組成,不能就地收權限,
-  # 所以在執行時把入口與片段複製到 /etc/dae,以 0600 交給 dae。
+  # 入口固定為 /etc/dae/config.dae。/etc 由啟動時的 store 組成,不能就地改權限,
+  # 因此執行時把入口與片段複製到 /etc/dae,以 0600 交給 dae。
   runtimeConfig = "/etc/dae/config.dae";
 
   assembleConfig = pkgs.writeShellScript "assemble-dae-config" ''
@@ -159,10 +157,10 @@ in
     };
 
     systemd.services.dae = {
-      # 片段在 sops 解密後才存在,組裝必須排在它後面。
+      # 片段要等 sops 解密後才存在,組裝必須排在它後面。
       after = [ "sops-install-secrets.service" ];
       serviceConfig = {
-        # 上游只把入口配置複製進憑據目錄,include 的 config.d 會找不到。
+        # NixOS 模組只複製入口配置,include 的 config.d 會找不到。
         LoadCredential = lib.mkForce [ ];
         ExecStartPre = lib.mkForce [
           ""
