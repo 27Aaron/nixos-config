@@ -25,6 +25,8 @@ in
   home.packages = [
     pkgs.vscode
     nagram-desktop
+    # 查看 GNOME 鑰匙環。
+    pkgs.seahorse
   ];
 
   # 設定與登入態由程式自行寫入,只保留跨重啟。

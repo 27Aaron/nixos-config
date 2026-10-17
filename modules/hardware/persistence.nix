@@ -65,6 +65,12 @@ in
         directory = ".gnupg";
         mode = "0700";
       }
+
+      # 鑰匙環。
+      {
+        directory = ".local/share/keyrings";
+        mode = "0700";
+      }
     ]
     ++ persist.directories;
 
