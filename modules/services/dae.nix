@@ -44,8 +44,8 @@ let
         dns {
           ipversion_prefer: 4
           upstream {
-            alidns: 'udp://dns.alidns.com:53'
-            remote: 'tcp+udp://dns.google'
+            alidns: 'quic://dns.alidns.com'
+            remote: 'quic://dns.google'
             pollution: 'quic://unfiltered.adguard-dns.com'
           }
           routing {
