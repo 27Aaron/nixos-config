@@ -33,8 +33,7 @@ in
     "${kvantumTheme}/share/Kvantum/catppuccin-${flavor}-${accent}";
 
   # nixpkgs 沒有 Catppuccin 圖示主題,圖示用 Papirus 的深色版。
-  # GTK 應用程式直接讀 extraConfig 這兩個檔,不經過 dconf,Noctalia 也不會寫它們。
-  # 系統的 color-scheme 偏好則由 Noctalia 在套用主題時自行設定。
+  # GTK3 直接讀 extraConfig,不經過 dconf。GTK4 不用這個鍵,深色由 Noctalia 的 color-scheme 設定。
   gtk = {
     enable = true;
 
@@ -59,6 +58,5 @@ in
     };
 
     gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
-    gtk4.extraConfig.gtk-application-prefer-dark-theme = true;
   };
 }
