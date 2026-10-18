@@ -70,6 +70,7 @@
   # 接電不開始倒數,就停在睡眠。外接螢幕時合蓋不睡眠,內建面板仍可使用。
   systemd.sleep.settings.Sleep = {
     AllowSuspendThenHibernate = "yes";
+    HibernateMode = "shutdown";
     HibernateOnACPower = "no";
     HibernateDelaySec = "1h";
   };
