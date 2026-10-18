@@ -7,6 +7,7 @@
 
   core'.firewall.enable = true;
   core'.sops.enable = true;
+  core'.yubikey.enable = true;
 
   desktop'.greetd.enable = true;
   desktop'.niri.enable = true;
