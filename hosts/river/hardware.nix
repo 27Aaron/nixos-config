@@ -36,6 +36,7 @@
     espSize = "1G";
     swapSize = "32769M";
     luks.enable = true;
+    luks.fido2.enable = true;
   };
 
   # 開機:載入器、核心與 initrd、休眠。

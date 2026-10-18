@@ -87,10 +87,44 @@ in
 
     luks.enable = lib.mkEnableOption "LUKS encryption for the data partition";
 
+    luks.fido2.enable = lib.mkEnableOption ''
+      FIDO2 unlocking for the LUKS partition. This only teaches the initrd to
+      use an enrolled YubiKey. Enrollment is not done here: disko's own
+      enrollFido2 runs while formatting the disk
+    '';
+
     bios.enable = lib.mkEnableOption "a BIOS boot partition for GRUB";
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = cfg.luks.fido2.enable -> cfg.luks.enable;
+        message = "hardware'.disko.luks.fido2.enable requires hardware'.disko.luks.enable.";
+      }
+    ];
+
+    # FIDO2 權杖在 LUKS 頭部,開機時由 systemd-cryptsetup 讀取。
+    # 這裡只讓 initrd 認得已登記的鑰匙,不會替磁碟登記。
+    # 鑰匙是 USB HID,不放進 initrd 就看不到。
+    #
+    # 操作對象是 /dev/disk/by-partlabel/disk-main-luks,不要對 /dev/mapper/crypted。
+    # 每次只插一把鑰匙。查看槽位(槽 0 通常是密碼):
+    #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks
+    # 添加密碼槽(先驗證現有密碼,再輸入要新增的密碼):
+    #   sudo systemd-cryptenroll --password /dev/disk/by-partlabel/disk-main-luks
+    # 添加 FIDO2,開機要 FIDO2 PIN 再觸摸:
+    #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
+    # 添加 FIDO2,只觸摸、不設 PIN:
+    #   sudo systemd-cryptenroll --fido2-device=auto --fido2-with-client-pin=no /dev/disk/by-partlabel/disk-main-luks
+    boot.initrd = lib.mkIf cfg.luks.fido2.enable {
+      systemd.enable = true;
+      availableKernelModules = [
+        "usbhid"
+        "hid_generic"
+      ];
+    };
+
     disko.devices = {
       nodev."/" = {
         fsType = "tmpfs";
@@ -149,6 +183,11 @@ in
                         crypttabExtraOpts = [
                           "same-cpu-crypt"
                           "submit-from-crypt-cpus"
+                        ]
+                        ++ lib.optionals cfg.luks.fido2.enable [
+                          "fido2-device=auto"
+                          # 鑰匙沒插上時不必空等預設的 30 秒。數值單位是秒。
+                          "token-timeout=5"
                         ];
                       };
                       content = btrfs;
