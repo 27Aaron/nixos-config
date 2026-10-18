@@ -22,5 +22,5 @@
   services'.vnstat.enable = true;
 
   time.timeZone = "Asia/Tokyo";
-  system.stateVersion = "26.05";
+  system.stateVersion = "24.11";
 }
