@@ -89,6 +89,7 @@
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   hardware'.amdgpu.enable = true;
   hardware'.bluetooth.enable = true;
+  hardware'.brightness.enable = true;
 
   # 狀態持久化。
   hardware'.persistence.enable = true;
