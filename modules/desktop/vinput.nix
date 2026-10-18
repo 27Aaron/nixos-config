@@ -24,11 +24,9 @@ in
 
     environment.systemPackages = [ vinput ];
 
-    # 插件本體由 fcitx5 的 addon 包裝載入;daemon 與 CLI 仍要在 PATH 上。
+    # addon 只載入插件，執行檔另外放進 PATH。
     i18n.inputMethod.fcitx5.addons = [ vinput ];
 
-    # 跟著圖形工作階段走。不注入密鑰檔:預設走本地 sherpa-onnx,
-    # 還沒下載模型時 daemon 仍會起來,只是無法轉寫。
     hm'.systemd.user.services.vinput-daemon = {
       Unit = {
         Description = "Fcitx5 Vinput voice input daemon";
@@ -42,15 +40,13 @@ in
         Restart = "on-failure";
         RestartSec = 3;
 
-        # 豆包這類命令行識別器用 ctypes.util.find_library("opus")，
-        # 不看 daemon 包裝器帶上的 LD_LIBRARY_PATH，找不到就直接退出。
+        # 命令行識別器不看 LD_LIBRARY_PATH，找不到 libopus 就會退出。
         Environment = "VINPUT_ASR_LIBOPUS_PATH=${lib.getLib pkgs.libopus}/lib/libopus.so";
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };
 
-    # 模型與 daemon 自己寫的 config.json。tmpfs 根目錄不保留這兩處的話,
-    # 每次重開機都要重新下載模型。
+    # 模型與 config.json 要跨重啟保留。
     preservation'.user.directories = [
       {
         directory = ".config/vinput";
