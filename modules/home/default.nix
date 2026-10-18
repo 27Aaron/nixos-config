@@ -52,8 +52,7 @@ in
             username = vars.username;
             homeDirectory = osConfig.users.users.${vars.username}.home;
 
-            # 預設跟隨系統的 stateVersion;主機可直接賦值覆寫此 mkDefault。
-            stateVersion = lib.mkDefault osConfig.system.stateVersion;
+            stateVersion = "26.11";
             language.collate = "C.UTF-8";
           };
 
