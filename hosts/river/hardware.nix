@@ -1,3 +1,20 @@
+# Hardware profile for the MECHREVO WUJIE14XA (Wujie 14X Blizzard) laptop.
+#
+#   DMI        MECHREVO WUJIE14XA, board WUJIE14-GX4HRXL, BIOS N.1.14MRO50
+#   CPU        AMD Ryzen 7 8845HS (Phoenix / Hawk Point), 8C/16T
+#   Memory     2 x 16 GB DDR5-5600, Crucial/Micron CT16G56C46S5.C8D
+#   GPU        Radeon 780M (HawkPoint1)                  [1002:1900]
+#   Wi-Fi      MediaTek MT7922 (RZ616), mt7921e          [14c3:7922]
+#   Bluetooth  13d3:3585, the Bluetooth half of the MT7922
+#   Ethernet   Motorcomm YT6801, needs Linux >= 7.0      [1f0a:6801]
+#   Touchpad   UNIW0001:00 093A:0255, on I2C rather than PS/2
+#   Audio      Radeon HD Audio + Ryzen HD Audio          [1002:1640], [1022:15e3]
+#   USB4       single-cable USB-C display output works   [1022:1669]
+#   Storage    Micron 2550 NVMe SSD, 1 TB
+#   TPM        present (/dev/tpm0)
+#   Sensors    k10temp, amdgpu, nvme, BAT0, spd5118 x2
+#   Power      s2idle only
+#   Webcam     IR camera                                 [04f2:b7dd]
 {
   config,
   lib,
@@ -5,7 +22,6 @@
   modulesPath,
   ...
 }:
-
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -44,13 +60,24 @@
       kernelModules = [ ];
     };
 
-    # 休眠:從 LUKS 加密的 swapfile 恢復。偏移量是 /swap/swapfile 的物理頁起點。
-    # Btrfs 上 filefrag 回報的是虛擬位址而非物理偏移,不可使用;必須用以下
-    # 命令測量(Arch Wiki: Acquire swap file offset)。swapfile 重建或 balance
-    # 過後數值會改變,需重新測量:
+    # 從加密的 swapfile 恢復。Btrfs 上要用物理偏移,重建或 balance 後重測:
     # sudo btrfs inspect-internal map-swapfile -r /swap/swapfile
     resumeDevice = "/dev/mapper/crypted";
     kernelParams = [ "resume_offset=533760" ];
+  };
+
+  # 韌體只有 s2idle,沒有 S3。合蓋先睡眠,一小時後再休眠。
+  # 接電不開始倒數,就停在睡眠。外接螢幕時合蓋不睡眠,內建面板仍可使用。
+  systemd.sleep.settings.Sleep = {
+    AllowSuspendThenHibernate = "yes";
+    HibernateOnACPower = "no";
+    HibernateDelaySec = "1h";
+  };
+
+  services.logind.settings.Login = {
+    HandleLidSwitch = "suspend-then-hibernate";
+    HandleLidSwitchExternalPower = "suspend-then-hibernate";
+    HandleLidSwitchDocked = "ignore";
   };
 
   # 韌體與週邊驅動。
