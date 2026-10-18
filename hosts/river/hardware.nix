@@ -46,6 +46,9 @@
     kernelModules = [ "kvm-amd" ];
     extraModulePackages = [ ];
 
+    # 開機畫面不顯示 ACPI 這類錯誤,記錄仍在 journal 裡。
+    consoleLogLevel = 3;
+
     initrd = {
       # preservation 的硬性需求;同時讓 LUKS 的 crypttab 選項生效。
       systemd.enable = true;
