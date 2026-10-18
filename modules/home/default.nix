@@ -81,5 +81,6 @@ in
     ./desktop/mime-apps.nix
     ./desktop/theme.nix
     ./desktop/user-dirs.nix
+    ./desktop/zed.nix
   ];
 }
