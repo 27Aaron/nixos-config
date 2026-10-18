@@ -68,7 +68,6 @@
 
   # 韌體只有 s2idle,沒有 S3。合蓋先睡眠,一小時後再休眠。
   # 接電不開始倒數,就停在睡眠。外接螢幕時合蓋不睡眠,內建面板仍可使用。
-  # platform 進入 S4 後會立刻醒來,所以先寫入 swapfile 再斷電。
   systemd.sleep.settings.Sleep = {
     AllowSuspendThenHibernate = "yes";
     HibernateMode = "shutdown";
