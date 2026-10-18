@@ -22,7 +22,6 @@
       ];
       trusted-users = [ vars.username ];
 
-      # llm-agents.nix 與 fcitx5-vinput 的預編譯包。
       extra-substituters = [
         "https://cache.numtide.com"
         "https://fcitx5-vinput.cachix.org"
