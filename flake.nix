@@ -31,6 +31,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # dsh-desktop 依自己的 nixpkgs 鎖定 Electron 與 libvips,不要改跟這份配置走。
+    nur-packages = {
+      url = "github:27Aaron/nur-packages";
+    };
+
     nagram = {
       url = "github:NextAlone/Nagram-Qt";
     };
