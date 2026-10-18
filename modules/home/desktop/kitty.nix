@@ -8,7 +8,7 @@
     # 字型由 desktop'.fonts 安裝,這裡只指定家族名。
     font = {
       name = "Maple Mono NF";
-      size = 14;
+      size = 12;
     };
 
     settings = {
