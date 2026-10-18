@@ -10,6 +10,7 @@
 *~
 
 # Nix build and development artifacts
+.cache-nix-eval/
 result
 result-*
 .direnv/

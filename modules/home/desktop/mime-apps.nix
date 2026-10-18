@@ -4,7 +4,10 @@ let
     "google-chrome.desktop"
     "firefox.desktop"
   ];
-  editor = [ "code.desktop" ];
+  editor = [
+    "dev.zed.Zed.desktop"
+    "code.desktop"
+  ];
 in
 {
   # 只列出已安裝的程式;播放器、圖片檢視與解壓縮尚未安裝,不在這裡指定。
@@ -31,7 +34,6 @@ in
       "x-scheme-handler/http" = browser;
       "x-scheme-handler/https" = browser;
 
-      # 文字檔用 VS Code。
       "text/plain" = editor;
       "application/json" = editor;
       "x-scheme-handler/vscode" = [ "code-url-handler.desktop" ];
