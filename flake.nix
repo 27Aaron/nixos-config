@@ -39,6 +39,11 @@
       url = "github:NextAlone/Nagram-Qt";
     };
 
+    # 釘在發行標籤。不 follow nixpkgs，Cachix 上的包是用上游自己的 lock 建的。
+    fcitx5-vinput = {
+      url = "github:xifan2333/fcitx5-vinput/v2.4.2";
+    };
+
     secrets = {
       url = "git+ssh://git@github.com/27Aaron/nix-secrets.git?shallow=1";
       flake = false;

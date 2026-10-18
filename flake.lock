@@ -54,6 +54,26 @@
         "type": "github"
       }
     },
+    "fcitx5-vinput": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "sherpa-onnx": "sherpa-onnx"
+      },
+      "locked": {
+        "lastModified": 1791980447,
+        "narHash": "sha256-jZxyxDEUYuGDh7c27yiGYn6BW0KzfgwX+HW9nXmvCoo=",
+        "owner": "xifan2333",
+        "repo": "fcitx5-vinput",
+        "rev": "ac545c6c5ec1105f0c4ec8b54b21dd3a79a544a4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "xifan2333",
+        "ref": "v2.4.2",
+        "repo": "fcitx5-vinput",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": [
@@ -121,7 +141,7 @@
     },
     "nagram": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs_2"
       },
       "locked": {
         "lastModified": 1791992568,
@@ -139,6 +159,22 @@
     },
     "nixpkgs": {
       "locked": {
+        "lastModified": 1791594108,
+        "narHash": "sha256-XK4KceonkwD8LuMAt/vNrz982mXJM5jeHAxMwsUXXAQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "6510408d147d8c5e6d76043e899e9251756f6a75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
         "lastModified": 1790822859,
         "narHash": "sha256-69xHQhAeMAD2wDXO7T2pcOZIF9Sga2W+JkmY2a11Ops=",
         "owner": "NixOS",
@@ -153,7 +189,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1792176968,
         "narHash": "sha256-3Gz/KV1COBbiTAcSOsMZTEDxYk9FClZMF8p6Uh9+yoE=",
@@ -169,7 +205,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1792116957,
         "narHash": "sha256-EjZqHKObBfIOeHZnMRVV87HB3pPq/WBkmRJWyFxmZu8=",
@@ -187,7 +223,7 @@
     },
     "nur-packages": {
       "inputs": {
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1792293818,
@@ -221,10 +257,11 @@
     "root": {
       "inputs": {
         "disko": "disko",
+        "fcitx5-vinput": "fcitx5-vinput",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nagram": "nagram",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "nur-packages": "nur-packages",
         "preservation": "preservation",
         "secrets": "secrets",
@@ -246,6 +283,27 @@
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/27Aaron/nix-secrets.git"
+      }
+    },
+    "sherpa-onnx": {
+      "inputs": {
+        "nixpkgs": [
+          "fcitx5-vinput",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785564218,
+        "narHash": "sha256-B1/qLagKXemMgyrmd7RqPEgz2polrZMUkeBT1dv3hso=",
+        "owner": "xifan2333",
+        "repo": "sherpa-onnx-flake",
+        "rev": "a8ef134239c923420becfa6870538dcc8e9c8eb8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "xifan2333",
+        "repo": "sherpa-onnx-flake",
+        "type": "github"
       }
     },
     "sops-nix": {
