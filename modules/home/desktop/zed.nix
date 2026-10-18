@@ -3,15 +3,15 @@
     enable = true;
 
     # 名稱取自 zed-industries/extensions 的條目。
-    # catppuccin 是主題,catppuccin-icons 是檔案圖示,nix 提供語法與 nixd。
     extensions = [
       "catppuccin"
       "catppuccin-icons"
+      "git-firefly"
       "nix"
+      "toml"
     ];
 
     # 啟動時與既有 settings.json 合併,同名項目以這裡為準。
-    # 沒列在這裡的項目可以在介面裡改,並隨下面的目錄留下。
     userSettings = {
       # 版本由 Nix 更新,不要讓編輯器自己下載新版本。
       auto_update = false;
@@ -21,15 +21,13 @@
         metrics = false;
       };
 
-      # Zed 自己的鍵位,不套 VS Code 的那層差異。
       base_keymap = "Zed";
       hour_format = "hour24";
 
       # 新打開的目錄直接信任,不再逐個確認。
-      # 語言伺服器、MCP 與項目裡的 .zed/settings.json 會直接生效。
       session.trust_all_worktrees = true;
 
-      # 跟隨系統深淺色。桌面目前是 Mocha,淺色備 Latte。
+      # 跟隨系統深淺色。
       theme = {
         mode = "system";
         dark = "Catppuccin Mocha";
@@ -41,7 +39,7 @@
         light = "Catppuccin Latte";
       };
 
-      # 等寬字型與 kitty 相同,游標同樣不閃。中文由 fontconfig 回退到思源。
+      # 等寬字型與 kitty 相同,游標同樣不閃。
       buffer_font_family = "Maple Mono NF";
       buffer_font_size = 14;
       cursor_blink = false;
@@ -52,12 +50,10 @@
       git_panel.dock = "left";
       agent = {
         dock = "right";
-        # 對話列表跟 Agent 同一側,不要佔左側。
         threads_sidebar.position = "right";
       };
 
       terminal = {
-        # 終端按鈕留在底部。
         dock = "bottom";
         font_family = "Maple Mono NF";
         font_size = 14;
@@ -67,8 +63,16 @@
       # 用 fish 的 direnv hook,讓 .envrc 進入編輯器與內建終端。
       load_direnv = "shell_hook";
 
-      # nixd 與 nixfmt 已在系統路徑上,不要再下載一份無法在 NixOS 執行的語言伺服器。
-      lsp.nixd.binary.path_lookup = true;
+      # 語言伺服器優先用 PATH 上的(mise、uv、direnv 或系統包)。
+      # 找不到才會下載;下載的原生二進位在 NixOS 上通常跑不起來。
+      lsp = {
+        nixd.binary.path_lookup = true;
+        basedpyright.binary.path_lookup = true;
+        ruff.binary.path_lookup = true;
+        gopls.binary.path_lookup = true;
+        rust-analyzer.binary.path_lookup = true;
+        vtsls.binary.path_lookup = true;
+      };
 
       languages.Nix = {
         language_servers = [
