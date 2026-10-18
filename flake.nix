@@ -31,6 +31,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nur-packages = {
+      url = "github:27Aaron/nur-packages";
+    };
+
     nagram = {
       url = "github:NextAlone/Nagram-Qt";
     };

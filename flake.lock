@@ -169,6 +169,40 @@
         "type": "github"
       }
     },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1792116957,
+        "narHash": "sha256-EjZqHKObBfIOeHZnMRVV87HB3pPq/WBkmRJWyFxmZu8=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "f20cd90e28fe0403873f473b29e42662cd86e8c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nur-packages": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_3"
+      },
+      "locked": {
+        "lastModified": 1792293818,
+        "narHash": "sha256-YoxBVtYHhT2sPD7VFMnIR0htEcSu2ZG4jESDxud6L58=",
+        "owner": "27Aaron",
+        "repo": "nur-packages",
+        "rev": "e61189f0ff5f05ffe43ec36b6acfedd9fe272df9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "27Aaron",
+        "repo": "nur-packages",
+        "type": "github"
+      }
+    },
     "preservation": {
       "locked": {
         "lastModified": 1757436102,
@@ -191,6 +225,7 @@
         "llm-agents": "llm-agents",
         "nagram": "nagram",
         "nixpkgs": "nixpkgs_2",
+        "nur-packages": "nur-packages",
         "preservation": "preservation",
         "secrets": "secrets",
         "sops-nix": "sops-nix"
