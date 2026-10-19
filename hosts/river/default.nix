@@ -15,6 +15,7 @@
   desktop'.fcitx5.enable = true;
   desktop'.vinput.enable = true;
   desktop'.noctalia.enable = true;
+  desktop'.file-manager.enable = true;
   desktop'.fonts.enable = true;
 
   services'.dae.enable = true;

@@ -41,7 +41,7 @@ in
       # Nagram 連結。
       "x-scheme-handler/tg" = [ "xyz.nextalone.nagram.desktop.desktop" ];
 
-      # 目錄用 Nautilus,由 niri 的入口帶入。
+      # 目錄用 Nautilus,由 desktop'.file-manager 安裝。
       "inode/directory" = [ "org.gnome.Nautilus.desktop" ];
     };
   };
