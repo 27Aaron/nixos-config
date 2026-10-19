@@ -81,6 +81,7 @@ in
     ./desktop/mime-apps.nix
     ./desktop/theme.nix
     ./desktop/user-dirs.nix
+    ./desktop/vscode.nix
     ./desktop/zed.nix
   ];
 }
