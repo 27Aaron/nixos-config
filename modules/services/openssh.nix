@@ -9,6 +9,10 @@ let
 
   # 客戶端的主機別名清單,來自 nix-secrets。不含金鑰,可直接引用。
   sshConfig = inputs.secrets + "/openssh/config";
+
+  # NixOS 模組拿到的 lib 沒有 lib.hm,要引用 HM 啟用腳本的排序庫時,
+  # 用 HM 自己的接線把 lib 補齊,再取 hm.dag。
+  hmLib = import "${inputs.home-manager}/modules/lib/stdlib-extended.nix" lib;
 in
 {
   options.services'.openssh = {
@@ -17,7 +21,14 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf (builtins.pathExists sshConfig) {
-      hm'.home.file.".ssh/config".source = sshConfig;
+      # OpenSSH 10 起,讀取 ~/.ssh/config 前會檢查最終檔案屬於使用者本人
+      # (權限位不檢查);home.file 產生的 store 符號連結(root 所有)通不過
+      # 檢查,所有 ssh 指令都會噴 Bad owner or permissions。因此改在啟用時
+      # 複製成使用者自己的真實檔案,每次切換都重寫,內容仍以 nix-secrets 為源。
+      hm'.home.activation.installSshConfig = hmLib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        rm -f "$HOME/.ssh/config"
+        install -m 600 ${sshConfig} "$HOME/.ssh/config"
+      '';
     })
 
     (lib.mkIf cfg.enable {
