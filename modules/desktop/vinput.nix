@@ -7,11 +7,24 @@
 }:
 let
   cfg = config.desktop'.vinput;
-  vinput = inputs.fcitx5-vinput.packages.${pkgs.stdenv.hostPlatform.system}.fcitx5-vinput;
+  packages = inputs.fcitx5-vinput.packages.${pkgs.stdenv.hostPlatform.system};
+
+  # 上游只提供兩個屬性:fcitx5-vinput(含本地 ASR)與 fcitx5-vinput-lite。
+  vinput = if cfg.lite then packages.fcitx5-vinput-lite else packages.fcitx5-vinput;
 in
 {
   options.desktop'.vinput = {
     enable = lib.mkEnableOption "Fcitx5 Vinput voice input";
+
+    lite = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Install fcitx5-vinput-lite, which upstream builds with
+        -DVINPUT_ENABLE_LOCAL_ASR=OFF: no sherpa-onnx or onnxruntime, so
+        recognition and rewriting happen entirely in the cloud.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
