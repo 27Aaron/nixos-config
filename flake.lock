@@ -226,11 +226,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1792377336,
-        "narHash": "sha256-IHhEeyUpyVcUN9et4jqIZgmNbHbRzzkJ070V9xXdmYk=",
+        "lastModified": 1792389532,
+        "narHash": "sha256-XDszkePb0CdJIBK3SgPZpaZrjCjNQhIOagEgobitK70=",
         "owner": "27Aaron",
         "repo": "nur-packages",
-        "rev": "0e06aec3cf15eefe35901faa50dbc952577be024",
+        "rev": "fe2df79ccab6b5412a92e5419a084eeb61904bd2",
         "type": "github"
       },
       "original": {
