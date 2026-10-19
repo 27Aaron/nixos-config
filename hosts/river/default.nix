@@ -24,6 +24,21 @@
   services'.networkmanager.enable = true;
   services'.pipewire.enable = true;
   services'.vnstat.enable = true;
+  services'.keyd.enable = true;
+  services'.keyd.keyboards.default = {
+    # 僅套用於內建「AT Translated Set 2 keyboard」(vendor:product)。
+    # 其餘裝置(Razer 滑鼠、HHKB)不受影響。
+    ids = [ "0001:0001" ];
+    settings = {
+      main = {
+        # Copilot 鍵位於右 Ctrl 的位置,按下時會以單次釋放送出
+        # meta+shift+F23,因此需將整組按鍵組合一起映射。
+        "leftshift+leftmeta+f23" = "rightcontrol";
+        # 還原 keyd 預設將右 Ctrl 改送左 Ctrl 的行為。
+        rightcontrol = "rightcontrol";
+      };
+    };
+  };
 
   time.timeZone = "Asia/Tokyo";
   system.stateVersion = "24.11";
