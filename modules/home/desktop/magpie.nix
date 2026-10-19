@@ -5,14 +5,12 @@
   ...
 }:
 let
-  magpie = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.magpie-desktop;
+  magpie = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.magpie;
 in
 {
-  # 桌面包同時提供 magpie 命令。終端包也叫 magpie,不要再裝一份。
   home.packages = [ magpie ];
 
-  # 套件自帶 magpie:// 處理器。上游在 Linux 上不再往家目錄寫桌面檔。
-  xdg.mimeApps.defaultApplications."x-scheme-handler/magpie" = [ "magpie.desktop" ];
+  xdg.mimeApps.defaultApplicationPackages = [ magpie ];
 
   # 托盤程序同時提供本機閘道。登入圖形工作階段後啟動,關掉視窗也不該停。
   systemd.user.services.magpie = {
