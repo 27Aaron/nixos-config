@@ -5,5 +5,11 @@
 {
   home.packages = [ pkgs.seahorse ];
 
-  # 鑰匙環本身由 nixos/base/hardware/persistence.nix 登記,這裡不重複。
+  # GNOME 鑰匙環,seahorse 就是它的管理介面。
+  persist'.directories = [
+    {
+      directory = ".local/share/keyrings";
+      mode = "0700";
+    }
+  ];
 }

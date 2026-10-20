@@ -16,21 +16,13 @@ in
       type = lib.types.nullOr lib.types.str;
       default = null;
       example = "niri-session";
-      description = ''
-        Session command Tuigreet launches after login. Null keeps the
-        greeter default. Set by the desktop module that owns the session,
-        so the greeter binary choice stays inside this module.
-      '';
+      description = "Command Tuigreet runs after login. Null uses the greeter default.";
     };
 
     autoLogin = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = ''
-        Whether to log in to the session command automatically, skipping
-        the greeter. Requires sessionCommand; desktop modules forward
-        their own autoLogin switch here.
-      '';
+      description = "Log in without the greeter. Requires sessionCommand.";
     };
   };
 

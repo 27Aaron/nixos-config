@@ -13,4 +13,7 @@
     ./base
     ./nixos
   ];
+
+  # Home Manager 自己的狀態。
+  preservation'.user.directories = [ ".local/state/home-manager" ];
 }

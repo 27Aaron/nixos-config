@@ -13,20 +13,14 @@ in
     memoryPercent = lib.mkOption {
       type = lib.types.ints.positive;
       default = 50;
-      description = ''
-        Maximum total amount of memory usable by the zram swap devices,
-        as a percentage of total RAM.
-      '';
+      description = "zram swap upper bound, as a percentage of RAM.";
     };
 
     memoryMax = lib.mkOption {
       type = with lib.types; nullOr int;
       default = null;
       example = 16 * 1024 * 1024 * 1024;
-      description = ''
-        Maximum total amount of memory (in bytes) usable by the zram swap
-        devices. The smaller of this and memoryPercent is used.
-      '';
+      description = "zram swap upper bound in bytes; the smaller of this and memoryPercent wins.";
     };
   };
 

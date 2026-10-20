@@ -55,17 +55,13 @@ in
     directories = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "directory"));
       default = [ ];
-      description = ''
-        Directories to preserve inside the user's home directory.
-      '';
+      description = "Directories to preserve in the home directory.";
     };
 
     files = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "file"));
       default = [ ];
-      description = ''
-        Files to preserve inside the user's home directory.
-      '';
+      description = "Files to preserve in the home directory.";
     };
   };
 

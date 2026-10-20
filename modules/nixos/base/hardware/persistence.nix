@@ -44,22 +44,15 @@ in
       ];
     };
 
-    # 基礎使用者狀態;Home Manager 回報的會附加在後。
+    # 基礎使用者狀態;各軟體模組與 Home Manager 回報的會附加在後。
     preservation'.user.directories = [
       # 不整體持久化 ~/.cache:幾乎全是可重建內容且成長很快(實測 3.6G,光
       # 瀏覽器快取就 1.7G),留在 tmpfs 上重開機即清空。需要跨重啟的快取由
-      # 各模組以 persist' 登記,目前只有 Nix 的(見 core/nix.nix)。
-      ".local/share/nix"
-      ".local/state/home-manager"
-      ".local/state/nix/profiles"
+      # 各模組自行登記。
 
-      # 沒有專屬模組管理的憑證與鑰匙環。
+      # 沒有專屬模組可歸的 GPG 金鑰環。鑰匙環見 home/base/gui/seahorse.nix。
       {
         directory = ".gnupg";
-        mode = "0700";
-      }
-      {
-        directory = ".local/share/keyrings";
         mode = "0700";
       }
     ]

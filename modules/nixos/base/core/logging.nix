@@ -13,26 +13,19 @@ in
     journalMaxUse = lib.mkOption {
       type = lib.types.str;
       default = "2G";
-      description = ''
-        Upper bound for the persistent journal in /var/log/journal.
-      '';
+      description = "Persistent journal size cap.";
     };
 
     journalRuntimeMaxUse = lib.mkOption {
       type = lib.types.str;
       default = "256M";
-      description = ''
-        Upper bound for the volatile journal in /run/log/journal. /run is a
-        tmpfs, so this is memory, not disk.
-      '';
+      description = "Volatile journal size cap, counted against RAM because /run is tmpfs.";
     };
 
     coredumpMaxUse = lib.mkOption {
       type = lib.types.str;
       default = "1G";
-      description = ''
-        Upper bound for stored core dumps in /var/lib/systemd/coredump.
-      '';
+      description = "Core dump size cap.";
     };
   };
 

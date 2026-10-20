@@ -53,6 +53,10 @@
       mode = "0700";
     }
 
+    # nix 本身的使用者狀態與 profile 連結。
+    ".local/share/nix"
+    ".local/state/nix/profiles"
+
     # 快取不含機密但不重建就要重抓 flake input,離線時 nix 直接失敗。
     {
       directory = ".cache/nix";

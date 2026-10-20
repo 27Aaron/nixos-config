@@ -18,11 +18,7 @@ in
     lite = lib.mkOption {
       type = lib.types.bool;
       default = false;
-      description = ''
-        Install fcitx5-vinput-lite, which upstream builds with
-        -DVINPUT_ENABLE_LOCAL_ASR=OFF: no sherpa-onnx or onnxruntime, so
-        recognition and rewriting happen entirely in the cloud.
-      '';
+      description = "Use the lite build: no local ASR model, recognition runs in the cloud.";
     };
   };
 

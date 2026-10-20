@@ -77,28 +77,25 @@ in
 
     device = lib.mkOption {
       type = lib.types.str;
-      description = ''
-        Path to the main disk to format, ideally a stable path such as
-        /dev/disk/by-id/.
-      '';
+      description = "Disk to format; prefer a stable /dev/disk/by-id/ path.";
     };
 
     tmpfsSize = lib.mkOption {
       type = lib.types.str;
       default = "4G";
-      description = "The size of the ephemeral root filesystem.";
+      description = "Size of the ephemeral root tmpfs.";
     };
 
     espSize = lib.mkOption {
       type = lib.types.str;
       default = "256M";
-      description = "The size of the EFI system partition.";
+      description = "Size of the EFI system partition.";
     };
 
     swapSize = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "The Btrfs swapfile size, or null to disable it.";
+      description = "Btrfs swapfile size; null disables it.";
     };
 
     luks.enable = lib.mkEnableOption "LUKS encryption for the data partition";
