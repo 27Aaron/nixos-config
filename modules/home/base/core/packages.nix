@@ -1,13 +1,13 @@
+# 命令列工具:讀入、輸出、結束,自己不畫介面。
+#
+# 這一類只安裝程式,不做任何設定。真正需要配置的工具各自有模組,
+# 例如 shell.nix、git.nix、development.nix。
 {
   pkgs,
   ...
 }:
 {
   home.packages = with pkgs; [
-    # 系統資訊與監控。
-    btop
-    fastfetch
-
     # 磁碟用量。
     dust
     duf
@@ -22,8 +22,7 @@
     jq
     ripgrep
 
-    # 開發與版本控制(git、git-lfs 由 modules/home/cli/git.nix 的
-    # programs.git 提供)。
+    # 建置工具。
     just
 
     # 網路與診斷。
@@ -33,11 +32,5 @@
     nmap
     socat
     wget
-  ];
-
-  # 會自行改寫配置的工具。
-  persist'.directories = [
-    # btop 在 UI 裡調整設定時會自行改寫配置。
-    ".config/btop"
   ];
 }

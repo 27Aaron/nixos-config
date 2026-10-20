@@ -33,6 +33,7 @@ in
     # tui:接管終端。
     ./tui/agents/claude-code.nix
     ./tui/agents/dsh.nix
+    ./tui/monitoring.nix
 
     # gui:開一個視窗。
     ./gui/agents/claude-desktop.nix
