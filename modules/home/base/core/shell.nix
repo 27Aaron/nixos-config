@@ -1,6 +1,12 @@
 {
+  # 兩個 shell 都是刻意啟用的,不是遺留:
+  #   fish 是主力,系統側 modules/nixos/base/core/fish.nix 把它設為登錄 shell;
+  #   zsh 是備援,少數情況下 fish 跑不起來(某些安裝腳本、只認 POSIX shell 的
+  #   環境)時改用它,比 bash 好用。
+  # programs.zsh.enable 會把 zsh 裝進 ~/.nix-profile,所以 `zsh` 隨時可用;
+  # 它沒有進 /etc/shells,因為不需要設成登錄 shell。
   programs = {
-    # Shell 初始化與補全。
+    # 主力 shell。
     fish = {
       enable = true;
       interactiveShellInit = ''
@@ -16,7 +22,7 @@
       '';
     };
 
-    # Zsh 行為與補全。
+    # 備援 shell 的行為與補全;提示符、目錄跳轉與歷史見下方。
     zsh = {
       enable = true;
       enableCompletion = true;

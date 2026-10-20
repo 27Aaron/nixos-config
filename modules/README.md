@@ -269,16 +269,24 @@ NixOS 模块，一旦同一个入口也去喂 darwin 主机，就不再是无害
 
 `fastfetch`、`duf`、`dust` 留在 `core`：它们印一次结果就退出，不接管画面，符合上面的标准。
 
+### 看起来奇怪，但刻意如此
+
+下面这些不是疏漏，改动之前先读理由：
+
+- **`shell.nix` 同时启用 fish 与 zsh。** fish 是主力，系统侧 `nixos/base/core/fish.nix` 把它设为
+  登录 shell；zsh 是备援——少数情况下 fish 跑不起来（某些安装脚本、只认 POSIX shell 的环境）时
+  改用它，比 bash 好用。`programs.zsh.enable` 会把它装进 profile，所以 `zsh` 随时可用；它没有进
+  `/etc/shells`，因为不需要设为登录 shell。
+- **`zed.nix` 的 `extraPackages`** 装了 14 个语言工具链，与 `core/development.nix` 的 mise/uv 是两
+  套来源。它们只进 Zed 的 PATH，供编辑器内的 LSP 使用；项目的工具链仍由 mise 管。目前没有冲突。
+- **`~/.cache` 不整体持久化。** tmpfs 根目录下它几乎全是可重建内容且增长很快（实测 3.6G，其中浏览器
+  HTTP 缓存 1.7G）。需要跨重启的缓存由各模块用 `persist'` 逐项登记。
+- **`magpie.nix` 的名字**看不出它是带托盘的 GUI 程序。位置是对的（靠 systemd 常驻），改名
+  `magpie-tray.nix` 只是可读性，不影响行为。
+
 ### 仍然待处理的
 
-- **`shell.nix` 同时启用 fish 与 zsh**，但系统侧 `nixos/base/core/fish.nix` 已经把 fish 定为登录
-  shell，zsh 实际上只在 `.zsh_history` 被持久化时才会用到。要么删掉 zsh，要么在注释里说明它什么时候
-  用得上。
-- **`zed.nix` 的 `extraPackages`** 装了 14 个语言工具链，与 `core/development.nix` 的 mise/uv 构成两
-  套工具链来源。目前只进 Zed 的 PATH，有注释说明，暂时保留；如果哪天两边版本打架，再抽出去。
-- **`magpie.nix` 的名字**看不出它是带托盘的 GUI 程序。位置是对的（靠 systemd 常驻），改名
-  `magpie-tray.nix` 会更清楚，但这只是可读性，不影响行为。
-- **`tmpfs` 根目录下 `~/.cache` 不整体持久化**是刻意的；各模块只登记真正需要跨重启的单项。
+- 目前没有。上一轮记的 fish/zsh 与 zed 工具链两项已确认是有意为之，理由见上。
 
 ## Darwin 什么时候来
 
