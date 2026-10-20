@@ -6,6 +6,7 @@
   ];
 
   core'.firewall.enable = true;
+  core'.logging.enable = true;
   core'.sops.enable = true;
   core'.yubikey.enable = true;
 
@@ -20,9 +21,11 @@
   desktop'.fonts.enable = true;
 
   services'.dae.enable = true;
+  services'.logrotate.enable = true;
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
   services'.pipewire.enable = true;
+  services'.trash.enable = true;
   services'.vnstat.enable = true;
   services'.keyd.enable = true;
   services'.keyd.keyboards = {
