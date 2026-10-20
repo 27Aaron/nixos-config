@@ -56,10 +56,9 @@ modules/
     └── darwin/            #   预留：只有 macOS 需要的 Home Manager 设置
 ```
 
-上面的目录都已建好，但**现有文件还留在 `modules/{core,desktop,hardware,services,home}`**，每个文件
-的目标位置见[迁移对照表](#迁移对照表)。新建的每个目录都带一个 `.gitkeep`，因为 Git 不跟踪空目录；
-在放入第一个真实模块的那个 commit 里把它删掉即可。预留的叶子目录——`base/`、`darwin/`、
-`nixos/server/`、`home/nixos/`、`home/darwin/`——会保留得久一些，要等到第二个平台真的需要它们。
+上面的目录都已建好，文件也已经搬进去了，过程记在[迁移记录](#迁移记录)。新建的每个目录原本带一个
+`.gitkeep`，因为 Git 不跟踪空目录；放入真实模块时已经删掉。仍然留着的四个——`base/`、`darwin/`、
+`nixos/server/`、`home/darwin/`——要等到第二个平台或第一台无头主机真的需要它们。
 
 ## nixos/base —— 每一台 NixOS
 
@@ -127,10 +126,13 @@ commit 来做。
 按目前的内容就是：
 
 - **`base/core/`** —— `shell.nix`（fish、zsh、提示符、别名）、`git.nix`、`development.nix`
-  （direnv、mise、uv）、`packages.nix`（fd、ripgrep、jq、curl、dust、ncdu）。
-- **`base/tui/`** —— `agents/`（claude-code、dsh）；以后还有 `btop`、`yazi`、`lazygit`、`nvim`。
-- **`base/gui/`** —— `terminal/`（kitty）、`browsers/`（chrome、firefox）、`editors/`（vscode、zed、
-  cursor）、`theme.nix`、`mime-apps.nix`、`user-dirs.nix`、`apps.nix`、`magpie.nix`。
+  （direnv、mise、uv）、`packages.nix`（fd、ripgrep、jq、curl、fastfetch、duf、dust）。
+- **`base/tui/`** —— `agents/`（claude-code、dsh）、`git/lazygit.nix`、`monitoring.nix`（btop、ncdu、
+  nload）；以后还有 `yazi`、`nvim`。
+- **`base/gui/`** —— `terminal/`（kitty）、`browsers/`（chrome、firefox）、`editors/`（vscode、zed）、
+  `agents/`（claude-desktop、dsh-desktop）、`nagram.nix`、`seahorse.nix`、`pointer-cursor.nix`、
+  `theme.nix`、`mime-apps.nix`、`user-dirs.nix`。
+- **`home/nixos/`** —— 目前只有 `magpie.nix`，因为托盘程序注册 `systemd.user.services`。
 
 ### 接线的两个层次
 
@@ -152,8 +154,12 @@ commit 来做。
 
 - **kitty → `base/gui/terminal/`**。它是一个图形程序，只是刚好用来渲染文字。在一个没有其他终端的
   会话里它照样起得来，因为**它就是那个终端**。
-- **btop、yazi、lazygit、nvim → `base/tui/`**。它们需要一个已经存在的终端，没有就根本起不来。
-- **fd、ripgrep、jq、dust → `base/core/`**。自己没有画面：读入、输出、退出。
+- **btop、ncdu、nload、lazygit、nvim → `base/tui/`**。它们需要一个已经存在的终端，没有就根本起不来。
+- **fd、ripgrep、jq、fastfetch、duf、dust → `base/core/`**。自己没有画面：读入、输出、退出。
+
+一个容易混淆的边界是 `ncdu` 与 `duf`：名字和用途几乎一样，但 `duf` 印出表格就退回，`ncdu` 停在
+ncurses 界面里等按键。**判断依据是「它退不退出」，不是「它属于哪个领域」**：同一类工具可以分属两个
+桶，只要一个交互、一个不交互。
 
 大家第一个想到的名字是 "cli"，但那是错的切分轴：kitty、btop、fd 全都是命令行程序，所以一个
 `cli/` 桶必须同时装下这三类。真正能把它们分开的问题是：**程序运行时是否占据屏幕**——完全不占、
@@ -161,7 +167,8 @@ commit 来做。
 
 `cli` 仍然值得作为一个 `core/` 下的子目录存在，含义收窄成「只装命令，不装任何配置」。等
 `packages.nix` 长到需要拆分时，按领域分——`base/core/cli/search.nix`、`base/core/cli/network.nix`、
-`base/core/cli/disk.nix`——而不是把 `cli` 提升成与 `tui/`、`gui/` 平级的第四个桶。
+`base/core/cli/disk.nix`——而不是把 `cli` 提升成与 `tui/`、`gui/` 平级的第四个桶。目前还没拆，
+因为 20 个包放进一个文件还看得过来。
 
 `core/` 内部还有一层区分值得保留：`shell.nix`、`git.nix`、`development.nix` 是**配置**一个工具，
 因此会改变它的行为——你落进哪个 shell、commit 上署谁的名、哪些工具链会被激活；`packages.nix` 只是
@@ -231,86 +238,42 @@ NixOS 模块，一旦同一个入口也去喂 darwin 主机，就不再是无害
 5. 在需要它的主机上打开：`hardware'.bluetooth.enable = true;`。
 6. 跑 `nix fmt` 和 `just check`。
 
-## 迁移对照表
+## 迁移记录
 
-现有每个文件的目标位置。每一块是一次 commit；**选项名不变**，所以 `hosts/<name>/default.nix` 在
-每一次移动前后都能照常工作。
+文件已经搬完，`modules/{core,desktop,hardware,services,home}` 不再存在。这一步只动位置，**选项名一个
+都没改**，所以 `hosts/<name>/default.nix` 在迁移前后都能照常工作。验证方式是拿迁移前的 commit 对比：
+系统包列表 202 个、Home Manager 包列表、以及 66 个持久化目录加 4 个文件，全部完全一致。
 
-### `modules/core`、`hardware`、`services` → `nixos/base`
+分四次 commit 完成，每次都可以单独回退：
 
-| 现在                  | 目标                             |
-| --------------------- | -------------------------------- |
-| `core/firewall.nix`   | `nixos/base/core/firewall.nix`   |
-| `core/fish.nix`       | `nixos/base/core/fish.nix`       |
-| `core/host.nix`       | `nixos/base/core/host.nix`       |
-| `core/i18n.nix`       | `nixos/base/core/i18n.nix`       |
-| `core/logging.nix`    | `nixos/base/core/logging.nix`    |
-| `core/nix.nix`        | `nixos/base/core/nix.nix`        |
-| `core/sops.nix`       | `nixos/base/core/sops.nix`       |
-| `core/yubikey.nix`    | `nixos/base/core/yubikey.nix`    |
-| `hardware/*.nix`      | `nixos/base/hardware/*.nix`      |
-| `hardware/boot/*.nix` | `nixos/base/hardware/boot/*.nix` |
-| `services/*.nix`      | `nixos/base/services/*.nix`      |
+1. 系统模块搬进 `nixos/{base,desktop}`；
+2. `home` 拆成平台入口与共用清单两层，模块搬进三桶，`llm` 按软件拆分；
+3. `btop`、`fastfetch` 从 `core` 移到 `tui`；
+4. 修正三个放错位置的模块（见下）。
 
-### `modules/desktop` → `nixos/desktop`
+### 拆分过程中修正的问题
 
-| 现在                       | 目标                             |
-| -------------------------- | -------------------------------- |
-| `desktop/fcitx5.nix`       | `nixos/desktop/fcitx5.nix`       |
-| `desktop/file-manager.nix` | `nixos/desktop/file-manager.nix` |
-| `desktop/fonts.nix`        | `nixos/desktop/fonts.nix`        |
-| `desktop/greetd.nix`       | `nixos/desktop/greetd.nix`       |
-| `desktop/niri.nix`         | `nixos/desktop/niri.nix`         |
-| `desktop/noctalia.nix`     | `nixos/desktop/noctalia.nix`     |
-| `desktop/vinput.nix`       | `nixos/desktop/vinput.nix`       |
+| 问题                                   | 处理                                               |
+| -------------------------------------- | -------------------------------------------------- |
+| `llm/default.nix` 一个文件管四个 agent | 拆成四个文件，各自管自己的包与持久化               |
+| `cursor.nix` 其实不是 Cursor 编辑器    | 改名 `gui/pointer-cursor.nix`，它只设 XCursor 主题 |
+| `lazygit` 混在 `core/git.nix`          | 独立成 `tui/git/lazygit.nix`                       |
+| `ncdu`、`nload` 是 ncurses 交互界面    | 移到 `tui/monitoring.nix`                          |
+| `apps.nix` 是杂物袋                    | 拆成 `gui/nagram.nix` 与 `gui/seahorse.nix`        |
+| `cli/tools.nix` 名不副实               | 改名 `core/packages.nix`，只留「印完就退出」的工具 |
 
-### `modules/home` → `home/base/*` 与 `home/nixos/*`
+`fastfetch`、`duf`、`dust` 留在 `core`：它们印一次结果就退出，不接管画面，符合上面的标准。
 
-| 现在                         | 目标                                 |
-| ---------------------------- | ------------------------------------ |
-| `home/cli/development.nix`   | `home/base/core/development.nix`     |
-| `home/cli/git.nix`           | `home/base/core/git.nix`             |
-| `home/cli/shell.nix`         | `home/base/core/shell.nix`           |
-| `home/cli/tools.nix`         | `home/base/core/packages.nix`        |
-| `home/llm/default.nix`       | `home/base/tui/agents/default.nix`   |
-| `home/desktop/kitty.nix`     | `home/base/gui/terminal/kitty.nix`   |
-| `home/desktop/chrome.nix`    | `home/base/gui/browsers/chrome.nix`  |
-| `home/desktop/firefox.nix`   | `home/base/gui/browsers/firefox.nix` |
-| `home/desktop/vscode.nix`    | `home/base/gui/editors/vscode.nix`   |
-| `home/desktop/zed.nix`       | `home/base/gui/editors/zed.nix`      |
-| `home/desktop/cursor.nix`    | `home/base/gui/editors/cursor.nix`   |
-| `home/desktop/theme.nix`     | `home/base/gui/theme.nix`            |
-| `home/desktop/mime-apps.nix` | `home/base/gui/mime-apps.nix`        |
-| `home/desktop/user-dirs.nix` | `home/base/gui/user-dirs.nix`        |
-| `home/desktop/apps.nix`      | `home/base/gui/apps.nix`             |
-| `home/desktop/magpie.nix`    | `home/nixos/magpie.nix`              |
-| `home/default.nix`           | 拆成两个文件，见下                   |
+### 仍然待处理的
 
-`home/default.nix` 会变成两个文件，因为它现在同时干着两件不相关的事：
-
-- **`modules/home/default.nix`** 留在原处，作为平台入口。它保留 `programs.dconf.enable`，并把那一长
-  串模块列表换成 `home-manager.users.<name>.imports = [ ./base ./nixos ]`。
-- **`modules/home/base/default.nix`** 是新增的，放两个平台都需要的东西：`persist'` 选项宣告、
-  `home.username`／`homeDirectory`／`stateVersion`、`programs.home-manager.enable`，以及 `core/`、
-  `tui/`、`gui/` 下各文件的 import。
-
-`persist'` 必须宣告在 `base/` 而不是根上：一台 darwin 主机只 import `./base ./darwin`，宣告在根上
-的选项在那边会不存在。
-
-`magpie` 是唯一不能进 `base/` 的文件：它用 `systemd.user.services` 注册自己，而 macOS 上没有这个
-东西。这正是 `home/nixos/` 存在的场合。
-
-有两个遗留问题，光靠移动文件解决不了：
-
-- `home/base/tui/agents/default.nix` 把控制台 agent（`claude-code`、`dsh`）和 Electron 应用
-  （`claude-desktop`、`dsh-desktop`）混在一起。下次动它时，把带窗口的拆到 `home/base/gui/agents/`。
-- `home/base/core/packages.nix` 装了 `btop` 和 `fastfetch`，按上面的标准它们属于 `tui/`。暂时留着，
-  因为这个文件只是安装它们；等其中某一个需要自己的配置时，再给它一个 `tui/` 模块。
-
-每一块搬完之后用 `just check` 和 `just build river` 验证。
-
-这一轮**没有任何东西进 `home/darwin/`**：现在还没有 macOS 主机，放在那里而没人 import 的文件只是
-纯负担。等 darwin 输出接通时，它才会有第一个模块。
+- **`shell.nix` 同时启用 fish 与 zsh**，但系统侧 `nixos/base/core/fish.nix` 已经把 fish 定为登录
+  shell，zsh 实际上只在 `.zsh_history` 被持久化时才会用到。要么删掉 zsh，要么在注释里说明它什么时候
+  用得上。
+- **`zed.nix` 的 `extraPackages`** 装了 14 个语言工具链，与 `core/development.nix` 的 mise/uv 构成两
+  套工具链来源。目前只进 Zed 的 PATH，有注释说明，暂时保留；如果哪天两边版本打架，再抽出去。
+- **`magpie.nix` 放在 `home/nixos/`**，因为它注册 `systemd.user.services`。文件名看不出它是 GUI 托
+  盘程序，可以考虑改名 `magpie-tray.nix`。
+- **`tmpfs` 根目录下 `~/.cache` 不整体持久化**是刻意的；各模块只登记真正需要跨重启的单项。
 
 ## Darwin 什么时候来
 
