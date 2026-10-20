@@ -32,6 +32,17 @@ in
     })
 
     (lib.mkIf cfg.enable {
+      # 上游預設把 systemd 的 ssh proxy 設定 Include 進 /etc/ssh/ssh_config,
+      # 但那個檔案在 Nix store 裡屬於 nobody。OpenSSH 10 起會檢查被 Include
+      # 檔案的擁有者,不符就中止並印出
+      #   Bad owner or permissions on .../20-systemd-ssh-proxy.conf
+      # 結果是整個 /etc/ssh/ssh_config 失效,所有 ssh 與 git 操作都會失敗。
+      #
+      # 這裡關掉該 Include。它只提供 .host / unix/* / machine/* 這類連到
+      # 本機與 machined 虛擬機的簡寫,本機沒有用到(ssh-unix-local socket
+      # 不存在),關閉不影響任何既有連線。
+      programs.ssh.systemd-ssh-proxy.enable = lib.mkDefault false;
+
       services.openssh = {
         enable = true;
         ports = [ 233 ];
