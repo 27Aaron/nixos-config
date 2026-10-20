@@ -52,7 +52,7 @@ modules/
     │   ├── core/          #     自己不画界面
     │   ├── tui/           #     接管终端
     │   └── gui/           #     开一个窗口
-    ├── nixos/             #   预留：只有 NixOS 需要的 Home Manager 设置
+    ├── nixos/             #   只有 NixOS 需要的 Home Manager 设置（systemd.user 等）
     └── darwin/            #   预留：只有 macOS 需要的 Home Manager 设置
 ```
 
