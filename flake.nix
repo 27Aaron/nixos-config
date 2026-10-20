@@ -35,6 +35,11 @@
       url = "github:27Aaron/nur-packages";
     };
 
+    fonts = {
+      url = "github:27Aaron/Fonts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nagram = {
       url = "github:NextAlone/Nagram-Qt";
     };
