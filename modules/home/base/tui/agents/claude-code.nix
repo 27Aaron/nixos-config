@@ -17,6 +17,11 @@ in
   # 登入態與設定由程式自己寫入;~/.cache 留在 tmpfs 上不登記。
   persist' = {
     directories = [ ".claude" ];
-    files = [ ".claude.json" ];
+    files = [
+      {
+        file = ".claude.json";
+        mode = "0600";
+      }
+    ];
   };
 }

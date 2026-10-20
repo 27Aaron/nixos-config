@@ -32,8 +32,9 @@ in
   };
 
   # 供應商金鑰與用量在 .config/magpie,WebKit 頁面資料在 .local/share/magpie。
-  # ~/.cache 不整體持久化,所以放在那裡的使用者狀態要逐項登記;其餘(bun、
-  # models.json、plugin-*.json)可重新下載,留在 tmpfs 即可。
+  # 整個 ~/.cache/magpie 一併保留:agents/sessions 是使用者狀態,models.json
+  # 與 plugin-*.json 則需要重新下載;目錄 bind mount 也避免原子替換問題。
+  # 清理時保留 agents-state.json 與 sessions.json,其餘快取可刪。
   persist' = {
     directories = [
       {
@@ -44,18 +45,9 @@ in
         directory = ".local/share/magpie";
         mode = "0700";
       }
-    ];
-
-    files = [
-      # 自訂的 agent 定義(模型、選項、路徑),重建不會還原。
       {
-        file = ".cache/magpie/agents-state.json";
-        mode = "0600";
-      }
-      # 開啟過的檔案與工作階段索引,指向 .dsh 的 session 檔。
-      {
-        file = ".cache/magpie/sessions.json";
-        mode = "0600";
+        directory = ".cache/magpie";
+        mode = "0700";
       }
     ];
   };
