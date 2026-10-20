@@ -59,4 +59,15 @@ in
 
     gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
   };
+
+  # dconf 的資料庫是二進位檔,存放 GTK 應用與 Nautilus 在執行時寫入的
+  # 外觀狀態(游標尺寸與主題、視窗大小等)。本倉庫只用 gtk.extraConfig
+  # 宣告主題,沒有宣告任何 dconf.settings,因此這些內容無法由 rebuild
+  # 重建;根目錄是 tmpfs,不登記就會在每次開機後從零開始。
+  persist'.directories = [
+    {
+      directory = ".config/dconf";
+      mode = "0700";
+    }
+  ];
 }

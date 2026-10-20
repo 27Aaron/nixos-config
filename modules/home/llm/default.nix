@@ -13,12 +13,12 @@ in
   ];
 
   # 登入態與配置由程式自行寫入,只保留跨重啟。
+  # 快取一律不登記:~/.cache 留在 tmpfs 上,重開機即清空。
   persist' = {
     directories = [
       ".claude"
-      # Claude 桌面端的設定與快取。
+      # Claude 桌面端的設定。
       ".config/Claude"
-      ".cache/Claude"
       # dsh 的設定、憑證與工作階段都在 DSH_HOME,預設 ~/.dsh。
       ".dsh"
       # dsh-desktop 的 Electron 設定與崩潰紀錄。

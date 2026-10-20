@@ -43,6 +43,12 @@ in
         directory = ".local/share/gvfs-metadata";
         mode = "0700";
       }
+      # Nautilus 的星號與標籤資料庫(meta.db),同樣是執行時寫入的
+      # 二進位檔,rebuild 不會重建。
+      {
+        directory = ".local/share/nautilus";
+        mode = "0700";
+      }
     ];
   };
 }
