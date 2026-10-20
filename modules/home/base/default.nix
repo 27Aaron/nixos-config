@@ -29,6 +29,7 @@ in
     ./core/git.nix
     ./core/packages.nix
     ./core/shell.nix
+    ./core/toolchain.nix
 
     # tui:接管終端。
     ./tui/agents/claude-code.nix

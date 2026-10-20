@@ -126,7 +126,8 @@ commit 来做。
 按目前的内容就是：
 
 - **`base/core/`** —— `shell.nix`（fish、zsh、提示符、别名）、`git.nix`、`development.nix`
-  （direnv、mise、uv）、`packages.nix`（fd、ripgrep、jq、curl、fastfetch、duf、dust）。
+  （direnv、mise、uv）、`toolchain.nix`（go、rustc、python3 与各语言服务器）、`packages.nix`（fd、
+  ripgrep、jq、curl、fastfetch、duf、dust）。
 - **`base/tui/`** —— `agents/`（claude-code、dsh）、`git/lazygit.nix`、`monitoring.nix`（btop、ncdu、
   nload）；以后还有 `yazi`、`nvim`。
 - **`base/gui/`** —— `terminal/`（kitty）、`browsers/`（chrome、firefox）、`editors/`（vscode、zed）、
@@ -277,8 +278,11 @@ NixOS 模块，一旦同一个入口也去喂 darwin 主机，就不再是无害
   登录 shell；zsh 是备援——少数情况下 fish 跑不起来（某些安装脚本、只认 POSIX shell 的环境）时
   改用它，比 bash 好用。`programs.zsh.enable` 会把它装进 profile，所以 `zsh` 随时可用；它没有进
   `/etc/shells`，因为不需要设为登录 shell。
-- **`zed.nix` 的 `extraPackages`** 装了 14 个语言工具链，与 `core/development.nix` 的 mise/uv 是两
-  套来源。它们只进 Zed 的 PATH，供编辑器内的 LSP 使用；项目的工具链仍由 mise 管。目前没有冲突。
+- **`core/toolchain.nix` 与 `development.nix` 并存。** 前者是语言直译器与语言服务器（go、rustc、
+  python3、gopls、rust-analyzer…），装在使用者 PATH 上，任何程序都能取用；后者是 direnv、mise、
+  uv 这类**环境切换**工具。两者层次不同：toolchain 给的是开箱即用的基底版本，mise 管的是项目指定
+  的版本，direnv 把专案环境叠在前面。编辑器的 LSP 靠 `path_lookup` 从 PATH 找到它们，所以工具链
+  不再塞进任何单一编辑器的私有 PATH。
 - **`~/.cache` 不整体持久化。** tmpfs 根目录下它几乎全是可重建内容且增长很快（实测 3.6G，其中浏览器
   HTTP 缓存 1.7G）。需要跨重启的缓存由各模块用 `persist'` 逐项登记。
 - **`magpie.nix` 的名字**看不出它是带托盘的 GUI 程序。位置是对的（靠 systemd 常驻），改名

@@ -1,8 +1,4 @@
 {
-  pkgs,
-  ...
-}:
-{
   programs.zed-editor = {
     enable = true;
 
@@ -67,7 +63,7 @@
       # 用 fish 的 direnv hook,讓 .envrc 進入編輯器與內建終端。
       load_direnv = "shell_hook";
 
-      # 語言伺服器優先用 PATH 上的(mise、uv、direnv,或下面的工具鏈)。
+      # 語言伺服器優先用 PATH 上的(mise、uv、direnv,或 core/toolchain.nix)。
       # 找不到才會下載;下載的原生二進位在 NixOS 上通常跑不起來。
       lsp = {
         nixd.binary.path_lookup = true;
@@ -93,33 +89,6 @@
         tab_size = 2;
       };
     };
-
-    # 只進 Zed 的 PATH。Zed 啟動就帶上,不另做開關。
-    extraPackages = with pkgs; [
-      # Python。直譯器版本仍可由 uv 管。
-      python3
-      basedpyright
-      ruff
-
-      # Go。
-      go
-      gopls
-
-      # Rust。
-      rustc
-      cargo
-      rustfmt
-      clippy
-      rust-analyzer
-
-      # TypeScript。
-      nodejs
-      typescript
-      vtsls
-
-      # package.json 的版本懸停。用 Nix 包,不要 Zed 下載的那份。
-      package-version-server
-    ];
   };
 
   # 擴充功能、工作區資料庫與登入態在 .local/share/zed。
