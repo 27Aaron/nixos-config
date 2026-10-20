@@ -29,15 +29,34 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  # 供應商金鑰、用量與 WebKit 的頁面資料都要跨重啟。快取在已保留的 .cache 裡。
-  persist'.directories = [
-    {
-      directory = ".config/magpie";
-      mode = "0700";
-    }
-    {
-      directory = ".local/share/magpie";
-      mode = "0700";
-    }
-  ];
+  # 供應商金鑰與用量在 .config/magpie,WebKit 的頁面資料在
+  # .local/share/magpie。~/.cache 不再整體持久化,因此 magpie 放在那裡的
+  # 使用者狀態要逐項登記;其餘(bun、update、models.json、plugin-*.json 等)
+  # 都是可重新下載的內容,留在 tmpfs 上即可。
+  persist' = {
+    directories = [
+      {
+        directory = ".config/magpie";
+        mode = "0700";
+      }
+      {
+        directory = ".local/share/magpie";
+        mode = "0700";
+      }
+    ];
+
+    files = [
+      # 自訂的 agent 定義(模型、選項、路徑),重建不會還原。
+      {
+        file = ".cache/magpie/agents-state.json";
+        mode = "0600";
+      }
+      # 開啟過的檔案與工作階段索引;它指向 .dsh 的 session 檔,
+      # 對應的內容本身已持久化。
+      {
+        file = ".cache/magpie/sessions.json";
+        mode = "0600";
+      }
+    ];
+  };
 }

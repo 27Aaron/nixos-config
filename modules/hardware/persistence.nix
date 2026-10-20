@@ -49,11 +49,12 @@ in
     # 基礎使用者狀態;Home Manager 工具經由 persist'
     # 回報的狀態會附加在後。
     preservation'.user.directories = [
-      # 把快取移出 tmpfs 根目錄,避免佔用過多記憶體。
-      {
-        directory = ".cache";
-        mode = "0700";
-      }
+      # 不整體持久化 ~/.cache。它幾乎全是可重建的內容,而且成長得很快
+      # (實測 3.6G,其中瀏覽器 HTTP 快取就佔 1.7G)。留在 tmpfs 上,
+      # 重開機即清空,順帶把「快取無限長大」這個問題一併消掉。
+      #
+      # 需要跨重啟的快取由各模組自行以 persist' 精確登記,
+      # 目前只有 Nix 的求值與抓取快取(見 modules/core/nix.nix)。
 
       # Nix 與 Home Manager
       ".local/share/nix"
