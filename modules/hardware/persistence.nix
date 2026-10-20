@@ -97,8 +97,14 @@ in
         }
         "/var/log"
         {
+          # 暫存區放在持久卷上,才不會吃掉根 tmpfs 的記憶體。
+          # 它是世界可寫,因此比照 /tmp 加上 nosuid 與 nodev。
           directory = "/var/tmp";
           mode = "1777";
+          mountOptions = [
+            "nosuid"
+            "nodev"
+          ];
         }
       ];
 
@@ -115,6 +121,15 @@ in
     environment.etc."tmpfiles.d/lastlog2-tmpfiles.conf".text = ''
       # Managed by Preservation.
     '';
+
+    # /var/tmp 與 /tmp 都是可重建的暫存區,但 /var/tmp 位於持久卷,
+    # 不清理就會跨重啟無限累積(systemd 預設只清 30 天前的項目)。
+    # D! 在開機時清空內容並保留目錄與權限,效果等同 boot.tmp.cleanOnBoot。
+    #
+    # core dump 的清除與容量上限一併由 core'.logging 管理。
+    systemd.tmpfiles.rules = [
+      "D! /var/tmp 1777 root root"
+    ];
 
     # systemd-machine-id-commit.service 會執行失敗,
     # 但對這種持久化 machine-id 的配置而言無關緊要,因此予以抑制。

@@ -27,6 +27,28 @@ let
       mountpoint = "/snapshots";
       mountOptions = btrfsOptions;
     };
+
+    # /tmp 放在磁碟上,不與根目錄共用那 4G 的 tmpfs。
+    # 暫存檔不該佔用記憶體:一次解大壓縮檔、一次錄影或 docker save,
+    # 就會把根吃滿,而根一滿是整個系統癱掉,不只是該程式失敗。
+    # 代價是它會跨重啟累積,因此搭配 boot.tmp.cleanOnBoot 在開機時清空。
+    #
+    # 既有機器不必重灌,建立 subvolume 後重開機即可:
+    #   sudo btrfs subvolume create /btr_pool/@tmp
+    # 權限(1777)由 boot.tmp.cleanOnBoot 產生的
+    #   D! /tmp 1777 root root
+    # 在每次開機時設定,不需要另外 chmod。只有「先 switch 才手動掛載」
+    # 這種 tmpfiles 已經跑完的情境,才需要一次性 sudo chmod 1777 /tmp。
+    #
+    # nofail 讓 subvolume 尚未建立時退回根 tmpfs,不至於開不了機。
+    "@tmp" = {
+      mountpoint = "/tmp";
+      mountOptions = btrfsOptions ++ [
+        "nosuid"
+        "nodev"
+        "nofail"
+      ];
+    };
   }
   // lib.optionalAttrs (cfg.swapSize != null) {
     "@swap" = {
@@ -103,6 +125,11 @@ in
         message = "hardware'.disko.luks.fido2.enable requires hardware'.disko.luks.enable.";
       }
     ];
+
+    # /tmp 由 disko 配置為 @tmp subvolume。boot.tmp.cleanOnBoot 只是在開機時
+    # 追加一條 tmpfiles 規則(D! /tmp 1777 root root),本身不會改變 /tmp 的
+    # 位置——它只有在 /tmp 位於磁碟上時才有意義,兩者必須成對使用。
+    boot.tmp.cleanOnBoot = true;
 
     # FIDO2 權杖在 LUKS 頭部,開機時由 systemd-cryptsetup 讀取。
     # 這裡只讓 initrd 認得已登記的鑰匙,不會替磁碟登記。
