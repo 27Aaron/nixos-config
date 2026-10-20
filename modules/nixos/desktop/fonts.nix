@@ -1,11 +1,14 @@
 {
   config,
+  inputs,
   lib,
   pkgs,
   ...
 }:
 let
   cfg = config.desktop'.fonts;
+
+  fonts = inputs.fonts.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   options.desktop'.fonts = {
@@ -19,25 +22,24 @@ in
       fontDir.enable = true;
 
       packages = with pkgs; [
-        # kitty 與 zed 以這個家族名指定字型,中文回退到思源。
         maple-mono.NF-unhinted
         nerd-fonts.symbols-only
 
         source-han-sans
         source-han-serif
 
+        fonts.pingfang
+
         noto-fonts-color-emoji
       ];
 
-      # 繁體排在簡體前面,才會先挑到 TC。
       fontconfig.defaultFonts = {
         serif = [
           "Source Han Serif TC"
-          "Source Han Serif SC"
         ];
         sansSerif = [
+          "PingFang TC"
           "Source Han Sans TC"
-          "Source Han Sans SC"
         ];
         monospace = [ "Maple Mono NF" ];
         emoji = [ "Noto Color Emoji" ];

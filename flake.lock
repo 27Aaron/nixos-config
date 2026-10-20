@@ -95,6 +95,26 @@
         "type": "github"
       }
     },
+    "fonts": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792494961,
+        "narHash": "sha256-BbwxU+EkNCXhz8kF6q3jfdH1PAQBRlKyH8PhhygCZtg=",
+        "owner": "27Aaron",
+        "repo": "Fonts",
+        "rev": "287867ba243162646aa5e49381b64a014f35f5ec",
+        "type": "github"
+      },
+      "original": {
+        "owner": "27Aaron",
+        "repo": "Fonts",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -258,6 +278,7 @@
       "inputs": {
         "disko": "disko",
         "fcitx5-vinput": "fcitx5-vinput",
+        "fonts": "fonts",
         "home-manager": "home-manager",
         "llm-agents": "llm-agents",
         "nagram": "nagram",
