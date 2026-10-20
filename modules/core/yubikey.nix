@@ -37,5 +37,14 @@ in
 
     # 通用 U2F/FIDO 權限。YubiKey 專用規則已由 yubikey-manager 帶入。
     services.udev.packages = [ pkgs.libfido2 ];
+
+    # libfido2 帶入的 70-u2f.rules 每條都寫了 GROUP="plugdev",但 NixOS 沒有
+    # 這個組(Debian 系才有),udev 因此對每一條規則各報一次
+    # "Failed to resolve group 'plugdev'"。開機時會累積上百行,把真正的錯誤淹掉。
+    #
+    # 這裡建一個沒有成員的空組,只為了讓規則解析通過。存取權仍由同一條規則裡的
+    # TAG+="uaccess" 決定(systemd-logind 對當前登入者授予 ACL),
+    # 不依賴組成員身分,所以不必把使用者加進去。
+    users.groups.plugdev = { };
   };
 }
