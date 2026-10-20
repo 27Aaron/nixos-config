@@ -28,12 +28,17 @@ in
     # user-dirs 的各掛載點已帶 x-gvfs-trash,gvfs 會把回收桶匯總成同一個檢視。
     services.gvfs.enable = true;
 
-    # tmpfs 根之下要登記才跨重啟:回收桶內容,以及 Nautilus 的
-    # 星號、圖示位置等檔案中繼資料。
-    # 家目錄掛載點上的檔案(如 Downloads)丟進掛載點內的 .Trash-$uid,
-    # 隨目錄本身保留;這裡保留的是 tmpfs 家目錄區域的回收桶。
+    # tmpfs 根之下要登記才跨重啟:Nautilus 的星號、圖示位置等檔案中繼資料。
+    #
+    # 刻意不持久化 ~/.local/share/Trash。trash 規格要求「被丟棄檔案的
+    # topdir 必須等於回收桶的 topdir」,而家目錄的 topdir 是根 tmpfs;
+    # 回收桶一旦 bind 掛載到持久卷就成了另一個 topdir,結果是家目錄第一層
+    # 的檔案完全無法丟回收桶(Nautilus、gio trash、rm --trash 皆然):
+    #   Unable to trash file ... across filesystem boundaries
+    # 家目錄回收桶留在 tmpfs 上,重開機即清空,符合這個系統的語意。
+    # 掛載點底下的檔案(如 Downloads)進到該掛載點內的 .Trash-$uid,
+    # 隨目錄本身保留,由 services'.trash 的保留計時器清理。
     preservation'.user.directories = [
-      ".local/share/Trash"
       {
         directory = ".local/share/gvfs-metadata";
         mode = "0700";
