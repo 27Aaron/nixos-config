@@ -25,6 +25,7 @@
   services'.openssh.enable = true;
   services'.networkmanager.enable = true;
   services'.pipewire.enable = true;
+  services'.trash.enable = true;
   services'.vnstat.enable = true;
   services'.keyd.enable = true;
   services'.keyd.keyboards = {
