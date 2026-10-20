@@ -6,6 +6,7 @@
   ];
 
   core'.firewall.enable = true;
+  core'.logging.enable = true;
   core'.sops.enable = true;
   core'.yubikey.enable = true;
 
