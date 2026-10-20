@@ -1,3 +1,4 @@
+# Nagram:Telegram 桌面客戶端,開自己的視窗。
 { inputs, pkgs, ... }:
 let
   nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop;
@@ -22,15 +23,8 @@ let
   };
 in
 {
-  home.packages = [
-    nagram-desktop
-    # 查看 GNOME 鑰匙環。
-    pkgs.seahorse
-  ];
+  home.packages = [ nagram-desktop ];
 
-  # 設定與登入態由程式自行寫入,只保留跨重啟。
-  persist'.directories = [
-    # Nagram 的工作階段與設定,含 tdata。沒有舊資料時寫在這裡。
-    ".local/share/NagramDesktop"
-  ];
+  # 工作階段與設定,含 tdata。
+  persist'.directories = [ ".local/share/NagramDesktop" ];
 }

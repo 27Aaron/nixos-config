@@ -1,15 +1,18 @@
-# 終端機介面的監控工具。
+# 互動式的終端監控工具:會一直停在畫面上等按鍵,需要一個已存在的終端。
 #
-# btop 與 fastfetch 都是接管整個終端、需要一個已存在的終端才能跑,
-# 所以屬於 tui 而不是 core。
+# 一次印完就退出的工具(fastfetch、duf、dust)屬於 core,不在這裡。
 {
   pkgs,
   ...
 }:
 {
   home.packages = with pkgs; [
+    # 資源與磁碟監控;ncdu 是 ncurses 介面,按鍵操作。
     btop
-    fastfetch
+    ncdu
+
+    # 網路流量;ncurses 圖表。
+    nload
   ];
 
   # btop 在 UI 裡調整設定時會自行改寫配置,重開機要留著。

@@ -8,10 +8,12 @@
 }:
 {
   home.packages = with pkgs; [
-    # 磁碟用量。
+    # 系統資訊:印完就退出,不接管畫面。
+    fastfetch
+
+    # 磁碟用量:duf 與 dust 都是一次性輸出;互動式的 ncdu 在 tui/monitoring.nix。
     dust
     duf
-    ncdu
 
     # 搜尋、文字處理與導航。
     fd
@@ -25,10 +27,9 @@
     # 建置工具。
     just
 
-    # 網路與診斷。
+    # 網路與診斷。互動式的 nload 在 tui/monitoring.nix。
     curl
     iperf3
-    nload
     nmap
     socat
     wget

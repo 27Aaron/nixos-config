@@ -33,15 +33,17 @@ in
     # tui:接管終端。
     ./tui/agents/claude-code.nix
     ./tui/agents/dsh.nix
+    ./tui/git/lazygit.nix
     ./tui/monitoring.nix
 
     # gui:開一個視窗。
     ./gui/agents/claude-desktop.nix
     ./gui/agents/dsh-desktop.nix
-    ./gui/apps.nix
+    ./gui/nagram.nix
+    ./gui/seahorse.nix
     ./gui/browsers/chrome.nix
     ./gui/browsers/firefox.nix
-    ./gui/editors/cursor.nix
+    ./gui/pointer-cursor.nix
     ./gui/editors/vscode.nix
     ./gui/editors/zed.nix
     ./gui/mime-apps.nix
