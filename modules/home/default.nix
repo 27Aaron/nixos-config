@@ -74,8 +74,9 @@ in
     ./llm
 
     ./desktop/apps.nix
-    ./desktop/browsers.nix
+    ./desktop/chrome.nix
     ./desktop/cursor.nix
+    ./desktop/firefox.nix
     ./desktop/kitty.nix
     ./desktop/magpie.nix
     ./desktop/mime-apps.nix
