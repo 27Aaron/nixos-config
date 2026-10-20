@@ -82,7 +82,7 @@
   };
 
   # 上述 shell 與歷史工具的執行時狀態(fish 的狀態目錄由
-  # modules/core/fish.nix 持久化)。
+  # modules/nixos/base/core/fish.nix 持久化)。
   persist' = {
     directories = [
       ".local/share/zoxide"

@@ -54,7 +54,7 @@ in
       # 重開機即清空,順帶把「快取無限長大」這個問題一併消掉。
       #
       # 需要跨重啟的快取由各模組自行以 persist' 精確登記,
-      # 目前只有 Nix 的求值與抓取快取(見 modules/core/nix.nix)。
+      # 目前只有 Nix 的求值與抓取快取(見 modules/nixos/base/core/nix.nix)。
 
       # Nix 與 Home Manager
       ".local/share/nix"
