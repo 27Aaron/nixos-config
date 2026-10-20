@@ -1,3 +1,8 @@
+# magpie:带托盘的 GUI 程序(菜单栏界面 + 本机模型网关)。
+#
+# 它归在 nixos/ 而不是 base/gui/,是因为它靠 systemd.user.services 常驻图形
+# 会话:那是 Linux 的启动方式。systemd 的选项在 macOS 上依然存在、只是不生效,
+# 所以放这里不会让 darwin 求值失败——理由是这个文件只在 NixOS 上有意义。
 {
   inputs,
   lib,

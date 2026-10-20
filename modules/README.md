@@ -132,7 +132,8 @@ commit 来做。
 - **`base/gui/`** —— `terminal/`（kitty）、`browsers/`（chrome、firefox）、`editors/`（vscode、zed）、
   `agents/`（claude-desktop、dsh-desktop）、`nagram.nix`、`seahorse.nix`、`pointer-cursor.nix`、
   `theme.nix`、`mime-apps.nix`、`user-dirs.nix`。
-- **`home/nixos/`** —— 目前只有 `magpie.nix`，因为托盘程序注册 `systemd.user.services`。
+- **`home/nixos/`** —— 目前只有 `magpie.nix`。它是 GUI 托盘程序，但靠 `systemd.user.services` 常驻
+  在图形会话里，那是 Linux 的启动方式，所以放在平台目录而不是 `gui/`。
 
 ### 接线的两个层次
 
@@ -176,14 +177,18 @@ ncurses 界面里等按键。**判断依据是「它退不退出」，不是「�
 
 ### 为什么 Home Manager 这边也要分平台
 
-Home Manager 天生跨平台，所以绝大多数设置落在 `base/` 里就再也不用动了。只有两种情况必须给它们
+Home Manager 天生跨平台，所以绝大多数设置落在 `base/` 里就再也不用动了。只有三种情况需要给它们
 一个专门的位置：
 
-- **只在单平台存在的模块。** nix-darwin 的 Home Manager 那边多出 NixOS 没有的选项
-  （`targets.darwin-defaults`、launchd agents、`homebrew.*`），而 NixOS 这边多出 `systemd.user.*`。
-  `programs.magpie` 已经在用 `systemd.user.services`，所以它原样搬到 macOS 是跑不通的。
 - **只在单平台打包的包。** 一个在 aarch64-darwin 上构建不出来的 `home.packages` 条目会让求值失败，
-  连带整个 darwin 主机一起挂掉。
+  连带整个 darwin 主机一起挂掉。这是最硬的一条，也是唯一会真正炸掉的。
+- **只在单平台存在的选项。** nix-darwin 的 Home Manager 那边多出 NixOS 没有的选项
+  （`targets.darwin-defaults`、launchd agents、`homebrew.*`），NixOS 这边多出 `systemd.user.*`。
+  注意这类不一定会让求值失败：`systemd.user.services` 的选项是无条件宣告的，只有 `enable` 默认
+  绑在 `isLinux`，所以在 macOS 上它只是**静默不生效**，不会报错。归到 `nixos/` 的理由是「这个文件
+  只在 NixOS 上才有意义」，而不是「放了会炸」。
+- **只在单平台有意义的启动方式。** `systemd.user.services` 描述的是 Linux 的常驻方式；同一个程序在
+  macOS 上要靠 launchd。这类文件放平台目录，读者一眼就知道它替哪个平台服务。
 
 `base/` 是默认，平台目录是例外：**当一个文件确实是带着某个平台写的，再放过去，不要为了对称提前
 拆散。** 一个 `base/` 里的文件如果长出了 `lib.mkIf pkgs.stdenv.isDarwin`，那说明它想被拆分，而不是
@@ -271,8 +276,8 @@ NixOS 模块，一旦同一个入口也去喂 darwin 主机，就不再是无害
   用得上。
 - **`zed.nix` 的 `extraPackages`** 装了 14 个语言工具链，与 `core/development.nix` 的 mise/uv 构成两
   套工具链来源。目前只进 Zed 的 PATH，有注释说明，暂时保留；如果哪天两边版本打架，再抽出去。
-- **`magpie.nix` 放在 `home/nixos/`**，因为它注册 `systemd.user.services`。文件名看不出它是 GUI 托
-  盘程序，可以考虑改名 `magpie-tray.nix`。
+- **`magpie.nix` 的名字**看不出它是带托盘的 GUI 程序。位置是对的（靠 systemd 常驻），改名
+  `magpie-tray.nix` 会更清楚，但这只是可读性，不影响行为。
 - **`tmpfs` 根目录下 `~/.cache` 不整体持久化**是刻意的；各模块只登记真正需要跨重启的单项。
 
 ## Darwin 什么时候来
