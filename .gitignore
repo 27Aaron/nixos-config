@@ -16,6 +16,9 @@ result-*
 .direnv/
 .worktrees/
 
+# Local snapshots taken before a refactor; restore with tar -xzf.
+.backups/
+
 # Local environment and secret files
 .env
 .env.*
