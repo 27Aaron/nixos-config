@@ -1,6 +1,4 @@
-# Claude Desktop:Electron 桌面應用,開自己的視窗,所以放 gui 而不是 tui。
-#
-# 非自由軟體,依賴 nixpkgs.config.allowUnfree。
+# 非自由軟體,需要 nixpkgs.config.allowUnfree。
 {
   inputs,
   pkgs,

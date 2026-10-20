@@ -1,24 +1,22 @@
 {
-  # 以 direnv 與 nix-direnv 載入專案環境。
+  # 用 direnv + nix-direnv 載入專案環境。
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
-    # 載入 .envrc 時隱藏環境變數差異清單(direnv.toml 的 hide_env_diff)。
+    # 載入 .envrc 時不列出環境變數差異。
     config.global.hide_env_diff = true;
   };
 
-  # 啟用 mise,但不在這裡管理它的全域工具版本。
+  # mise 只管專案層級的工具版本,全域版本見 core/toolchain.nix。
   programs.mise = {
     enable = true;
     enableFishIntegration = true;
     enableZshIntegration = true;
   };
 
-  # 透過 Home Manager 安裝 uv。
   programs.uv.enable = true;
 
-  # 上述工具的執行時狀態:direnv 的 .envrc 允許清單、
-  # mise 管理的工具鏈,以及 uv 管理的直譯器與工具。
+  # .envrc 允許清單、mise 工具鏈、uv 直譯器。
   persist'.directories = [
     ".local/share/direnv"
     ".local/share/mise"

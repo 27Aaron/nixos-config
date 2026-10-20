@@ -14,7 +14,6 @@ in
   config = lib.mkIf cfg.enable {
     services.vnstat.enable = true;
 
-    # 流量資料庫,擁有者是 vnstatd 服務帳號。
     preservation'.os.directories = [
       {
         directory = "/var/lib/vnstat";

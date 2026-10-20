@@ -15,14 +15,13 @@ in
     programs.noctalia = {
       enable = true;
 
-      # 掛到圖形工作階段上,登入 niri 後自動啟動。
       systemd = {
         enable = true;
         target = "graphical-session.target";
       };
     };
 
-    # 配置由 Noctalia 自己的介面管理,只保留狀態跨重啟。
+    # 設定由 Noctalia 介面管理,只保留狀態跨重啟。
     preservation'.user.directories = [
       {
         directory = ".config/noctalia";

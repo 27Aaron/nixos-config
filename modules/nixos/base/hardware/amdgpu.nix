@@ -16,8 +16,7 @@ in
     hardware.graphics = {
       enable = true;
 
-      # Rusticl 透過 Mesa 提供 OpenCL,支援 Radeon 680M/780M 等
-      # GFX9 之後的 iGPU,無需引入龐大許多的 ROCm 套件。
+      # Rusticl 提供 OpenCL,支援 GFX9 之後的 iGPU,不必引入龐大的 ROCm。
       extraPackages = [ pkgs.mesa.opencl ];
     };
 

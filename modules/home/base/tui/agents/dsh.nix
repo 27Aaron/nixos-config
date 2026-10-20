@@ -1,4 +1,3 @@
-# dsh:終端裡的 agent harness。
 {
   inputs,
   pkgs,

@@ -7,7 +7,7 @@
 let
   cfg = config.services'.openssh;
 
-  # 客戶端的主機別名清單,來自 nix-secrets。不含金鑰,可直接引用。
+  # 客戶端主機別名清單,來自 nix-secrets。不含金鑰,可直接引用。
   sshConfig = inputs.secrets + "/openssh/config";
 
   # NixOS 模組拿到的 lib 沒有 lib.hm,要引用 HM 啟用腳本的排序庫時,
@@ -21,10 +21,9 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf (builtins.pathExists sshConfig) {
-      # OpenSSH 10 起,讀取 ~/.ssh/config 前會檢查最終檔案屬於使用者本人
-      # (權限位不檢查);home.file 產生的 store 符號連結(root 所有)通不過
-      # 檢查,所有 ssh 指令都會噴 Bad owner or permissions。因此改在啟用時
-      # 複製成使用者自己的真實檔案,每次切換都重寫,內容仍以 nix-secrets 為源。
+      # OpenSSH 10 起會檢查 ~/.ssh/config 的最終檔案屬於使用者本人(不看權限
+      # 位);home.file 產生的 store 連結屬於 root,通不過檢查,所有 ssh 都會噴
+      # Bad owner or permissions。改成啟用時複製成真實檔案,每次切換重寫。
       hm'.home.activation.installSshConfig = hmLib.hm.dag.entryAfter [ "writeBoundary" ] ''
         rm -f "$HOME/.ssh/config"
         install -m 600 ${sshConfig} "$HOME/.ssh/config"
@@ -32,15 +31,11 @@ in
     })
 
     (lib.mkIf cfg.enable {
-      # 上游預設把 systemd 的 ssh proxy 設定 Include 進 /etc/ssh/ssh_config,
-      # 但那個檔案在 Nix store 裡屬於 nobody。OpenSSH 10 起會檢查被 Include
-      # 檔案的擁有者,不符就中止並印出
-      #   Bad owner or permissions on .../20-systemd-ssh-proxy.conf
-      # 結果是整個 /etc/ssh/ssh_config 失效,所有 ssh 與 git 操作都會失敗。
-      #
-      # 這裡關掉該 Include。它只提供 .host / unix/* / machine/* 這類連到
-      # 本機與 machined 虛擬機的簡寫,本機沒有用到(ssh-unix-local socket
-      # 不存在),關閉不影響任何既有連線。
+      # 上游預設把 systemd ssh proxy 設定 Include 進 /etc/ssh/ssh_config,但該檔
+      # 在 store 裡屬於 nobody。OpenSSH 10 起會檢查被 Include 檔案的擁有者,
+      # 不符就中止(Bad owner or permissions on .../20-systemd-ssh-proxy.conf),
+      # 整個 ssh_config 失效,所有 ssh 與 git 操作都失敗。該 Include 只提供本機
+      # 與 machined 的簡寫,本機沒用到,關掉不影響連線。
       programs.ssh.systemd-ssh-proxy.enable = lib.mkDefault false;
 
       services.openssh = {
@@ -56,25 +51,24 @@ in
         ];
 
         settings = {
-          # root 使用者用於遠端部署,因此需要允許
+          # root 用於遠端部署。
           PermitRootLogin = lib.mkDefault "prohibit-password";
           PasswordAuthentication = lib.mkDefault false;
-          # 關閉此通道後,無論 PAM 堆疊為何,publickey 都會是唯一方式
-          # (舊版 nixpkgs 會在此放行 Unix 密碼)。
+          # 關掉此通道,publickey 才是唯一方式(舊版 nixpkgs 會在此放行
+          # Unix 密碼)。
           KbdInteractiveAuthentication = lib.mkDefault false;
           PermitEmptyPasswords = lib.mkDefault false;
-          # 純 Wayland 主機從 X11 轉發得不到任何好處。
+          # 純 Wayland 主機用不到 X11 轉發。
           X11Forwarding = lib.mkDefault false;
         };
       };
 
-      # 把所有已知終端機的 terminfo 資料庫加入系統 profile,讓 SSH 連入的
-      # 各種終端機都能正確顯示。
+      # 讓各種終端機經 SSH 連入時都能正確顯示。
       environment.enableAllTerminfo = lib.mkDefault true;
 
-      # 只持久化主機金鑰本身。持久化整個 /etc/ssh 目錄會在開機掛載後遮住
-      # NixOS 生成的 sshd_config 與 authorized_keys.d,使 sshd 無法認證;
-      # 配方取自 preservation 的 impermanence 遷移指南。
+      # 只持久化主機金鑰。持久化整個 /etc/ssh 會在掛載後遮住 NixOS 生成的
+      # sshd_config 與 authorized_keys.d,使 sshd 無法認證;配方取自 preservation
+      # 的 impermanence 遷移指南。
       preservation'.os.files = [
         {
           file = "/etc/ssh/ssh_host_ed25519_key";

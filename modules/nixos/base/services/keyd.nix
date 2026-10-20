@@ -15,8 +15,6 @@ in
     keyboards = lib.mkOption {
       type = lib.types.attrsOf (
         lib.types.submodule {
-          # 鍵盤裝置的個別設定:ids 限定要接管的裝置,
-          # settings 對應設定檔中除 [ids] 以外的各個段落。
           options = {
             ids = lib.mkOption {
               type = lib.types.listOf lib.types.str;

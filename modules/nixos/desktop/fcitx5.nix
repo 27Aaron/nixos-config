@@ -7,7 +7,7 @@
 let
   cfg = config.desktop'.fcitx5;
 
-  # fcitx5 以 themes/<目錄名>/theme.conf 識別主題,「微言」對應 mellow-wechat。
+  # fcitx5 以 themes/<目錄名>/theme.conf 識別主題,目錄名須與下方 Theme 的值一致。
   mellow-themes = pkgs.fetchFromGitHub {
     owner = "sanweiya";
     repo = "fcitx5-mellow-themes";
@@ -28,16 +28,14 @@ in
       fcitx5 = {
         waylandFrontend = true;
         addons = with pkgs; [
-          # GTK 應用程式的輸入支援。
           fcitx5-gtk
           (fcitx5-rime.override {
-            # rime-ice 以可重現的套件提供方案與詞庫,無需另固定模型。
+            # rime-ice 套件已提供方案與詞庫,無需另外固定模型。
             rimeDataPkgs = [ rime-ice ];
           })
         ];
 
         settings = {
-          # 預設輸入法為 rime,美式鍵盤留作切換。
           inputMethod = {
             "Groups/0" = {
               Name = "Default";
@@ -57,7 +55,6 @@ in
             };
           };
 
-          # 「微言」:淺色用 mellow-wechat,深色用 mellow-wechat-dark。
           # UseDarkTheme 讓 classicui 跟隨 xdg-desktop-portal 回報的系統外觀切換。
           addons.classicui.globalSection = {
             Theme = "mellow-wechat";
@@ -68,13 +65,13 @@ in
       };
     };
 
-    # 只鏈接主題目錄;fcitx5 的使用者資料目錄保持可寫,詞庫才能存下來。
+    # 只連結主題目錄;fcitx5 的使用者資料目錄保持可寫,詞庫才能存下來。
     hm'.xdg.dataFile = {
       "fcitx5/themes/mellow-wechat".source = "${mellow-themes}/mellow-wechat";
       "fcitx5/themes/mellow-wechat-dark".source = "${mellow-themes}/mellow-wechat-dark";
     };
 
-    # 從 rime-ice 的方案啟動,而不是內建預設。
+    # 換掉 fcitx5-rime 的內建預設方案,改以 rime-ice 啟動。
     hm'.xdg.dataFile."fcitx5/rime/default.custom.yaml".text = ''
       patch:
         __include: rime_ice_suggestion:/

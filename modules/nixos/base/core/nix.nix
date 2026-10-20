@@ -46,16 +46,14 @@
     };
   };
 
-  # nh 讀取的配置倉庫目錄。
+  # nh 從固定路徑讀取 flake,因此倉庫本身也要跨重啟保留。
   preservation'.user.directories = [
     {
       directory = "nixos-config";
       mode = "0700";
     }
 
-    # Nix 的求值快取、flake 抓取快取與 tarball 快取。這三個不含機密,
-    # 但重建需要重新解析並下載 flake input,開機後第一次執行 nix 指令
-    # 會因此變慢,且在離線時直接失敗。其餘 ~/.cache 內容留在 tmpfs。
+    # 快取不含機密但不重建就要重抓 flake input,離線時 nix 直接失敗。
     {
       directory = ".cache/nix";
       mode = "0700";

@@ -10,12 +10,12 @@ let
   ];
 in
 {
-  # 只列出已安裝的程式;播放器、圖片檢視與解壓縮尚未安裝,不在這裡指定。
+  # 只列已安裝的程式。
   xdg.mimeApps = {
     enable = true;
 
     defaultApplications = {
-      # 瀏覽器,Chrome 優先。
+      # Chrome 優先。
       "text/html" = browser;
       "text/xml" = browser;
       "application/xml" = browser;
@@ -46,6 +46,6 @@ in
     };
   };
 
-  # xdg-open 等工具,mimeApps 生成的關聯靠它生效。
+  # xdg-open 靠它讓 mimeApps 的關聯生效。
   home.packages = [ pkgs.xdg-utils ];
 }

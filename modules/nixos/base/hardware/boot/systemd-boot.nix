@@ -20,8 +20,7 @@ in
         configurationLimit = lib.mkDefault 8;
       };
 
-      # bootctl 會在安裝時註冊「Linux Boot Manager」NVRAM 項目;
-      # 正是這個共享的 EFI 層選項允許它這麼做。
+      # bootctl 安裝時要註冊 NVRAM 項目,少了這個共享的 EFI 層選項就會失敗。
       efi.canTouchEfiVariables = true;
     };
   };

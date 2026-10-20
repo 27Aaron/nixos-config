@@ -18,7 +18,7 @@
     configFile."user-dirs.locale".text = "en_US";
   };
 
-  # 這些目錄會被程式寫入,只保留跨重啟;x-gvfs-trash 讓檔案總管能用回收桶。
+  # x-gvfs-trash 讓檔案總管對這些目錄使用共用回收桶。
   persist'.directories =
     map
       (directory: {

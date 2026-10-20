@@ -1,6 +1,4 @@
-# Claude Code:終端裡的 agent。
-#
-# 非自由軟體,依賴 nixpkgs.config.allowUnfree。
+# 非自由軟體,需要 nixpkgs.config.allowUnfree。
 {
   inputs,
   pkgs,
@@ -16,8 +14,7 @@ in
     cc = "claude --dangerously-skip-permissions";
   };
 
-  # 登入態、設定與工作階段索引;由程式自行寫入,只保留跨重啟。
-  # ~/.cache 不登記:留在 tmpfs 上,重開機即清空。
+  # 登入態與設定由程式自己寫入;~/.cache 留在 tmpfs 上不登記。
   persist' = {
     directories = [ ".claude" ];
     files = [ ".claude.json" ];

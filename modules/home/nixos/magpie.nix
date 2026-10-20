@@ -1,8 +1,5 @@
-# magpie:带托盘的 GUI 程序(菜单栏界面 + 本机模型网关)。
-#
-# 它归在 nixos/ 而不是 base/gui/,是因为它靠 systemd.user.services 常驻图形
-# 会话:那是 Linux 的启动方式。systemd 的选项在 macOS 上依然存在、只是不生效,
-# 所以放这里不会让 darwin 求值失败——理由是这个文件只在 NixOS 上有意义。
+# 帶托盤的 GUI 程序。放在 nixos/ 而非 base/gui/,因為它靠 systemd 使用者
+# 服務常駐圖形會話,那是 Linux 的啟動方式。
 {
   inputs,
   lib,
@@ -17,7 +14,7 @@ in
 
   xdg.mimeApps.defaultApplicationPackages = [ magpie ];
 
-  # 托盤程序同時提供本機閘道。登入圖形工作階段後啟動,關掉視窗也不該停。
+  # 托盤程式同時提供本機閘道,關掉視窗也要繼續跑。
   systemd.user.services.magpie = {
     Unit = {
       Description = "magpie menu bar and local model gateway";
@@ -34,10 +31,9 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  # 供應商金鑰與用量在 .config/magpie,WebKit 的頁面資料在
-  # .local/share/magpie。~/.cache 不再整體持久化,因此 magpie 放在那裡的
-  # 使用者狀態要逐項登記;其餘(bun、update、models.json、plugin-*.json 等)
-  # 都是可重新下載的內容,留在 tmpfs 上即可。
+  # 供應商金鑰與用量在 .config/magpie,WebKit 頁面資料在 .local/share/magpie。
+  # ~/.cache 不整體持久化,所以放在那裡的使用者狀態要逐項登記;其餘(bun、
+  # models.json、plugin-*.json)可重新下載,留在 tmpfs 即可。
   persist' = {
     directories = [
       {
@@ -56,8 +52,7 @@ in
         file = ".cache/magpie/agents-state.json";
         mode = "0600";
       }
-      # 開啟過的檔案與工作階段索引;它指向 .dsh 的 session 檔,
-      # 對應的內容本身已持久化。
+      # 開啟過的檔案與工作階段索引,指向 .dsh 的 session 檔。
       {
         file = ".cache/magpie/sessions.json";
         mode = "0600";

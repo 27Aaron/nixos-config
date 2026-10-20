@@ -14,8 +14,7 @@ in
   config = {
     hardware.bluetooth.enable = lib.mkIf cfg.enable true;
 
-    # 上游消費者可能自行啟用此服務,持久化跟隨服務的最終狀態,
-    # 無論是誰開啟的。
+    # 跟隨服務的最終狀態(上游可能自行啟用),而非本模組的開關。
     preservation'.os.directories = lib.optionals config.hardware.bluetooth.enable [
       {
         directory = "/var/lib/bluetooth";

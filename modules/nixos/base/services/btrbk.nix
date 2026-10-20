@@ -24,8 +24,7 @@ in
     ];
 
     services.btrbk = {
-      # 建立快照很快,但清理在筆電上應保持低調,
-      # 尤其是關機一段時間後追趕進度時。
+      # 建立快照很快,但清理在筆電上應保持低調,尤其是開機追趕進度時。
       niceness = 15;
       ioSchedulingClass = "idle";
 
@@ -50,7 +49,7 @@ in
       "/snapshots"
     ];
 
-    # 服務使用者的家目錄與 systemd StateDirectory。
+    # 服務使用者 btrbk 的家目錄,同時是它的 systemd StateDirectory。
     preservation'.os.directories = [
       {
         directory = "/var/lib/btrbk";

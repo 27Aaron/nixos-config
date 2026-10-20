@@ -14,24 +14,22 @@ in
 
   config = lib.mkIf cfg.enable {
     fonts = {
-      # 下面的清單就是全部字型,不帶入 nixpkgs 的預設字型包。
+      # 只裝下面清單,不帶入 nixpkgs 的預設字型包。
       enableDefaultPackages = false;
       fontDir.enable = true;
 
       packages = with pkgs; [
-        # 等寬,含圖示字形;kitty 也用這個家族名,中文回退到思源。
+        # kitty 與 zed 以這個家族名指定字型,中文回退到思源。
         maple-mono.NF-unhinted
         nerd-fonts.symbols-only
 
-        # 中文:思源黑體與思源宋體。
         source-han-sans
         source-han-serif
 
-        # Emoji。
         noto-fonts-color-emoji
       ];
 
-      # 中文用思源,繁體在前。
+      # 繁體排在簡體前面,才會先挑到 TC。
       fontconfig.defaultFonts = {
         serif = [
           "Source Han Serif TC"

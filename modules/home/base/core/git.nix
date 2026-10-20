@@ -1,7 +1,4 @@
-# Git:身分、預設行為,以及配套的命令列工具。
-#
-# delta 只做差異渲染,輸出後就退回,不接管畫面,所以留在 core。
-# 接管整個終端的 lazygit 另有 tui/git/lazygit.nix。
+# delta 只做差異渲染,不接管畫面所以留在 core;lazygit 在 tui。
 {
   pkgs,
   vars,
@@ -9,7 +6,6 @@
 }:
 {
   programs = {
-    # Git 身分與預設行為。
     git = {
       enable = true;
       lfs.enable = true;
@@ -27,7 +23,7 @@
       };
     };
 
-    # 差異檢視器;把 pager 設成 delta 由 enableGitIntegration 完成。
+    # pager 由 enableGitIntegration 設成 delta。
     delta = {
       enable = true;
       enableGitIntegration = true;
@@ -39,7 +35,6 @@
     };
   };
 
-  # GitHub CLI 與分支清理。
   home.packages = [
     pkgs.gh
     pkgs.git-trim

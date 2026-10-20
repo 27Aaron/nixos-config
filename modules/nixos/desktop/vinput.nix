@@ -9,7 +9,6 @@ let
   cfg = config.desktop'.vinput;
   packages = inputs.fcitx5-vinput.packages.${pkgs.stdenv.hostPlatform.system};
 
-  # 上游只提供兩個屬性:fcitx5-vinput(含本地 ASR)與 fcitx5-vinput-lite。
   vinput = if cfg.lite then packages.fcitx5-vinput-lite else packages.fcitx5-vinput;
 in
 {
@@ -59,7 +58,6 @@ in
       Install.WantedBy = [ "graphical-session.target" ];
     };
 
-    # 模型與 config.json 要跨重啟保留。
     preservation'.user.directories = [
       {
         directory = ".config/vinput";

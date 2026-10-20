@@ -2,7 +2,7 @@
   programs.zed-editor = {
     enable = true;
 
-    # 名稱取自 zed-industries/extensions 的條目。
+    # 名稱取自 zed-industries/extensions。
     extensions = [
       "catppuccin"
       "catppuccin-icons"
@@ -11,7 +11,7 @@
       "toml"
     ];
 
-    # 啟動時與既有 settings.json 合併,同名項目以這裡為準。
+    # 與既有 settings.json 合併,同名項目以此為準。
     userSettings = {
       # 版本由 Nix 更新,不要讓編輯器自己下載新版本。
       auto_update = false;
@@ -24,7 +24,7 @@
       base_keymap = "Zed";
       hour_format = "hour24";
 
-      # 新打開的目錄直接信任,不再逐個確認。
+      # 新目錄直接信任,不再逐個確認。
       session.trust_all_worktrees = true;
 
       # 跟隨系統深淺色。
@@ -39,7 +39,7 @@
         light = "Catppuccin Latte";
       };
 
-      # 等寬字型與 kitty 相同,游標同樣不閃。
+      # 與 kitty 相同的等寬字型。
       buffer_font_family = "Maple Mono NF";
       buffer_font_size = 14;
       cursor_blink = false;

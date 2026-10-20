@@ -37,15 +37,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 兩者的預設上限都是所在檔案系統的 10%。這個目錄 bind 掛載自
-    # 持久卷,因此「預設」等於允許長到幾十 GB 才開始淘汰,對筆電毫無意義。
+    # 上游預設上限是檔案系統的 10%,而這裡 bind 掛載自持久卷,等於允許數十 GB。
     services.journald.settings.Journal = {
       SystemMaxUse = cfg.journalMaxUse;
       RuntimeMaxUse = cfg.journalRuntimeMaxUse;
     };
 
-    # core dump 是從行程記憶體抄出來的,可能含金鑰,不值得跨重啟保留;
-    # 上限之外再於開機時清空,只留當次開機的當機現場供除錯。
+    # core dump 可能含金鑰,除上限外再由下方 tmpfiles 的 D! 於開機時清空,
+    # 只留當次開機的當機現場。
     systemd.coredump.settings.Coredump.MaxUse = cfg.coredumpMaxUse;
 
     systemd.tmpfiles.rules = [

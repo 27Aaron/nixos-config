@@ -27,17 +27,15 @@ in
       }
     ];
 
-    # 尚未遷移到 Wayland 的應用程式透過 xwayland-satellite 執行,niri 會在需要時自動啟動它。
+    # 未遷移到 Wayland 的應用程式由 niri 按需要自動啟動 xwayland-satellite。
     environment.systemPackages = [ pkgs.xwayland-satellite ];
 
-    # 檔案選擇對話框沿用預設的 Nautilus(xdg-desktop-portal-gnome)。
     programs.niri.enable = true;
 
-    # 由 greetd 負責登入畫面時,把工作階段回報給它;greeter 的指令組裝與自動登入留在 greetd 模組內。
     desktop'.greetd.sessionCommand = lib.mkIf config.desktop'.greetd.enable niriSession;
     desktop'.greetd.autoLogin = lib.mkIf config.desktop'.greetd.enable cfg.autoLogin;
 
-    # 配置在機器上編輯,暫不由 Nix 生成;只保留目錄跨重啟。
+    # 設定在機器上編輯,不由 Nix 生成;只保留目錄跨重啟。
     preservation'.user.directories = [
       ".config/niri"
     ];

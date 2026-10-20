@@ -1,4 +1,3 @@
-# dsh-desktop:dsh 的 Electron 前端,開自己的視窗。
 {
   inputs,
   pkgs,

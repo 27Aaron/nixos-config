@@ -1,8 +1,5 @@
-# 兩個平台共用的 Home Manager 基準。
-#
-# 這裡是所有使用者環境的起點:persist' 選項、家目錄與 stateVersion,
-# 以及 core/tui/gui 三桶的檔案清單。平台專屬的東西放 ../nixos 或 ../darwin,
-# 不要在這份清單裡加平台判斷。
+# 兩個平臺共用的 Home Manager 基準:persist' 選項、帳號設定,以及 core/tui/
+# gui 三桶的檔案清單。平臺專屬的東西放 ../nixos 或 ../darwin。
 {
   lib,
   osConfig,
@@ -10,7 +7,7 @@
   ...
 }:
 let
-  # 狀態項目為相對於家目錄的路徑,或 preservation 接受的屬性集。
+  # 狀態項目可寫成家目錄相對路徑,或帶屬性的集合。
   entryType =
     kind:
     lib.types.submodule {
@@ -53,7 +50,7 @@ in
     ./gui/user-dirs.nix
   ];
 
-  # persist' 由各工具模組回報,persistence 模組會拼接進 preservation。
+  # 各工具模組回報自己的狀態,由 persistence 模組拼接進 preservation。
   options.persist' = {
     directories = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "directory"));
@@ -83,8 +80,7 @@ in
 
     programs.home-manager.enable = true;
 
-    # 要跳過 option manual 的建置,需要關掉第二個開關;
-    # 單獨的 man.enable 不夠。
+    # 跳過 option manual 的建置要關兩個開關,單獨的 man.enable 不夠。
     programs.man.enable = false;
     manual.manpages.enable = false;
   };

@@ -28,19 +28,13 @@ let
       mountOptions = btrfsOptions;
     };
 
-    # /tmp 放在磁碟上,不與根目錄共用那 4G 的 tmpfs。
-    # 暫存檔不該佔用記憶體:一次解大壓縮檔、一次錄影或 docker save,
-    # 就會把根吃滿,而根一滿是整個系統癱掉,不只是該程式失敗。
-    # 代價是它會跨重啟累積,因此搭配 boot.tmp.cleanOnBoot 在開機時清空。
-    #
-    # 既有機器不必重灌,建立 subvolume 後重開機即可:
+    # /tmp 放磁碟,不與根共用 tmpfs:一次解大壓縮檔就把根吃滿,而根一滿是整個
+    # 系統癱掉。代價是跨重啟累積,因此搭配 boot.tmp.cleanOnBoot 在開機時清空。
+    # 既有機器不必重灌,建立 subvolume 後重開機即可(nofail 讓它還沒建立時
+    # 退回根 tmpfs,不至於開不了機):
     #   sudo btrfs subvolume create /btr_pool/@tmp
-    # 權限(1777)由 boot.tmp.cleanOnBoot 產生的
-    #   D! /tmp 1777 root root
-    # 在每次開機時設定,不需要另外 chmod。只有「先 switch 才手動掛載」
-    # 這種 tmpfiles 已經跑完的情境,才需要一次性 sudo chmod 1777 /tmp。
-    #
-    # nofail 讓 subvolume 尚未建立時退回根 tmpfs,不至於開不了機。
+    # 權限 1777 由 cleanOnBoot 設定;但「先 switch 才手動掛載」時 tmpfiles 已
+    # 跑完,得自己 chmod 1777 /tmp。
     "@tmp" = {
       mountpoint = "/tmp";
       mountOptions = btrfsOptions ++ [
@@ -73,8 +67,8 @@ let
     ];
     inherit subvolumes;
   };
-  # GPT partlabel 由分割區屬性名生成(disk-main-<name>)。
-  # 加密時沿用既有磁碟的 luks 標籤,改名會使 crypttab 找不到設備。
+  # GPT partlabel 由屬性名生成(disk-main-<name>)。加密時沿用既有磁碟的 luks
+  # 標籤,改名會使 crypttab 找不到設備。
   dataPartitionName = if cfg.luks.enable then "luks" else "data";
 in
 {
@@ -126,24 +120,17 @@ in
       }
     ];
 
-    # /tmp 由 disko 配置為 @tmp subvolume。boot.tmp.cleanOnBoot 只是在開機時
-    # 追加一條 tmpfiles 規則(D! /tmp 1777 root root),本身不會改變 /tmp 的
-    # 位置——它只有在 /tmp 位於磁碟上時才有意義,兩者必須成對使用。
+    # cleanOnBoot 只追加一條開機 tmpfiles 規則(D! /tmp 1777 root root),不會改變
+    # /tmp 的位置——只有 /tmp 在磁碟上時才有意義,與上面的 @tmp 成對使用。
     boot.tmp.cleanOnBoot = true;
 
-    # FIDO2 權杖在 LUKS 頭部,開機時由 systemd-cryptsetup 讀取。
-    # 這裡只讓 initrd 認得已登記的鑰匙,不會替磁碟登記。
-    # 鑰匙是 USB HID,不放進 initrd 就看不到。
-    #
-    # 操作對象是 /dev/disk/by-partlabel/disk-main-luks,不要對 /dev/mapper/crypted。
-    # 每次只插一把鑰匙。查看槽位(槽 0 通常是密碼):
+    # 只讓 initrd 認得已登記的 FIDO2 鑰匙,不替磁碟登記;鑰匙是 USB HID,
+    # 不放進 initrd 就看不到。操作對象是 /dev/disk/by-partlabel/disk-main-luks,
+    # 不要對 /dev/mapper/crypted;每次只插一把鑰匙。列出槽位(槽 0 通常是密碼),
+    # 或加 --password 增設密碼槽:
     #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks
-    # 添加密碼槽(先驗證現有密碼,再輸入要新增的密碼):
-    #   sudo systemd-cryptenroll --password /dev/disk/by-partlabel/disk-main-luks
-    # 添加 FIDO2,開機要 FIDO2 PIN 再觸摸:
+    # 加 FIDO2(預設要 PIN 再觸摸;加 --fido2-with-client-pin=no 則只觸摸):
     #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
-    # 添加 FIDO2,只觸摸、不設 PIN:
-    #   sudo systemd-cryptenroll --fido2-device=auto --fido2-with-client-pin=no /dev/disk/by-partlabel/disk-main-luks
     boot.initrd = lib.mkIf cfg.luks.fido2.enable {
       systemd.enable = true;
       availableKernelModules = [
@@ -213,7 +200,7 @@ in
                         ]
                         ++ lib.optionals cfg.luks.fido2.enable [
                           "fido2-device=auto"
-                          # 鑰匙沒插上時不必空等預設的 30 秒。數值單位是秒。
+                          # 不必空等預設的 30 秒。單位是秒。
                           "token-timeout=5"
                         ];
                       };

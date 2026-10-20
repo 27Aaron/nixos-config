@@ -1,12 +1,8 @@
 {
-  # 兩個 shell 都是刻意啟用的,不是遺留:
-  #   fish 是主力,系統側 modules/nixos/base/core/fish.nix 把它設為登錄 shell;
-  #   zsh 是備援,少數情況下 fish 跑不起來(某些安裝腳本、只認 POSIX shell 的
-  #   環境)時改用它,比 bash 好用。
-  # programs.zsh.enable 會把 zsh 裝進 ~/.nix-profile,所以 `zsh` 隨時可用;
-  # 它沒有進 /etc/shells,因為不需要設成登錄 shell。
+  # 兩個 shell 都是刻意啟用的:fish 是主力,由 nixos/base/core/fish.nix 設為
+  # 登錄 shell;zsh 是備援,fish 跑不起來的場合改用它,比 bash 好用。
+  # zsh 沒進 /etc/shells,因為不需要設成登錄 shell。
   programs = {
-    # 主力 shell。
     fish = {
       enable = true;
       interactiveShellInit = ''
@@ -22,7 +18,6 @@
       '';
     };
 
-    # 備援 shell 的行為與補全;提示符、目錄跳轉與歷史見下方。
     zsh = {
       enable = true;
       enableCompletion = true;
@@ -39,7 +34,6 @@
       syntaxHighlighting.enable = true;
     };
 
-    # 提示符樣式。
     starship = {
       enable = true;
       enableFishIntegration = true;
@@ -53,7 +47,6 @@
       };
     };
 
-    # 目錄列表與導航。
     eza = {
       enable = true;
       enableFishIntegration = true;
@@ -68,7 +61,6 @@
       enableZshIntegration = true;
     };
 
-    # 命令歷史。
     atuin = {
       enable = true;
       enableFishIntegration = true;
@@ -76,6 +68,7 @@
       settings = {
         sync_frequency = 0;
         inline_height = 30;
+        # 不記錄無意義的指令,免得搜尋被淹掉。
         history_filter = [
           ''^\s+''
           ''^ls($|(\s+((-([a-zA-Z0-9]|-)+)|"(\.|[^/])[^"]*"|'(\.|[^/])*'|(\.|[^/\s-])[^\s]*))*\s*$)''
@@ -87,8 +80,7 @@
     };
   };
 
-  # 上述 shell 與歷史工具的執行時狀態(fish 的狀態目錄由
-  # modules/nixos/base/core/fish.nix 持久化)。
+  # fish 的狀態目錄由 nixos/base/core/fish.nix 持久化。
   persist' = {
     directories = [
       ".local/share/zoxide"
