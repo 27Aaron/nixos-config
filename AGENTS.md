@@ -13,10 +13,24 @@ hosts/
     └── ...               # host-local modules (e.g. hardware.nix)
 modules/
 ├── default.nix           # recursively imports every module; defines user'/hm' aliases
-├── core/                 # base system (core'.*)
-├── hardware/             # machine capabilities (hardware'.*)
-├── services/             # system services (services'.*)
-└── home/                 # Home Manager modules
+├── README.md             # the layout rules; read it before adding a module
+├── base/                 # reserved: settings identical on NixOS and nix-darwin
+├── darwin/               # reserved: nix-darwin system modules
+├── nixos/
+│   ├── base/core/        # identity, users, nix, i18n, sops, firewall, logging (core'.*)
+│   ├── base/hardware/    # disko, persistence, boot/, gpu, bluetooth, brightness (hardware'.*)
+│   ├── base/services/    # daemons: openssh, networkmanager, pipewire, zram, ... (services'.*)
+│   ├── desktop/          # greetd, niri, noctalia, fcitx5, fonts, file-manager (desktop'.*)
+│   └── server/           # reserved: headless-only modules
+└── home/
+    ├── default.nix       # platform entry: imports ./base plus ./nixos
+    ├── base/
+    │   ├── default.nix   # shared list: persist' options, account settings, bucket imports
+    │   ├── core/         # draws nothing of its own (shell, git, CLI packages)
+    │   ├── tui/          # takes over the terminal (agents, lazygit, monitors)
+    │   └── gui/          # opens a window (terminal, browsers, editors, theme)
+    ├── nixos/            # Home Manager settings only NixOS needs (systemd.user, ...)
+    └── darwin/           # reserved: Home Manager settings only macOS needs
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
 ```
@@ -32,11 +46,12 @@ Host files are ordinary NixOS modules:
 
 ## Module conventions
 
-- Modules under `modules/` are imported automatically; a new file needs no registration.
-- Shared modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`.
+- A file under `modules/nixos/`, `modules/darwin/` or `modules/base/` is imported automatically. A file under `modules/home/` must be added to the import list in `modules/home/base/default.nix`; `modules/home/default.nix` stops the walk and is the platform entry.
+- System modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`, `desktop'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory: `nixos/base/core` → `core'.*`, `nixos/desktop` → `desktop'.*`.
 - `modules/default.nix` defines the aliases `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`).
 - Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`.
 - Prefer a shared module over copying settings into hosts; keep one reusable capability per module.
+- Read `modules/README.md` before deciding where a new module goes. In short: `nixos/base` if any NixOS host may use it, `nixos/desktop` if it only makes sense with a screen, `home/base/{core,tui,gui}` by what the program draws, `home/nixos` for Home Manager settings that need systemd or Linux-only packages.
 
 ## Persistence and secrets
 
@@ -82,7 +97,7 @@ type(scope): description
 
 - Allowed types are `feat`, `fix`, `refactor`, `chore`, and `WIP`. Use `WIP` only for an explicitly temporary work-in-progress snapshot.
 - The commit title uses lowercase English text and never ends with a period. Keep the body readable with normal capitalization when it contains proper names or explanatory sentences.
-- The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `home`) for shared modules, `flake` for flake-level files and host discovery, `docs` for documentation.
+- The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `desktop`, `home`, `modules`) for shared modules, `flake` for flake-level files and host discovery, `docs` for documentation.
 - Keep the title concise and describe the resulting change, not the list of edited files.
 
 ### Flake lock bumps
