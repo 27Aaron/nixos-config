@@ -21,6 +21,15 @@
     zsh = {
       enable = true;
       enableCompletion = true;
+
+      # compinit 先寫 .zcompdump.<host>.<pid> 再 mv 成正式檔;直接綁定
+      # .config/zsh/.zcompdump 會讓 mv 撞上 EBUSY,所以放到可整目錄持久化的
+      # .cache/zsh,效果一樣。
+      completionInit = ''
+        mkdir -p "$HOME/.cache/zsh"
+        autoload -U compinit && compinit -d "$HOME/.cache/zsh/.zcompdump"
+      '';
+
       autosuggestion.enable = true;
       initContent = ''
         if command -v uv &>/dev/null; then
@@ -89,10 +98,17 @@
         mode = "0700";
       }
       ".local/share/atuin"
+      {
+        directory = ".cache/zsh";
+        mode = "0700";
+      }
     ];
 
     files = [
-      ".zsh_history"
+      {
+        file = ".zsh_history";
+        mode = "0600";
+      }
     ];
   };
 

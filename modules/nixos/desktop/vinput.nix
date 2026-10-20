@@ -60,6 +60,12 @@ in
         mode = "0700";
       }
       ".local/share/vinput"
+
+      # 登入憑證(DoubaoIME credentials.json)在 cache 目錄;不登記會每次重登。
+      {
+        directory = ".cache/vinput";
+        mode = "0700";
+      }
     ];
   };
 }

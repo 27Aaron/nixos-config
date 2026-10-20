@@ -35,6 +35,10 @@ in
         directory = ".local/share/noctalia";
         mode = "0700";
       }
+      {
+        directory = ".cache/noctalia";
+        mode = "0700";
+      }
     ];
   };
 }
