@@ -25,21 +25,20 @@ in
         maple-mono.NF-unhinted
         nerd-fonts.symbols-only
 
-        source-han-sans
-        source-han-serif
-
-        fonts.pingfang
+        fonts.lxgw-wenkai-tc
+        fonts.lxgw-wenkai
 
         noto-fonts-color-emoji
       ];
 
       fontconfig.defaultFonts = {
         serif = [
-          "Source Han Serif TC"
+          "LXGW WenKai TC"
+          "LXGW WenKai"
         ];
         sansSerif = [
-          "PingFang TC"
-          "Source Han Sans TC"
+          "LXGW WenKai TC"
+          "LXGW WenKai"
         ];
         monospace = [ "Maple Mono NF" ];
         emoji = [ "Noto Color Emoji" ];
