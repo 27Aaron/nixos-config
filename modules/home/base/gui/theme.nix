@@ -52,7 +52,7 @@ in
     };
 
     font = {
-      name = "Source Han Sans TC";
+      name = "LXGW WenKai TC";
       size = 12;
     };
 

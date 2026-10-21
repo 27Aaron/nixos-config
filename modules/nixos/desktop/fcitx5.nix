@@ -60,6 +60,8 @@ in
             Theme = "mellow-wechat";
             DarkTheme = "mellow-wechat-dark";
             UseDarkTheme = true;
+            Font = "LXGW WenKai 12";
+            MenuFont = "LXGW WenKai 12";
           };
         };
       };

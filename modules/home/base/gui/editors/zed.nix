@@ -39,7 +39,10 @@
         light = "Catppuccin Latte";
       };
 
-      # 與 kitty 相同的等寬字型。
+      ui_font_family = "LXGW WenKai TC";
+      agent_ui_font_family = "LXGW WenKai TC";
+
+      # 與 kitty 相同的等寬字型;緩衝區與終端機維持等寬。
       buffer_font_family = "Maple Mono NF";
       buffer_font_size = 14;
       cursor_blink = false;
