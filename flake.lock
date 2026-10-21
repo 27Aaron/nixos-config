@@ -102,11 +102,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792494961,
-        "narHash": "sha256-BbwxU+EkNCXhz8kF6q3jfdH1PAQBRlKyH8PhhygCZtg=",
+        "lastModified": 1792556848,
+        "narHash": "sha256-yQxc3cfIBVXYPrva3mQEN8HtEnDL/5X/dOl/FjL3rZc=",
         "owner": "27Aaron",
         "repo": "Fonts",
-        "rev": "287867ba243162646aa5e49381b64a014f35f5ec",
+        "rev": "ebd09bce14118a8c1575d57a176a360e357b245b",
         "type": "github"
       },
       "original": {
