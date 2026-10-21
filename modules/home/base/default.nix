@@ -37,6 +37,7 @@ in
     # gui:開一個視窗。
     ./gui/agents/claude-desktop.nix
     ./gui/agents/dsh-desktop.nix
+    ./gui/manggo.nix
     ./gui/nagram.nix
     ./gui/seahorse.nix
     ./gui/browsers/chrome.nix

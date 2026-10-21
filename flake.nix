@@ -3,8 +3,8 @@
 
   inputs = {
     nixpkgs = {
-      # url = "github:NixOS/nixpkgs/nixos-unstable";
-      url = "github:NixOS/nixpkgs/nixos-unstable-small";
+      url = "github:NixOS/nixpkgs/nixos-unstable";
+      # url = "github:NixOS/nixpkgs/nixos-unstable-small";
     };
 
     disko = {
@@ -33,6 +33,7 @@
 
     nur-packages = {
       url = "github:27Aaron/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     fonts = {
@@ -42,6 +43,7 @@
 
     nagram = {
       url = "github:NextAlone/Nagram-Qt";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     fcitx5-vinput = {
