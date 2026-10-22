@@ -24,7 +24,7 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 | Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation, with river's own SSH key; river holds no copy of the shared server key. | The key is readable by the user, not only root, and every secret shares the same recipients ([WA-016](WORKAROUNDS.md#security-exceptions)). |
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
 | Desktop apps | Nagram runs in a nixpak sandbox: it sees only its data directory and `~/Downloads/Telegram`, reaches other files through the file chooser portal, and talks to a filtered D-Bus. Trust prompts stay on in Zed, VS Code and Claude Code. | The other apps, including closed-source ones, can still read `~/.ssh`, browser profiles and tokens. |
-| Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. |
+| Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. `@games` (`/games`) holds re-downloadable game libraries and is never snapshotted. |
 
 ## Application sandboxes
 

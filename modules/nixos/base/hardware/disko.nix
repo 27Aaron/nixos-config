@@ -40,6 +40,21 @@ let
       ];
     };
   }
+  # 遊戲庫可以重新下載,獨立成 subvolume 才不會被 btrbk 隨 @persistent 快照,
+  # 每次遊戲更新都留下數十 GB 的舊版本。新 subvolume 的根目錄屬於 root,
+  # 建立後要交給使用者一次;擁有者存在 Btrfs 上,不必每次開機設定:
+  #   sudo btrfs subvolume create /btr_pool/@games
+  #   sudo chown <user>:users /btr_pool/@games && sudo chmod 0700 /btr_pool/@games
+  // lib.optionalAttrs cfg.games.enable {
+    "@games" = {
+      mountpoint = "/games";
+      mountOptions = btrfsOptions ++ [
+        "nosuid"
+        "nodev"
+        "nofail"
+      ];
+    };
+  }
   // lib.optionalAttrs (cfg.swapSize != null) {
     "@swap" = {
       mountpoint = "/swap";
@@ -92,6 +107,8 @@ in
       default = null;
       description = "Btrfs swapfile size; null disables it.";
     };
+
+    games.enable = lib.mkEnableOption "a Btrfs subvolume at /games for game libraries, kept out of snapshots";
 
     luks.enable = lib.mkEnableOption "LUKS encryption for the data partition";
 
