@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.services'.trash;
+  home = config.users.users.${vars.username}.home;
 in
 {
   options.services'.trash = {
@@ -43,8 +44,8 @@ in
         Type = "oneshot";
         User = vars.username;
         Environment = [
-          "HOME=/home/${vars.username}"
-          "XDG_DATA_HOME=/home/${vars.username}/.local/share"
+          "HOME=${home}"
+          "XDG_DATA_HOME=${home}/.local/share"
         ];
       };
     };
