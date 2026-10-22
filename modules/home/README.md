@@ -1,17 +1,44 @@
 # Home Manager 模組
 
-使用者層的程式與設定。依平臺分成三個目錄，在 `base/` 底下再依程式的介面分類。
+使用者層的程式與設定。先依平臺分成三個目錄，各自再依程式的介面分類。
 
 ```text
 home/
-├── base/            # Mac 和 Linux 共用
-│   ├── home.nix     # 帳號與 Home Manager 本身
-│   ├── persist.nix  # persist' 選項
-│   ├── cli/         # 命令列工具,不佔用整個終端機(shell、git、工具鏈)
-│   ├── tui/         # 佔用整個終端機的介面(lazygit、btop、AI 代理)
-│   └── gui/         # 開啟視窗的程式(瀏覽器、編輯器、終端機)
-├── nixos/           # 只有 Linux:systemd 使用者服務、Linux 專屬套件
-└── darwin/          # 只有 macOS,預留
+├── base/                    # Mac 和 Linux 共用
+│   ├── core/                # 一律生效:帳號設定、persist' 選項
+│   ├── cli/                 # 命令列工具,不佔用整個終端機(cli'.*)
+│   │                        #   development、git、packages、shell、toolchain
+│   ├── tui/                 # 佔用整個終端機的介面(tui'.*)
+│   │   ├── agents/          #   claude-code、dsh
+│   │   └── lazygit.nix、monitoring.nix
+│   └── gui/                 # 開啟視窗的程式(gui'.*)
+│       ├── browsers/        #   chrome、firefox
+│       ├── editors/         #   vscode、zed
+│       └── kitty.nix、claude-desktop.nix
+├── nixos/                   # 只有 Linux
+│   ├── core/                # 一律生效:快取登記
+│   └── gui/                 # GTK/Qt 主題、游標、XDG、Linux 專屬程式(gui'.*)
+└── darwin/                  # 只有 macOS,預留
+```
+
+## 放在哪裡
+
+1. 依平臺：Mac 也能用就放 `base/`，否則放 `nixos/` 或 `darwin/`。
+   不確定時，查套件在 `aarch64-darwin` 上是否可用；依賴 systemd、XDG、GTK 的一律放 `nixos/`。
+2. 依介面：不佔用終端機的放 `cli/`，佔用整個終端機的放 `tui/`，開啟視窗的放 `gui/`。
+
+選項命名空間跟著介面分類，不分平臺：`nixos/gui/theme.nix` 的選項是 `gui'.theme`。
+
+## 開關
+
+`core/` 以外的模組都預設關閉，主機在 `default.nix` 以 `hm'` 打開：
+
+```nix
+hm' = {
+  cli'.git.enable = true;
+  tui'.lazygit.enable = true;
+  gui'.zed.enable = true;
+};
 ```
 
 ## 載入方式

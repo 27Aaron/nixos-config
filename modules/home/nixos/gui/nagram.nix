@@ -1,5 +1,13 @@
-{ inputs, pkgs, ... }:
+{
+  config,
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
+  cfg = config.gui'.nagram;
+
   nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop;
 
   # 上游二進位內建的 libxkbcommon 只找 /usr/share/X11/xkb,在 NixOS 上會於
@@ -21,8 +29,12 @@ let
   };
 in
 {
-  home.packages = [ nagram-desktop ];
+  options.gui'.nagram.enable = lib.mkEnableOption "the Nagram Telegram client";
 
-  # 工作階段與設定,含 tdata。
-  persist'.directories = [ ".local/share/NagramDesktop" ];
+  config = lib.mkIf cfg.enable {
+    home.packages = [ nagram-desktop ];
+
+    # 工作階段與設定,含 tdata。
+    persist'.directories = [ ".local/share/NagramDesktop" ];
+  };
 }

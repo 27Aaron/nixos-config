@@ -34,6 +34,40 @@
     vnstat.enable = true;
   };
 
+  hm' = {
+    cli' = {
+      development.enable = true;
+      git.enable = true;
+      packages.enable = true;
+      shell.enable = true;
+      toolchain.enable = true;
+    };
+
+    tui' = {
+      claude-code.enable = true;
+      dsh.enable = true;
+      lazygit.enable = true;
+      monitoring.enable = true;
+    };
+
+    gui' = {
+      chrome.enable = true;
+      firefox.enable = true;
+      vscode.enable = true;
+      zed.enable = true;
+      kitty.enable = true;
+      claude-desktop.enable = true;
+      dsh-desktop.enable = true;
+      nagram.enable = true;
+      magpie.enable = true;
+      seahorse.enable = true;
+      theme.enable = true;
+      pointer-cursor.enable = true;
+      mime-apps.enable = true;
+      user-dirs.enable = true;
+    };
+  };
+
   services'.keyd.enable = true;
   services'.keyd.keyboards = {
     # 內建鍵盤(AT Translated Set 2 keyboard)。
