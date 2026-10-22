@@ -58,6 +58,7 @@
 
   outputs =
     inputs@{
+      self,
       nixpkgs,
       ...
     }:
@@ -87,5 +88,15 @@
       );
 
       inherit (import ./hosts { inherit inputs; }) nixosConfigurations;
+
+      checks = forAllSystems (system: {
+        eval-tests = import ./tests {
+          inherit (nixpkgs) lib;
+          pkgs = nixpkgs.legacyPackages.${system};
+          nixosConfigurations = nixpkgs.lib.filterAttrs (
+            _: host: host.config.nixpkgs.hostPlatform.system == system
+          ) self.nixosConfigurations;
+        };
+      });
     };
 }
