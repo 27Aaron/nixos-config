@@ -1,4 +1,3 @@
-# delta 只渲染差異輸出,屬於 core;lazygit 在 tui。
 {
   config,
   lib,

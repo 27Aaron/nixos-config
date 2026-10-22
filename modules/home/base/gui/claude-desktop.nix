@@ -1,4 +1,3 @@
-# 非自由軟體,需要 nixpkgs.config.allowUnfree。
 {
   config,
   inputs,
@@ -15,6 +14,7 @@ in
   options.gui'.claude-desktop.enable = lib.mkEnableOption "Claude Desktop";
 
   config = lib.mkIf cfg.enable {
+    # 非自由軟體,需要 nixpkgs.config.allowUnfree。
     home.packages = [ llm.claude-desktop ];
 
     # 設定與登入狀態。

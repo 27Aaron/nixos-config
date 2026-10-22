@@ -1,4 +1,3 @@
-# SSH 客戶端:主機別名與使用者金鑰。sshd 伺服器在 nixos/base/services/openssh.nix。
 {
   config,
   inputs,

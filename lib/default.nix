@@ -1,4 +1,3 @@
-# 倉庫共用的輔助函式,由 hosts/default.nix 與各平臺入口匯入。
 { lib }:
 let
   # 遞迴收集模組:一般 .nix 檔,以及含 default.nix 的子目錄(不再深入)。
