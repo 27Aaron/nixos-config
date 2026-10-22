@@ -10,6 +10,7 @@ nixos/
 │   │   └── boot/            # 開機管理
 │   └── services/            # 常駐服務:SSH、dae、快照、監控(services'.*)
 ├── desktop/                 # 只有接螢幕的主機(desktop'.*)
+│   ├── game/                # Steam 與 GameMode
 │   ├── input-method/        # fcitx5 與語音輸入
 │   └── power/               # 筆電電源:upower、power-profiles-daemon
 └── server/                  # 只有伺服器:fail2ban、initrd 遠端解鎖(server'.*)
