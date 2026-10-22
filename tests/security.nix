@@ -44,6 +44,8 @@ let
     ".local/share/NagramDesktop"
     ".local/share/atuin"
     ".local/share/fish"
+    ".local/share/Steam"
+    ".steam"
     "nixos-config"
   ];
   privateFiles = [ ".claude.json" ];

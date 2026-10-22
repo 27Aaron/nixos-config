@@ -7,6 +7,8 @@
 }:
 let
   cfg = config.desktop'.greetd;
+  # tuigreet 預設只找 /usr/share/wayland-sessions,NixOS 沒有這個目錄。
+  sessions = "${config.services.displayManager.sessionData.desktops}/share/wayland-sessions";
 in
 {
   options.desktop'.greetd = {
@@ -38,9 +40,9 @@ in
       enable = true;
       useTextGreeter = true;
       settings = {
-        default_session.command = lib.mkIf (
-          cfg.sessionCommand != null
-        ) "${lib.getExe pkgs.tuigreet} --remember --time --cmd ${cfg.sessionCommand}";
+        default_session.command =
+          lib.mkIf (cfg.sessionCommand != null)
+            "${lib.getExe pkgs.tuigreet} --remember --time --sessions ${sessions} --cmd ${cfg.sessionCommand}";
 
         # 缺少 sessionCommand 時交由上方斷言報錯。
         initial_session = lib.mkIf (cfg.autoLogin && cfg.sessionCommand != null) {
