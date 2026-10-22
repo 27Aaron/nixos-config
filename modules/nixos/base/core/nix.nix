@@ -1,3 +1,4 @@
+# NixOS 專屬的 nix 工具;nix 本身的設定在 modules/base/nix.nix。
 {
   lib,
   pkgs,
@@ -10,30 +11,6 @@
     nixd
     nixfmt-rs
   ];
-
-  nix = {
-    channel.enable = false;
-    optimise.automatic = true;
-    settings = {
-      builders-use-substitutes = true;
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
-      trusted-users = [ vars.username ];
-
-      extra-substituters = [
-        "https://cache.numtide.com"
-        "https://fcitx5-vinput.cachix.org"
-      ];
-      extra-trusted-public-keys = [
-        "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-        "fcitx5-vinput.cachix.org-1:XpX3AA6+dDIX4qJhb1QM7sbTwX6/qSlGvW8Z5NK6XdU="
-      ];
-    };
-  };
-
-  nixpkgs.config.allowUnfree = true;
 
   programs.nh = {
     enable = true;

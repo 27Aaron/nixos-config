@@ -5,10 +5,10 @@
   ...
 }:
 let
-  cfg = config.core'.yubikey;
+  cfg = config.hardware'.yubikey;
 in
 {
-  options.core'.yubikey = {
+  options.hardware'.yubikey = {
     enable = lib.mkEnableOption "YubiKey tools and smart card access";
   };
 

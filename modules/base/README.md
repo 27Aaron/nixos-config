@@ -5,7 +5,9 @@ NixOS 與 nix-darwin 都會載入這裡的模組，因此只能使用兩邊都�
 
 ```text
 base/
-└── aliases.nix    # user' 與 hm' 別名
+├── aliases.nix    # user' 與 hm' 別名
+├── fish.nix       # fish 作為登入 shell
+└── nix.nix        # nix 設定、快取、allowUnfree
 ```
 
 放進這裡之前，先確認選項在兩個平臺都存在。只有 NixOS 才有的設定，例如

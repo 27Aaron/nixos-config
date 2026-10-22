@@ -6,11 +6,11 @@
   ...
 }:
 let
-  cfg = config.services'.trash;
+  cfg = config.desktop'.trash;
   home = config.users.users.${vars.username}.home;
 in
 {
-  options.services'.trash = {
+  options.desktop'.trash = {
     enable = lib.mkEnableOption "periodic purge of old trash items";
 
     retentionDays = lib.mkOption {

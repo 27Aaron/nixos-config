@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.services'.fail2ban;
+  cfg = config.server'.fail2ban;
 in
 {
-  options.services'.fail2ban = {
+  options.server'.fail2ban = {
     enable = lib.mkEnableOption "fail2ban intrusion prevention";
   };
 

@@ -4,14 +4,19 @@
 
 ```text
 nixos/
-├── base/                # 任何 NixOS 都可能用到,包括伺服器與路由器
-│   ├── core/            # 身分、使用者、nix、日誌等基礎(core'.*)
-│   ├── hardware/        # 機器上有什麼硬體(hardware'.*)
-│   │   └── boot/        # 開機管理與 initrd
-│   └── services/        # 常駐服務(services'.*)
-├── desktop/             # 只有接螢幕的主機(desktop'.*)
-└── server/              # 只有伺服器(server'.*),預留
+├── base/                    # 任何 NixOS 都可能用到,包括伺服器與路由器
+│   ├── core/                # 每臺都載入:帳號、主機名、語系、nix 工具、HM 整合(core'.*)
+│   ├── hardware/            # 機器上有什麼硬體:GPU、藍牙、YubiKey、磁碟、持久化(hardware'.*)
+│   │   └── boot/            # 開機管理
+│   └── services/            # 常駐服務:SSH、sops、dae、快照、監控(services'.*)
+├── desktop/                 # 只有接螢幕的主機(desktop'.*)
+│   ├── input-method/        # fcitx5 與語音輸入
+│   └── power/               # 筆電電源:upower、power-profiles-daemon
+└── server/                  # 只有伺服器:fail2ban、initrd 遠端解鎖(server'.*)
 ```
+
+子目錄只用來分組,不增加命名空間層級,例如 `desktop/input-method/fcitx5.nix`
+的選項是 `desktop'.fcitx5`。
 
 ## 判斷放哪裡
 

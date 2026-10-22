@@ -14,14 +14,14 @@ hosts/
 │   └── ...               # host-local modules (e.g. hardware.nix)
 └── darwin/               # reserved: nix-darwin hosts
 modules/
-├── base/                 # system modules shared by NixOS and nix-darwin (aliases.nix)
+├── base/                 # system modules shared by NixOS and nix-darwin (aliases, fish, nix)
 ├── darwin/               # reserved: nix-darwin system modules
 ├── nixos/
-│   ├── base/core/        # identity, users, nix, Home Manager integration, logging (core'.*)
-│   ├── base/hardware/    # disko, persistence, boot/, gpu, bluetooth, brightness (hardware'.*)
+│   ├── base/core/        # users, hostname, locale, nix tools, Home Manager integration (core'.*)
+│   ├── base/hardware/    # disko, persistence, boot/, gpu, bluetooth, yubikey (hardware'.*)
 │   ├── base/services/    # daemons usable on any NixOS host, servers included (services'.*)
-│   ├── desktop/          # greetd, niri, noctalia, fcitx5, fonts, file-manager (desktop'.*)
-│   └── server/           # reserved: server-only modules (server'.*)
+│   ├── desktop/          # greetd, niri, noctalia, input-method/, power/, pipewire (desktop'.*)
+│   └── server/           # server-only modules: fail2ban, initrd-ssh (server'.*)
 └── home/
     ├── base/             # Home Manager modules shared by Linux and macOS
     │   ├── home.nix      # account settings
@@ -50,7 +50,7 @@ Host files are ordinary NixOS modules:
 
 - Modules are collected automatically by `listModules` in `lib/default.nix`: a NixOS host loads `modules/base` and `modules/nixos`, and its Home Manager user loads `modules/home/base` and `modules/home/nixos`. A subdirectory with a `default.nix` is loaded through that file only.
 - Place a module at the most general level where it works: `base/` for both system platforms, `nixos/base/` for any NixOS host including servers, `nixos/desktop/` only with a screen, `nixos/server/` only on servers. `modules/README.md` lists the full order.
-- System modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory.
+- System modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory; grouping subdirectories such as `desktop/input-method/` do not add a level.
 - `modules/base/aliases.nix` defines the aliases `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`).
 - Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`.
 - Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.

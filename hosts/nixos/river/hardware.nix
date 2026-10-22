@@ -130,12 +130,12 @@
   # 狀態持久化。
   hardware'.persistence.enable = true;
 
-  # 與本機硬體綁定的服務:電源管理、壓縮 swap、磁碟健康與 Btrfs 維護。
-  services' = {
-    # 電源
-    power-profiles-daemon.enable = true;
-    upower.enable = true;
+  # 電源管理。
+  desktop'.power-profiles-daemon.enable = true;
+  desktop'.upower.enable = true;
 
+  # 與本機硬體綁定的服務:壓縮 swap、磁碟健康與 Btrfs 維護。
+  services' = {
     # 壓縮 swap
     zram = {
       enable = true;
