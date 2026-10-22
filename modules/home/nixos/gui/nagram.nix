@@ -8,32 +8,55 @@
 let
   cfg = config.gui'.nagram;
 
-  nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop;
+  mkNixPak = inputs.nixpak.lib.nixpak {
+    inherit (pkgs) lib;
+    inherit pkgs;
+  };
 
-  # 上游二進位內建的 libxkbcommon 只找 /usr/share/X11/xkb,在 NixOS 上會於
-  # Wayland 回呼中段錯誤,因此包裝並指定 XKB_CONFIG_ROOT。D-Bus 服務檔也要
-  # 指向包裝後的執行檔,否則 DBusActivatable 會繞過包裝。
+  # 上游二進位內建的 libxkbcommon 只找 /usr/share/X11/xkb,找不到時會在
+  # Wayland 回呼中段錯誤;把 xkeyboard-config 放進它的 FHS 環境即可。
   # 移除條件見 WORKAROUNDS.md 的 WA-007。
-  nagram-desktop = pkgs.symlinkJoin {
-    name = "nagram-desktop-wrapped";
-    paths = [ nagram ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/Nagram \
-        --set XKB_CONFIG_ROOT ${pkgs.xkeyboard-config}/share/X11/xkb
+  nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop.override {
+    buildFHSEnv =
+      args:
+      pkgs.buildFHSEnv (
+        args
+        // {
+          targetPkgs = p: args.targetPkgs p ++ [ p.xkeyboard-config ];
+        }
+      );
+  };
 
-      service=$out/share/dbus-1/services/xyz.nextalone.nagram.desktop.service
-      rm -f "$service"
-      substitute ${nagram}/share/dbus-1/services/xyz.nextalone.nagram.desktop.service "$service" \
-        --replace-fail ${nagram}/bin/Nagram $out/bin/Nagram
-    '';
+  # FHS 環境本身會掛入整個家目錄與 /run,不是沙箱;包在 nixpak 裡之後,
+  # 內層只看得到外層放行的路徑。其他檔案經檔案選擇器的 portal 取用。
+  sandboxed = mkNixPak {
+    config =
+      { sloth, ... }:
+      {
+        imports = [
+          ../../../../lib/nixpak/gui.nix
+          ../../../../lib/nixpak/network.nix
+        ];
+
+        app.package = nagram;
+        app.binPath = "bin/Nagram";
+        flatpak.appId = "xyz.nextalone.nagram.desktop";
+
+        bubblewrap.bind.rw = [
+          (sloth.mkdir (sloth.concat' sloth.xdgDataHome "/NagramDesktop"))
+          # Nagram 設定裡的下載位置要指向這裡;沙箱內的家目錄是 tmpfs,存到
+          # 其他路徑的檔案會在關閉後消失。
+          (sloth.mkdir (sloth.concat' sloth.xdgDownloadDir "/Telegram"))
+        ];
+      };
   };
 in
 {
   options.gui'.nagram.enable = lib.mkEnableOption "the Nagram Telegram client";
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ nagram-desktop ];
+    # env 會把桌面捷徑與 D-Bus 服務檔裡的執行檔換成沙箱版本。
+    home.packages = [ sandboxed.config.env ];
 
     # 工作階段與設定;tdata 等同帳號登入權限。
     persist'.directories = [
