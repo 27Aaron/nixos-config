@@ -160,6 +160,41 @@ in
       };
     };
 
+  # 密碼不可寫在設定裡(會進所有人可讀的 /nix/store),一律由 sops 在建立
+  # 帳號前解密;只比對是否設定,失敗訊息才不會印出雜湊。
+  password-source =
+    { config, ... }:
+    let
+      inline =
+        user:
+        lib.any (option: user.${option} != null) [
+          "hashedPassword"
+          "password"
+          "initialPassword"
+          "initialHashedPassword"
+        ];
+      accounts = [
+        "root"
+        vars.username
+      ];
+    in
+    {
+      expr = lib.genAttrs accounts (
+        name:
+        let
+          user = config.users.users.${name};
+        in
+        {
+          inline = inline user;
+          inherit (user) hashedPasswordFile;
+        }
+      );
+      expected = lib.genAttrs accounts (_: {
+        inline = false;
+        hashedPasswordFile = "/run/secrets-for-users/hashedPassword";
+      });
+    };
+
   # btrbk 以自己的帳號經 sudo 呼叫 btrfs,開啟 execWheelOnly 會讓快照失敗。
   btrbk-sudo =
     { config, ... }:

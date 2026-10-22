@@ -146,11 +146,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1792620735,
-        "narHash": "sha256-5unRGvOzL3dWQqXbDP9VL3ndco8MtvCKYUVECDxHYvE=",
+        "lastModified": 1792644304,
+        "narHash": "sha256-myLVvhZHmdb6CpgSzlfdRM2FRNWADQ0macbWpykODts=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "8b5adae4ae8782171ff6aaef94e444525cdd023d",
+        "rev": "8be60c6b0c19a2893841dce14b0c23a8f690c294",
         "type": "github"
       },
       "original": {
@@ -264,10 +264,10 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1792203677,
-        "narHash": "sha256-DzvwVPxpMGq7WiyRdAA5L7WIhDqhm9yyssRaYL6NoaM=",
+        "lastModified": 1792646742,
+        "narHash": "sha256-gH3Yw4/3Et6S6/H4fJAmPhDUOVOJrNWDMyldFl/MN1A=",
         "ref": "refs/heads/main",
-        "rev": "03d7129852958052ace66ede5fbda55e15404f3f",
+        "rev": "44d1f8a3a678c39974904894b95fdf54882147fc",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/27Aaron/nix-secrets.git"

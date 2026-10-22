@@ -130,9 +130,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 解密依賴 services'.sops 提供的 age 私鑰。
-    services'.sops.enable = true;
-
     sops.secrets = lib.genAttrs (map (name: "${name}.dae") secretFragments) (name: {
       sopsFile = secretFile;
       key = lib.removeSuffix ".dae" name;
