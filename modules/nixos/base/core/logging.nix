@@ -8,8 +8,6 @@ let
 in
 {
   options.core'.logging = {
-    enable = lib.mkEnableOption "bounded system logs and core dumps";
-
     journalMaxUse = lib.mkOption {
       type = lib.types.str;
       default = "2G";
@@ -29,7 +27,7 @@ in
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = {
     # 上游預設上限為檔案系統的 10%;/var/log 位於持久卷,等同數十 GB。
     services.journald.settings.Journal = {
       SystemMaxUse = cfg.journalMaxUse;

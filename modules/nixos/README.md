@@ -5,7 +5,7 @@
 ```text
 nixos/
 ├── base/                    # 任何 NixOS 都可能用到,包括伺服器與路由器
-│   ├── core/                # 每臺都載入:帳號、主機名、語系、nix 工具、HM 整合(core'.*)
+│   ├── core/                # 一律生效:帳號、主機名、語系、防火牆、日誌、nix 工具、HM 整合
 │   ├── hardware/            # 機器上有什麼硬體:GPU、藍牙、YubiKey、磁碟、持久化(hardware'.*)
 │   │   └── boot/            # 開機管理
 │   └── services/            # 常駐服務:SSH、sops、dae、快照、監控(services'.*)

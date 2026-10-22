@@ -5,29 +5,35 @@
     ./hardware.nix
   ];
 
-  core'.firewall.enable = true;
-  core'.logging.enable = true;
-
   hardware'.yubikey.enable = true;
 
-  desktop'.greetd.enable = true;
-  desktop'.niri.enable = true;
-  desktop'.niri.autoLogin = true;
-  desktop'.pipewire.enable = true;
-  desktop'.trash.enable = true;
-  desktop'.fcitx5.enable = true;
-  desktop'.vinput.enable = true;
-  desktop'.vinput.lite = true;
-  desktop'.noctalia.enable = true;
-  desktop'.file-manager.enable = true;
-  desktop'.fonts.enable = true;
+  desktop' = {
+    greetd.enable = true;
+    niri = {
+      enable = true;
+      autoLogin = true;
+    };
+    noctalia.enable = true;
+    fonts.enable = true;
+    file-manager.enable = true;
+    trash.enable = true;
+    pipewire.enable = true;
+    fcitx5.enable = true;
+    vinput = {
+      enable = true;
+      lite = true;
+    };
+  };
 
-  services'.sops.enable = true;
-  services'.dae.enable = true;
-  services'.logrotate.enable = true;
-  services'.openssh.enable = true;
-  services'.networkmanager.enable = true;
-  services'.vnstat.enable = true;
+  services' = {
+    networkmanager.enable = true;
+    openssh.enable = true;
+    sops.enable = true;
+    dae.enable = true;
+    logrotate.enable = true;
+    vnstat.enable = true;
+  };
+
   services'.keyd.enable = true;
   services'.keyd.keyboards = {
     # 內建鍵盤(AT Translated Set 2 keyboard)。

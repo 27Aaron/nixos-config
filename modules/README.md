@@ -38,6 +38,13 @@ modules/
 5. 只有 macOS 才用 → `darwin/`
 6. 使用者層的程式與設定 → `home/`，見 `home/README.md`
 
+## 開關
+
+- **`core/` 目錄裡的模組一律生效，沒有開關**：只放每臺機器都必須有的東西，
+  例如帳號、nix 設定、防火牆。
+- **其他模組一律預設關閉**，要在主機的 `default.nix` 寫 `enable = true` 才會生效。
+  伺服器因此只會帶入自己開啟的功能。
+
 ## 撰寫慣例
 
 - 一個檔案只負責一個程式或一個面向；安裝、設定與持久化放在同一個檔案。
@@ -47,7 +54,7 @@ modules/
 
 ## 別名
 
-`base/aliases.nix` 定義兩個別名，指向主要使用者：
+`base/core/aliases.nix` 定義兩個別名，指向主要使用者：
 
 - `user'.*` → `users.users.<使用者>`
 - `hm'.*` → `home-manager.users.<使用者>`
