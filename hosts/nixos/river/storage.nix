@@ -1,4 +1,3 @@
-# 磁碟、持久化與儲存維護。
 {
   # 磁碟與檔案系統佈局(ESP、LUKS、Btrfs、swapfile)。
   hardware'.disko = {

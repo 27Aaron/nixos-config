@@ -1,4 +1,3 @@
-# 滑鼠指標主題(XCursor 與 GTK)。
 {
   config,
   lib,

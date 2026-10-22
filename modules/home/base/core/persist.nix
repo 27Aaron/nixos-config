@@ -1,5 +1,3 @@
-# persist' 選項:各模組在此回報要跨重啟保留的家目錄路徑,由 NixOS 的
-# persistence 模組併入 preservation。其他平臺不讀取,宣告了也無妨。
 { lib, ... }:
 let
   # 狀態項目可寫成家目錄相對路徑,或帶屬性的集合。
@@ -15,6 +13,8 @@ let
     };
 in
 {
+  # 各模組在此回報要跨重啟保留的家目錄路徑,由 NixOS 的 persistence 模組
+  # 併入 preservation。其他平臺不讀取,宣告了也無妨。
   options.persist' = {
     directories = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "directory"));

@@ -1,12 +1,10 @@
 {
   config,
   lib,
-  vars,
   ...
 }:
 let
   cfg = config.gui'.kitty;
-  inherit (vars.appearance) catppuccin fonts;
 in
 {
   options.gui'.kitty.enable = lib.mkEnableOption "the kitty terminal";
@@ -16,11 +14,11 @@ in
       enable = true;
 
       # 另有 Frappe、Macchiato 與淺色的 Latte。
-      themeFile = "Catppuccin-${lib.toSentenceCase catppuccin.dark}";
+      themeFile = "Catppuccin-Mocha";
 
       # 字型由 desktop'.fonts 安裝,這裡只指定家族名。
       font = {
-        name = fonts.mono;
+        name = "Maple Mono NF";
         size = 12;
       };
 

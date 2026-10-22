@@ -1,5 +1,3 @@
-# 主機探索:hosts/nixos/<名稱>/ 成為 nixosConfigurations.<名稱>,目錄名即主機名。
-# hosts/darwin/ 預留給 nix-darwin,加入第一臺 Mac 時在此接上 darwinConfigurations。
 { inputs }:
 
 let
@@ -35,5 +33,6 @@ let
     };
 in
 {
+  # hosts/nixos/<名稱>/ 成為 nixosConfigurations.<名稱>;hosts/darwin/ 預留給 nix-darwin。
   nixosConfigurations = lib.mapAttrs mkNixos (hostsIn ./nixos);
 }

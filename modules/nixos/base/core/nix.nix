@@ -1,4 +1,3 @@
-# nh 與 flake 倉庫的持久化;nix 本身的設定在 modules/base/core/nix.nix。
 {
   lib,
   vars,

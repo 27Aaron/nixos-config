@@ -1,4 +1,3 @@
-# nix 本身的設定,NixOS 與 nix-darwin 共用。
 { vars, ... }:
 {
   nix = {

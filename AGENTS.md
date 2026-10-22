@@ -30,9 +30,7 @@ modules/
     │   └── gui/          # opens a window: browsers, editors, kitty (gui'.*)
     ├── nixos/            # Linux only: gui/ (GTK/Qt theme, XDG, Linux-only apps)
     └── darwin/           # reserved: Home Manager modules only macOS needs
-vars/
-├── default.nix           # shared non-secret user values
-└── appearance.nix        # fonts and the Catppuccin theme, the single source for every module
+vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
 ```
 

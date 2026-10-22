@@ -1,5 +1,3 @@
-# Home Manager 的 NixOS 整合。使用者模組自動收集自 modules/home/base 與
-# modules/home/nixos;nix-darwin 主機改收 base 與 darwin。
 {
   inputs,
   lib,
@@ -20,6 +18,7 @@ in
       inherit inputs vars;
     };
 
+    # 自動收集使用者模組;nix-darwin 主機改收 base 與 darwin。
     users.${vars.username}.imports = listModules ../../../home/base ++ listModules ../../../home/nixos;
   };
 

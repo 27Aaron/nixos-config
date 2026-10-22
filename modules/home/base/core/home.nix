@@ -1,4 +1,3 @@
-# 帳號與 Home Manager 本身的設定。
 {
   osConfig,
   vars,

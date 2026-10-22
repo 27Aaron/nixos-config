@@ -1,4 +1,3 @@
-# fish 作為主要使用者的登入 shell,NixOS 與 nix-darwin 共用。
 { pkgs, ... }:
 {
   programs.fish = {
@@ -9,5 +8,6 @@
     '';
   };
 
+  # 主要使用者的登入 shell。
   user'.shell = pkgs.fish;
 }

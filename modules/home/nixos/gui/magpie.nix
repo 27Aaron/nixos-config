@@ -1,5 +1,3 @@
-# 帶系統匣的 GUI 程式。放在 nixos/ 而非 base/gui/,因為它靠 systemd 使用者
-# 服務常駐於圖形工作階段,那是 Linux 的啟動方式。
 {
   config,
   inputs,
