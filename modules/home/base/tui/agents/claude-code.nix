@@ -8,14 +8,14 @@
 let
   cfg = config.tui'.claude-code;
 
-  llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+  claude-code = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
 in
 {
   options.tui'.claude-code.enable = lib.mkEnableOption "Claude Code";
 
   config = lib.mkIf cfg.enable {
     # 非自由軟體,需要 nixpkgs.config.allowUnfree。
-    home.packages = [ llm.claude-code ];
+    home.packages = [ claude-code ];
 
     home.shellAliases = {
       cc = "claude --dangerously-skip-permissions";
