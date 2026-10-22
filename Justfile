@@ -9,7 +9,7 @@ default:
 fmt:
     @nix fmt .
 
-# 檢查格式與死碼,並求值所有主機。
+# 檢查格式與死碼,求值所有主機並執行 tests/ 的 eval 測試。
 check:
     @nix fmt . -- --check
     @deadnix --fail .

@@ -31,6 +31,7 @@ modules/
     │   └── gui/          # gui'.*: opens a window (browsers/, editors/, kitty, claude-desktop)
     ├── nixos/gui/        # gui'.*: Linux only (GTK/Qt theme, cursor, XDG, Linux-only apps)
     └── darwin/           # reserved: Home Manager modules only macOS needs
+tests/                    # eval tests run by `just check`: security invariants and inventories
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
 ```
@@ -88,11 +89,13 @@ Host files are ordinary NixOS modules:
 
 ```bash
 nix fmt
-just check    # fmt --check, deadnix, and nix flake check --no-build --all-systems
+just check    # fmt --check, deadnix, and nix flake check --no-build --all-systems (includes the eval tests)
 just build    # build a host; defaults to the local hostname, or pass one explicitly
 ```
 
 A focused change may be validated by evaluating the affected options, for example `nix eval .#nixosConfigurations.<name>.config.<option>`. Build every affected host when changing host discovery, shared modules, or flake inputs.
+
+The eval tests in `tests/` assert the security rules above on every host and keep inventories of open ports, trusted binary caches and private persisted paths. When a change deliberately alters one of these (a service opens a port, a cache is added, a host is added), update the expectation in `tests/security.nix` in the same change and say why. Never weaken a test only to make it pass; see `tests/README.md`.
 
 For a refactor or comment-only change that should not alter the system, record the toplevel derivation before and after and compare them:
 

@@ -35,6 +35,7 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 | [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` entry |
 | [`modules/`](modules/README.md) | system and Home Manager modules, grouped by where they run |
 | `vars/` | shared non-secret values such as the user name and SSH public keys |
+| [`tests/`](tests/README.md) | eval tests for security settings, run by `just check` |
 | `lib/` | the module collector |
 
 ## References
