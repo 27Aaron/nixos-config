@@ -137,8 +137,6 @@ An app gets a nixpak sandbox when it is third-party, handles untrusted content, 
 
 ## Remaining work
 
-| Priority | Work | Notes |
-|---|---|---|
-| P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, restoring river's SSH key for sops, `resume_offset`. |
+Nothing is planned at the moment. Add new items here with a priority.
 
 Record temporary exceptions in [WORKAROUNDS.md](WORKAROUNDS.md) with a removal condition.
