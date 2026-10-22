@@ -25,7 +25,7 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 | Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon. | Code running as the user can wait for the password to be typed. |
 | Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) is open. dae's tproxy listener lives in its own network namespace. | sshd is reachable on every network the laptop joins. |
 | Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | The kernel and initrd sit on the unencrypted ESP. |
-| Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation. | One shared host key and no offline recovery key ([WA-016](WORKAROUNDS.md#security-exceptions)); unencrypted files in that repository land in the world-readable store ([WA-015](WORKAROUNDS.md#security-exceptions)). |
+| Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation, with river's own SSH key; river holds no copy of the shared server key. | The key is readable by the user, not only root, and every secret shares the same recipients ([WA-016](WORKAROUNDS.md#security-exceptions)). |
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
 | Desktop apps | Nagram runs in a nixpak sandbox: it sees only its data directory and `~/Downloads/Telegram`, reaches other files through the file chooser portal, and talks to a filtered D-Bus. Trust prompts stay on in Zed, VS Code and Claude Code. | The other apps, including closed-source ones, can still read `~/.ssh`, browser profiles and tokens. |
 | Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. |
@@ -81,6 +81,26 @@ sudo modprobe sctp                                 # must fail
 systemctl --failed
 ```
 
+## Secrets
+
+River decrypts with `~/.ssh/id_ed25519`, read from `/persistent/home/aaron/.ssh/` at activation. Every secret in nix-secrets is encrypted to three age keys: the MacBook's, the shared server key, and river's (the `ssh-to-age` form of that SSH key).
+
+Edit a secret on river without root:
+
+```fish
+set -x SOPS_AGE_KEY (ssh-to-age -private-key -i ~/.ssh/id_ed25519)
+sops users/password.yaml
+set -e SOPS_AGE_KEY
+```
+
+Replace river's SSH key (it must stay ed25519 without a passphrase):
+
+1. Generate the new key under another name and print its recipient with `ssh-to-age < new.pub`.
+2. In nix-secrets, replace `&River` in `.sops.yaml` and run `sops updatekeys` on every file with a key that can still decrypt them (the current river key or the MacBook's).
+3. Update the `secrets` input here, then move the new key to `~/.ssh/id_ed25519` and switch.
+
+If river's key and the MacBook's are both lost, the secrets can only be recovered from a server holding the shared key; otherwise recreate them.
+
 ## Updating
 
 1. Update inputs (`just update` or `just update-input <name>`) and audit the change as described in `AGENTS.md`.
@@ -109,7 +129,6 @@ Switching to an older generation does not undo a compromise: it only changes the
 
 | Priority | Work | Notes |
 |---|---|---|
-| P1 | Fix the nix-secrets exposure and key layout | [WA-015](WORKAROUNDS.md#security-exceptions), [WA-016](WORKAROUNDS.md#security-exceptions); work in the nix-secrets repository. |
 | P2 | Sandbox the remaining third-party GUI apps | Nagram is done; next candidates are dsh-desktop and magpie. Test input method and file chooser for each. |
 | P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, the age key, `resume_offset`. |
 
