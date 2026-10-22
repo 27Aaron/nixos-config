@@ -48,7 +48,6 @@ let
   ];
   privateFiles = [ ".claude.json" ];
   privateSystemDirs = [
-    "/var/lib/sops-nix"
     "/var/lib/bluetooth"
     "/etc/NetworkManager/system-connections"
   ];
@@ -233,6 +232,20 @@ in
     {
       expr = lib.mapAttrs (_: unsandboxed) sandboxedApps;
       expected = lib.mapAttrs (_: _: [ ]) sandboxedApps;
+    };
+
+  # sops 只用使用者自己的 SSH 金鑰解密,不再有共用或自動產生的金鑰檔。
+  sops-key =
+    { config, ... }:
+    {
+      expr = {
+        inherit (config.sops.age) keyFile sshKeyPaths generateKey;
+      };
+      expected = {
+        keyFile = null;
+        sshKeyPaths = [ "/persistent/home/${vars.username}/.ssh/id_ed25519" ];
+        generateKey = false;
+      };
     };
 
   # btrbk 以自己的帳號經 sudo 呼叫 btrfs,開啟 execWheelOnly 會讓快照失敗。
