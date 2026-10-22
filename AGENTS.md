@@ -18,7 +18,7 @@ modules/
 ├── base/core/            # always on, shared by NixOS and nix-darwin: aliases, fish, nix settings
 ├── darwin/               # reserved: nix-darwin system modules
 ├── nixos/
-│   ├── base/core/        # always on: users and sops, hostname, locale, firewall, logging, nix and nh, ssh client fix, Home Manager
+│   ├── base/core/        # always on: users and sops, hostname, locale, firewall, kernel hardening, logging, nix and nh, ssh client fix, Home Manager
 │   ├── base/hardware/    # hardware'.*: disko, persistence, boot/, amdgpu, bluetooth, brightness, yubikey
 │   ├── base/services/    # services'.*: daemons any NixOS host may run, servers included
 │   ├── desktop/          # desktop'.*: greetd, niri, noctalia, fonts, file manager, trash, pipewire, input-method/, power/
@@ -73,6 +73,7 @@ Host files are ordinary NixOS modules:
 - Do not add users to `nix.settings.trusted-users`: a trusted user can disable signature checks and import arbitrary store paths, which amounts to passwordless root. Only `@wheel` may connect to the daemon (`allowed-users`).
 - Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
 - `security.sudo.execWheelOnly` stays off: the upstream btrbk module runs as its own user and calls `btrfs` through sudo rules.
+- The kernel baseline in `core/kernel-hardening.nix` uses `lib.mkDefault`, so a host overrides a value with a plain definition, never `mkForce`. Keep user namespaces on (the Nix build sandbox needs them), leave `security.protectKernelImage` off (it disables hibernation), and keep `kernel.kptr_restrict` at 1 (dae's eBPF library reads `/proc/kallsyms`). A host that needs a module from `core'.kernel.blockedModules`, such as an IPsec VPN, removes it there.
 - Keep trust prompts on. Do not set Zed's `session.trust_all_worktrees`, disable VS Code's workspace trust, or alias coding agents to permission-bypass modes; a cloned repository must not be able to run code just by being opened.
 - Inputs that do not follow `nixpkgs` (currently `fcitx5-vinput`, for its binary cache) carry their own nixpkgs and only pick up security fixes when upstream updates its lock.
 
