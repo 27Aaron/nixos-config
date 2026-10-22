@@ -27,6 +27,7 @@
   # logind 因而反覆掛起。恢復必經電源鍵,蓋子必然開啟,故僅在此時以
   # lid_init_state=open 重綁 acpi-button。驅動於輸入裝置首次開啟時才回報
   # 初始狀態,open 須保留至下次睡眠前再還原;醒著時的開合仍由韌體事件回報。
+  # 移除條件見 WORKAROUNDS.md 的 WA-002。
   environment.etc."systemd/system-sleep/lid-after-hibernate".source =
     pkgs.writeShellScript "lid-after-hibernate" ''
       params=/sys/module/button/parameters/lid_init_state
@@ -45,6 +46,7 @@
 
   # 觸控板(I2C,UNIW0001:00)休眠恢復後不會重新列舉,需重綁 i2c_hid_acpi。
   # resumeCommands 於恢復後執行,PATH 僅含 coreutils、grep、sed 與 systemd。
+  # 移除條件見 WORKAROUNDS.md 的 WA-003。
   powerManagement.resumeCommands = ''
     for dev in /sys/bus/i2c/devices/i2c-UNIW*; do
       [ -e "$dev/driver" ] || continue

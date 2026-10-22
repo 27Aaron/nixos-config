@@ -38,6 +38,7 @@ in
 
     # libfido2 的 udev 規則指定 GROUP="plugdev",NixOS 沒有此群組,開機會刷出
     # 上百行解析錯誤。建立空群組即可;實際存取權由規則中的 TAG+="uaccess" 授予。
+    # 移除條件見 WORKAROUNDS.md 的 WA-011。
     users.groups.plugdev = { };
   };
 }

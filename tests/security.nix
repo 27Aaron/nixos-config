@@ -4,7 +4,7 @@ let
 
   # 各主機對外開放的連接埠。服務新開了埠,要在這裡登記才能通過測試。
   openPorts = {
-    # sshd 233;dae 的 tproxy 12345。
+    # sshd 233;dae 的 tproxy 12345(WA-014)。
     river = {
       tcp = [
         233

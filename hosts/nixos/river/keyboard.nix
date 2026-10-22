@@ -9,7 +9,7 @@
         main = {
           # Copilot 鍵(位於右 Ctrl)送出 meta+shift+F23,整組映射為右 Ctrl。
           "leftshift+leftmeta+f23" = "rightcontrol";
-          # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原。
+          # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
           rightcontrol = "rightcontrol";
         };
       };
@@ -20,7 +20,7 @@
       ids = [ "04fe:0021" ];
       settings.main = {
         rightmeta = "rightcontrol";
-        # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原。
+        # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
         rightcontrol = "rightcontrol";
       };
     };

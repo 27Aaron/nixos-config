@@ -34,6 +34,8 @@ modules/
 tests/                    # eval tests run by `just check`: security invariants and inventories
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
+SECURITY.md               # threat model, trust boundaries, runtime checks, remaining work
+WORKAROUNDS.md            # temporary workarounds, pins and security exceptions with removal conditions
 ```
 
 Every major directory has a `README.md` with its placement rules. Read it before adding a file there, and update it, together with the tree above, when a change makes either one stale.
@@ -69,6 +71,7 @@ Host files are ordinary NixOS modules:
 
 ## Security
 
+- `SECURITY.md` holds the threat model, trust boundaries, flake input inventory, runtime checks and remaining work. Update it in the same change when a change moves a security boundary, adds an input, or closes an item.
 - Credentials and secrets belong in the private `nix-secrets` repository and reach the system through sops-nix. `inputs.secrets` is copied into the world-readable `/nix/store`, so read only encrypted files, or files with nothing sensitive in them (like the SSH host aliases), from it at evaluation time. `vars/` holds non-secret values only. Account passwords come from `users/password.yaml` in nix-secrets, decrypted with `neededForUsers` before users are created; never put a password or hash in the configuration. sops is a core module because every host needs it for that.
 - Do not add users to `nix.settings.trusted-users`: a trusted user can disable signature checks and import arbitrary store paths, which amounts to passwordless root. Only `@wheel` may connect to the daemon (`allowed-users`).
 - Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
@@ -77,13 +80,17 @@ Host files are ordinary NixOS modules:
 - Keep trust prompts on. Do not set Zed's `session.trust_all_worktrees`, disable VS Code's workspace trust, or alias coding agents to permission-bypass modes; a cloned repository must not be able to run code just by being opened.
 - Inputs that do not follow `nixpkgs` (currently `fcitx5-vinput`, for its binary cache) carry their own nixpkgs and only pick up security fixes when upstream updates its lock.
 
+## Workarounds
+
+Record every temporary workaround, version pin and accepted security exception in `WORKAROUNDS.md` in the same change that introduces it: give it the next `WA-NNN` ID and a concrete removal condition, and mention the ID in a comment next to the code. When the condition is met, delete the code and the row and name the ID in the commit message. After a nixpkgs, kernel or BIOS update, recheck the rows that depend on it.
+
 ## Style and formatting
 
 - Two spaces for indentation, no tabs, LF line endings, a final newline, and no trailing whitespace.
 - Run the repository formatter with `nix fmt` after editing Nix files.
 - Format files changed by the task; do not reformat unrelated files.
 - Preserve existing naming conventions when extending a module.
-- `AGENTS.md`, option descriptions, the top-level `README.md` and commit messages are in English. Directory READMEs and Nix comments are in Traditional Chinese with Taiwanese usage (設定, 檔案, 預設, 支援). Markdown prose uses full-width punctuation; Nix comments use half-width `,;:()` with full-width `。、`.
+- Top-level documents (`README.md`, `AGENTS.md`, `SECURITY.md`, `WORKAROUNDS.md`), option descriptions and commit messages are in English. Directory READMEs and Nix comments are in Traditional Chinese with Taiwanese usage (設定, 檔案, 預設, 支援). Markdown prose uses full-width punctuation; Nix comments use half-width `,;:()` with full-width `。、`.
 - Comments explain why: a constraint, an upstream quirk, or a rejected alternative. Do not restate what the next line does, and do not add file header comments.
 
 ## Validation
@@ -150,8 +157,12 @@ When updating an input in `flake.lock`, describe the upstream change instead of 
    gh api repos/<owner>/<repo>/compare/<old>...<new>
    ```
 
-3. Review the commits or changed files and keep only meaningful changes in the commit body. Call out security fixes explicitly.
-4. Use a title naming the input, followed by the short revision range and a brief bullet list:
+3. Treat the update as a supply-chain event. For each input that moved, check what this repository consumes from it (see the input table in `SECURITY.md`):
+   - For inputs that provide NixOS or Home Manager modules (`home-manager`, `disko`, `preservation`, `sops-nix`), read the changes to the module files that are imported and look for `nix.settings` substituters, trusted keys or trusted users; activation scripts, root services, sudo or polkit rules; `environment.etc` or `home.file` entries that widen ownership or mode; `lib.mkForce` overrides; and import-from-derivation.
+   - For package inputs, confirm that the packages used here changed only as described.
+   - `just check` catches new caches and open ports; `just build` prints the package diff against the running system.
+4. Keep only meaningful changes in the commit body, and call out security fixes explicitly.
+5. Use a title naming the input, followed by the short revision range and a brief bullet list:
 
    ```text
    chore(flake): update home-manager input
@@ -160,5 +171,7 @@ When updating an input in `flake.lock`, describe the upstream change instead of 
    - summarize the meaningful change
    - summarize another relevant file or commit
    ```
+
+Pin a new third-party input to a release tag or a commit when the project publishes releases, rather than tracking a branch; record a pin that exists for a temporary reason in `WORKAROUNDS.md`.
 
 For multiple inputs, use `chore(flake): update flake inputs` and list each input in the body, or split the updates into separate commits. Do not claim details that are not supported by the upstream changelog or the local diff.

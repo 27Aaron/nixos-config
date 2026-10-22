@@ -98,6 +98,7 @@ in
     };
 
     # 持久化的 /var/lib/lastlog 與 lastlog2 的 tmpfiles 規則衝突,以空檔覆蓋。
+    # 移除條件見 WORKAROUNDS.md 的 WA-010。
     environment.etc."tmpfiles.d/lastlog2-tmpfiles.conf".text = ''
       # Managed by Preservation.
     '';

@@ -34,6 +34,7 @@ in
     # 明確宣告,不依賴核心編譯選項或 systemd 的預設;主機可直接覆寫。
     # kernel.kptr_restrict 維持 NixOS 預設的 1:設成 2 連 root 讀到的
     # /proc/kallsyms 都是 0,而 dae 的 eBPF 函式庫會讀它。
+    # 移除條件見 WORKAROUNDS.md 的 WA-013。
     boot.kernel.sysctl = lib.mapAttrs (_: lib.mkDefault) {
       # 核心日誌只給有 CAP_SYSLOG 的程序讀取。
       "kernel.dmesg_restrict" = 1;
