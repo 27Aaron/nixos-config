@@ -7,7 +7,8 @@
 let
   cfg = config.cli'.ssh;
 
-  # 客戶端主機別名,來自 nix-secrets;不含金鑰。
+  # 客戶端主機別名,來自 nix-secrets。檔案會複製進所有本機帳號都能讀取的
+  # /nix/store,只能放別名,不可放金鑰或密碼。
   sshConfig = inputs.secrets + "/openssh/config";
 in
 {

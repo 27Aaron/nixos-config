@@ -4,6 +4,10 @@
   ...
 }:
 {
+  # 只有 wheel 能連上 nix-daemon;服務帳號即使被攻破,也碰不到 daemon 的
+  # 提權類漏洞。root 一律可連線。
+  nix.settings.allowed-users = [ "@wheel" ];
+
   programs.nh = {
     enable = true;
     flake = lib.mkDefault "/home/${vars.username}/nixos-config";

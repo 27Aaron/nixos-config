@@ -10,7 +10,7 @@ in
   options.cli'.shell.enable = lib.mkEnableOption "fish and zsh with their prompt and history tools";
 
   config = lib.mkIf cfg.enable {
-    # fish 為主力(登入 shell 由 nixos/base/core/fish.nix 設定);zsh 為備援,
+    # fish 為主力(登入 shell 由 modules/base/core/fish.nix 設定);zsh 為備援,
     # 不需列入 /etc/shells。
     programs = {
       fish = {
@@ -108,7 +108,11 @@ in
           directory = ".atuin";
           mode = "0700";
         }
-        ".local/share/atuin"
+        # 指令歷史與同步金鑰。
+        {
+          directory = ".local/share/atuin";
+          mode = "0700";
+        }
         {
           directory = ".cache/zsh";
           mode = "0700";

@@ -35,8 +35,11 @@ in
         base_keymap = "Zed";
         hour_format = "hour24";
 
-        # 新目錄直接信任,不再逐個確認。
-        session.trust_all_worktrees = true;
+        # 新目錄先以受限模式開啟,不套用專案的 .zed/settings.json,也不啟動
+        # 語言伺服器與 MCP 伺服器;全部信任的話,開啟惡意倉庫即可執行任意指令。
+        # 自己的專案在首次開啟時信任一次即可。須明確寫 false:合併不會移除
+        # settings.json 裡既有的鍵。
+        session.trust_all_worktrees = false;
 
         # 跟隨系統深淺色。
         theme = {
@@ -108,7 +111,10 @@ in
     # 工作區資料庫與登入狀態在 .local/share/zed。
     persist'.directories = [
       ".config/zed"
-      ".local/share/zed"
+      {
+        directory = ".local/share/zed";
+        mode = "0700";
+      }
     ];
   };
 }

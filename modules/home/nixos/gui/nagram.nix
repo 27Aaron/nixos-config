@@ -34,7 +34,12 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ nagram-desktop ];
 
-    # 工作階段與設定,含 tdata。
-    persist'.directories = [ ".local/share/NagramDesktop" ];
+    # 工作階段與設定;tdata 等同帳號登入權限。
+    persist'.directories = [
+      {
+        directory = ".local/share/NagramDesktop";
+        mode = "0700";
+      }
+    ];
   };
 }

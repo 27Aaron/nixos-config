@@ -17,13 +17,20 @@ in
     # 非自由軟體,需要 nixpkgs.config.allowUnfree。
     home.packages = [ claude-code ];
 
+    # auto 模式逐一審查動作:例行操作直接放行,有風險的會被擋下。不用
+    # bypassPermissions,它完全不檢查,倉庫或網頁裡的提示注入可以直接執行指令。
     home.shellAliases = {
-      cc = "claude --dangerously-skip-permissions";
+      cc = "claude --permission-mode auto";
     };
 
-    # 登入狀態與設定由程式自行寫入。
+    # 登入憑證、設定與對話紀錄由程式自行寫入。
     persist' = {
-      directories = [ ".claude" ];
+      directories = [
+        {
+          directory = ".claude";
+          mode = "0700";
+        }
+      ];
       files = [
         {
           file = ".claude.json";
