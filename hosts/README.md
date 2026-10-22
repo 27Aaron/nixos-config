@@ -13,7 +13,7 @@ hosts/
 │       ├── storage.nix    # 磁碟佈局、持久化、zram、Btrfs 維護
 │       ├── power.nix      # 休眠、睡眠、蓋子與觸控板的恢復修補
 │       ├── keyboard.nix   # keyd 鍵位映射
-│       └── README.md      # 硬體清單、BIOS 更新與重灌步驟
+│       └── README.md      # 硬體清單與 BIOS 更新
 └── darwin/            # 預留:nix-darwin 主機
 ```
 
@@ -22,7 +22,7 @@ hosts/
 - `default.nix`：這臺機器開了哪些功能、時區、`stateVersion`，以及匯入同目錄的其他檔案。
 - 其他 `.nix` 檔：只屬於這臺機器的設定，依主題拆檔，例如 `hardware.nix`（核心、initrd、韌體）、
   `storage.nix`（磁碟與持久化）。
-- `README.md`：硬體規格、PCI ID、BIOS 與重灌步驟等備忘。
+- `README.md`：硬體規格、PCI ID、BIOS 等備忘。
 
 能被第二臺機器用到的設定，就不該留在主機目錄，應該做成 `modules/` 底下的模組。
 

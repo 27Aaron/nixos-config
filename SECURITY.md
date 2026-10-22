@@ -121,7 +121,7 @@ Check for updates at least weekly, and immediately when an actively exploited vu
 
 1. Disconnect the network.
 2. From another trusted machine, rotate what the laptop held: the account password in nix-secrets, SSH keys (and remove the old public keys from `vars/` and GitHub), GitHub and agent tokens, and the age key if root was compromised.
-3. Reinstall from this flake rather than cleaning the running system ([steps](hosts/nixos/river/README.md#重灌)), and copy back only data you have checked.
+3. Reinstall from this flake rather than cleaning the running system, and copy back only data you have checked.
 
 Switching to an older generation does not undo a compromise: it only changes the system configuration, not stolen secrets or modified data.
 
