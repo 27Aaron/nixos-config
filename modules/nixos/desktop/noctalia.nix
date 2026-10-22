@@ -15,11 +15,9 @@ in
     programs.noctalia = {
       enable = true;
 
-      # 遊戲模式(gamescope-session)也會帶起 graphical-session.target,
-      # 綁在 niri 上 Noctalia 才不會在沒有 layer-shell 的 gamescope 裡反覆崩潰。
       systemd = {
         enable = true;
-        target = "niri.service";
+        target = "graphical-session.target";
       };
     };
 
