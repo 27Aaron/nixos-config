@@ -22,8 +22,8 @@ in
     systemd.user.services.magpie = {
       Unit = {
         Description = "magpie menu bar and local model gateway";
-        After = [ "graphical-session.target" ];
-        PartOf = [ "graphical-session.target" ];
+        After = [ config.wayland.systemd.target ];
+        PartOf = [ config.wayland.systemd.target ];
       };
 
       Service = {
@@ -32,7 +32,7 @@ in
         RestartSec = 3;
       };
 
-      Install.WantedBy = [ "graphical-session.target" ];
+      Install.WantedBy = [ config.wayland.systemd.target ];
     };
 
     # 金鑰與用量在 .config/magpie,WebKit 資料在 .local/share/magpie;
