@@ -8,7 +8,7 @@ let
 in
 {
   options.services'.zram = {
-    enable = lib.mkEnableOption "compressed RAM swap with Zram";
+    enable = lib.mkEnableOption "compressed RAM swap with zram";
 
     memoryPercent = lib.mkOption {
       type = lib.types.ints.positive;

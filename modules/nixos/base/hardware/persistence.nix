@@ -49,7 +49,7 @@ in
       # 不整體保留 ~/.cache:內容幾乎都可重建且成長很快,需要的快取由各模組
       # 自行登記。
 
-      # GPG 金鑰環;GNOME 鑰匙圈見 home/base/gui/seahorse.nix。
+      # GPG 金鑰環;GNOME 鑰匙圈見 modules/home/nixos/gui/seahorse.nix。
       {
         directory = ".gnupg";
         mode = "0700";

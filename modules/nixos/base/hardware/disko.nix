@@ -96,9 +96,9 @@ in
     luks.enable = lib.mkEnableOption "LUKS encryption for the data partition";
 
     luks.fido2.enable = lib.mkEnableOption ''
-      FIDO2 unlocking for the LUKS partition. This only teaches the initrd to
-      use an enrolled YubiKey. Enrollment is not done here: disko's own
-      enrollFido2 runs while formatting the disk
+      FIDO2 unlocking for the LUKS partition. This only lets the initrd use a
+      key that is already enrolled; enroll one by hand with
+      systemd-cryptenroll, as the comment in this module describes
     '';
 
     bios.enable = lib.mkEnableOption "a BIOS boot partition for GRUB";
@@ -115,13 +115,15 @@ in
     # 只在開機時清空 /tmp,不改變其位置;與上方的 @tmp 搭配。
     boot.tmp.cleanOnBoot = true;
 
-    # 讓 initrd 能以已登記的 FIDO2 鑰匙解鎖(需要 USB HID 驅動)。登記需手動,
-    # 對分割區而非 /dev/mapper/crypted 操作,每次只插一把鑰匙:
+    # 下方的 crypttabExtraOpts 只有 systemd initrd 會讀取。
+    #
+    # FIDO2 解鎖需要 USB HID 驅動。登記需手動,對分割區而非 /dev/mapper/crypted
+    # 操作,每次只插一把鑰匙;預設要求 PIN 與觸摸,單有鑰匙無法解鎖:
     #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks   # 列出槽位
     #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
-    boot.initrd = lib.mkIf cfg.luks.fido2.enable {
+    boot.initrd = lib.mkIf cfg.luks.enable {
       systemd.enable = true;
-      availableKernelModules = [
+      availableKernelModules = lib.optionals cfg.luks.fido2.enable [
         "usbhid"
         "hid_generic"
       ];

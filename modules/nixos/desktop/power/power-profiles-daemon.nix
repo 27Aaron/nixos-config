@@ -8,7 +8,7 @@ let
 in
 {
   options.desktop'.power-profiles-daemon = {
-    enable = lib.mkEnableOption "Power profiles management daemon";
+    enable = lib.mkEnableOption "power-profiles-daemon";
   };
 
   config = {
