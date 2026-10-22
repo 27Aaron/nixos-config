@@ -17,7 +17,7 @@ in
 
   config = lib.mkIf cfg.enable {
     fonts = {
-      # 只裝下面清單,不帶入 nixpkgs 的預設字型包。
+      # 只安裝下列字型,不含 nixpkgs 預設字型。
       enableDefaultPackages = false;
       fontDir.enable = true;
 

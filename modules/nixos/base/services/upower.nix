@@ -14,7 +14,7 @@ in
   config = {
     services.upower.enable = lib.mkIf cfg.enable true;
 
-    # 跟隨服務的最終狀態(上游可能自行啟用),而非本模組的開關。
+    # 依服務的最終狀態而非本模組開關,上游模組也可能啟用它。
     preservation'.os.directories = lib.optionals config.services.upower.enable [
       "/var/lib/upower"
     ];

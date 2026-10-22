@@ -22,7 +22,7 @@ in
     # 讓音訊伺服器透過 RTKit 取得即時排程。
     security.rtkit.enable = lib.mkIf cfg.enable true;
 
-    # 跟隨服務的最終狀態(上游可能自行啟用),而非本模組的開關。
+    # 依服務的最終狀態而非本模組開關,上游模組也可能啟用它。
     preservation'.user.directories = lib.optionals config.services.pipewire.enable [
       {
         directory = ".config/pulse";

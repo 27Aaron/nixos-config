@@ -20,7 +20,7 @@ in
         configurationLimit = lib.mkDefault 8;
       };
 
-      # bootctl 安裝時要註冊 NVRAM 項目,少了這個共享的 EFI 層選項就會失敗。
+      # bootctl 安裝時需寫入 EFI 變數以註冊開機項目。
       efi.canTouchEfiVariables = true;
     };
   };

@@ -23,8 +23,8 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ pkgs.trash-cli ];
 
-    # tmpfs 根之下家目錄的回收桶重開機就沒了,但各掛載點裡的 .Trash-$uid
-    # 隨目錄本身留下來,而檔案總管不會匯總顯示,於是無聲無息地長大。
+    # 家目錄的回收桶在 tmpfs 上,重開機即清空;各持久化目錄中的 .Trash-$uid
+    # 則會一直累積,檔案總管也不會一併顯示,因此定期清理。
     systemd.services.trash-empty = {
       description = "Purge trash items older than ${toString cfg.retentionDays} days";
 
@@ -32,9 +32,8 @@ in
         ${pkgs.trash-cli}/bin/trash-empty ${toString cfg.retentionDays} -f
       '';
 
-      # .Trash-$uid 位於 preservation 的 bind 掛載之內,要等掛載完成才掃得到。
-      # preservation 的 mount unit 帶 DefaultDependencies=no,不排在
-      # local-fs.target 之後,所以兩個都列。
+      # .Trash-$uid 位於 preservation 的 bind 掛載內,而這些掛載不排在
+      # local-fs.target 之後,所以兩者都要等。
       after = [
         "local-fs.target"
         "preservation.target"

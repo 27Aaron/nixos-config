@@ -1,5 +1,5 @@
-# 兩個平臺共用的 Home Manager 基準:persist' 選項、帳號設定,以及 core/tui/
-# gui 三桶的檔案清單。平臺專屬的東西放 ../nixos 或 ../darwin。
+# 跨平臺共用的 Home Manager 設定:persist' 選項、帳號設定與模組清單。
+# 平臺專屬設定放在 ../nixos 或 ../darwin。
 {
   lib,
   osConfig,
@@ -21,20 +21,20 @@ let
 in
 {
   imports = [
-    # core:自己不畫介面。
+    # core:不繪製介面。
     ./core/development.nix
     ./core/git.nix
     ./core/packages.nix
     ./core/shell.nix
     ./core/toolchain.nix
 
-    # tui:接管終端。
+    # tui:佔用終端機。
     ./tui/agents/claude-code.nix
     ./tui/agents/dsh.nix
     ./tui/git/lazygit.nix
     ./tui/monitoring.nix
 
-    # gui:開一個視窗。
+    # gui:開啟視窗。
     ./gui/agents/claude-desktop.nix
     ./gui/agents/dsh-desktop.nix
     ./gui/nagram.nix
@@ -50,7 +50,7 @@ in
     ./gui/user-dirs.nix
   ];
 
-  # 各工具模組回報自己的狀態,由 persistence 模組拼接進 preservation。
+  # 各模組回報的狀態路徑,由 persistence 模組併入 preservation。
   options.persist' = {
     directories = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "directory"));
@@ -76,7 +76,7 @@ in
 
     programs.home-manager.enable = true;
 
-    # 跳過 option manual 的建置要關兩個開關,單獨的 man.enable 不夠。
+    # 兩者都關閉才能跳過 option manual 的建置。
     programs.man.enable = false;
     manual.manpages.enable = false;
   };

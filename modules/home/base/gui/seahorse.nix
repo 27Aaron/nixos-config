@@ -5,7 +5,7 @@
 {
   home.packages = [ pkgs.seahorse ];
 
-  # GNOME 鑰匙環,seahorse 就是它的管理介面。
+  # GNOME 鑰匙圈資料;seahorse 是其管理介面。
   persist'.directories = [
     {
       directory = ".local/share/keyrings";

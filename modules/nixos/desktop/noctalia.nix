@@ -21,7 +21,7 @@ in
       };
     };
 
-    # 設定由 Noctalia 介面管理,只保留狀態跨重啟。
+    # 設定由 Noctalia 介面管理,不由 Nix 生成。
     preservation'.user.directories = [
       {
         directory = ".config/noctalia";

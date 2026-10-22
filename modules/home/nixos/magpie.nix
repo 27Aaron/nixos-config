@@ -1,5 +1,5 @@
-# 帶托盤的 GUI 程序。放在 nixos/ 而非 base/gui/,因為它靠 systemd 使用者
-# 服務常駐圖形會話,那是 Linux 的啟動方式。
+# 帶系統匣的 GUI 程式。放在 nixos/ 而非 base/gui/,因為它靠 systemd 使用者
+# 服務常駐於圖形工作階段,那是 Linux 的啟動方式。
 {
   inputs,
   lib,
@@ -14,7 +14,7 @@ in
 
   xdg.mimeApps.defaultApplicationPackages = [ magpie ];
 
-  # 托盤程式同時提供本機閘道,關掉視窗也要繼續跑。
+  # 系統匣程式同時提供本機閘道,關掉視窗也要繼續跑。
   systemd.user.services.magpie = {
     Unit = {
       Description = "magpie menu bar and local model gateway";
@@ -31,10 +31,9 @@ in
     Install.WantedBy = [ "graphical-session.target" ];
   };
 
-  # 供應商金鑰與用量在 .config/magpie,WebKit 頁面資料在 .local/share/magpie。
-  # 整個 ~/.cache/magpie 一併保留:agents/sessions 是使用者狀態,models.json
-  # 與 plugin-*.json 則需要重新下載;目錄 bind mount 也避免原子替換問題。
-  # 清理時保留 agents-state.json 與 sessions.json,其餘快取可刪。
+  # 金鑰與用量在 .config/magpie,WebKit 資料在 .local/share/magpie;
+  # ~/.cache/magpie 含 agents/sessions 狀態,清理時保留 agents-state.json
+  # 與 sessions.json 即可。
   persist' = {
     directories = [
       {

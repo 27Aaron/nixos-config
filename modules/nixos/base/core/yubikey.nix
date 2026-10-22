@@ -25,7 +25,7 @@ in
       pkgs.yubioath-flutter
     ];
 
-    # OATH 驗證碼存在鑰匙上,這裡只留應用程式設定。
+    # OATH 憑證存於鑰匙本身,這裡只保留應用程式設定。
     preservation'.user.directories = [
       {
         directory = ".local/share/com.yubico.yubioath";
@@ -33,13 +33,11 @@ in
       }
     ];
 
-    # 通用 U2F/FIDO 權限。YubiKey 專用規則已由 yubikey-manager 帶入。
+    # 通用 U2F/FIDO 裝置權限;YubiKey 專用規則由 yubikey-manager 提供。
     services.udev.packages = [ pkgs.libfido2 ];
 
-    # libfido2 的 70-u2f.rules 每條都寫 GROUP="plugdev",但 NixOS 沒有這個組
-    # (Debian 系才有),udev 逐條報 "Failed to resolve group 'plugdev'",開機
-    # 累積上百行把真正的錯誤淹掉。空組只為了讓規則解析通過:存取權由同一條
-    # 規則的 TAG+="uaccess" 決定(systemd-logind 授予登入者 ACL),不看組成員。
+    # libfido2 的 udev 規則指定 GROUP="plugdev",NixOS 沒有此群組,開機會刷出
+    # 上百行解析錯誤。建立空群組即可;實際存取權由規則中的 TAG+="uaccess" 授予。
     users.groups.plugdev = { };
   };
 }

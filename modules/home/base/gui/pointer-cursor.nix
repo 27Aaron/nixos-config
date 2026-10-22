@@ -1,8 +1,7 @@
-# 滑鼠指標主題,不是 Cursor 編輯器;檔案原名 desktop/cursor.nix 容易誤會。
-# 視窗內的游標由 niri 決定,這裡只設 XCursor。
+# 滑鼠指標主題(XCursor 與 GTK)。
 { pkgs, ... }:
 {
-  # Bibata Modern 的白色;同包另有 Classic(黑色)與 Amber(黃色)。
+  # Bibata Modern Ice 為白色款,同套件另有 Classic(黑)與 Amber(黃)。
   home.pointerCursor = {
     enable = true;
     package = pkgs.bibata-cursors;

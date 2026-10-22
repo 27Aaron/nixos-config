@@ -16,7 +16,7 @@ in
     hardware.graphics = {
       enable = true;
 
-      # Rusticl 提供 OpenCL,支援 GFX9 之後的 iGPU,不必引入龐大的 ROCm。
+      # 以 Rusticl 提供 OpenCL(GFX9 以後),不必引入龐大的 ROCm。
       extraPackages = [ pkgs.mesa.opencl ];
     };
 

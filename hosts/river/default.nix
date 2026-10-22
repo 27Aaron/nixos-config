@@ -29,28 +29,25 @@
   services'.vnstat.enable = true;
   services'.keyd.enable = true;
   services'.keyd.keyboards = {
-    # 僅套用於內建「AT Translated Set 2 keyboard」(vendor:product)。
-    # 其餘裝置(Razer 滑鼠)不受影響。
+    # 內建鍵盤(AT Translated Set 2 keyboard)。
     default = {
       ids = [ "0001:0001" ];
       settings = {
         main = {
-          # Copilot 鍵位於右 Ctrl 的位置,按下時會以單次釋放送出
-          # meta+shift+F23,因此需將整組按鍵組合一起映射。
+          # Copilot 鍵(位於右 Ctrl)送出 meta+shift+F23,整組映射為右 Ctrl。
           "leftshift+leftmeta+f23" = "rightcontrol";
-          # 還原 keyd 預設將右 Ctrl 改送左 Ctrl 的行為。
+          # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原。
           rightcontrol = "rightcontrol";
         };
       };
     };
 
-    # HHKB-Hybrid_2(藍牙):右側 ◇(mod)鍵預設送出 rightmeta
-    # (右 Win 鍵),將其映射為 rightcontrol。
+    # HHKB-Hybrid_2(藍牙):右側 ◇ 鍵送出 rightmeta,映射為右 Ctrl。
     hhkb = {
       ids = [ "04fe:0021" ];
       settings.main = {
         rightmeta = "rightcontrol";
-        # 還原 keyd 預設將右 Ctrl 改送左 Ctrl 的行為。
+        # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原。
         rightcontrol = "rightcontrol";
       };
     };

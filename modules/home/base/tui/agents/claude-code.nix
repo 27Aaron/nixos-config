@@ -14,7 +14,7 @@ in
     cc = "claude --dangerously-skip-permissions";
   };
 
-  # 登入態與設定由程式自己寫入;~/.cache 留在 tmpfs 上不登記。
+  # 登入狀態與設定由程式自行寫入。
   persist' = {
     directories = [ ".claude" ];
     files = [

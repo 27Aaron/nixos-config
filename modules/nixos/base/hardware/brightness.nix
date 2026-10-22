@@ -13,8 +13,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Noctalia 直接寫 /sys/class/backlight/*/brightness。這個套件的 udev 規則
-    # 把該檔案改成 video 群組可寫,所以使用者要加入 video。
+    # Noctalia 直接寫入 /sys/class/backlight;brightnessctl 的 udev 規則讓
+    # video 群組可寫。
     services.udev.packages = [ pkgs.brightnessctl ];
     environment.systemPackages = [
       pkgs.brightnessctl
@@ -26,8 +26,7 @@ in
       "video"
     ];
 
-    # 外接螢幕走 DDC/CI;Noctalia 的 brightness.enable_ddcutil 預設關閉,
-    # 要在它的設定裡打開才會生效。
+    # 外接螢幕經 DDC/CI 調整,需在 Noctalia 設定中開啟 enable_ddcutil。
     hardware.i2c.enable = true;
   };
 }

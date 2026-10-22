@@ -24,7 +24,7 @@ in
     ];
 
     services.btrbk = {
-      # 建立快照很快,但清理在筆電上應保持低調,尤其是開機追趕進度時。
+      # 降低清理舊快照時的優先權,開機補跑時才不會拖慢系統。
       niceness = 15;
       ioSchedulingClass = "idle";
 

@@ -36,8 +36,8 @@ in
       };
     };
 
-    # SSH 會話中用 systemd-tty-ask-password-agent 提示 LUKS 通關密語;設在 systemd
-    # initrd 的 root 使用者上,以避開舊式 boot.initrd.network.ssh.shell 的警告。
+    # SSH 登入後直接提示 LUKS 密碼;設在 systemd initrd 的 root 上,
+    # 以避開舊選項 boot.initrd.network.ssh.shell 的警告。
     boot.initrd.systemd.users.root.shell = "/bin/systemd-tty-ask-password-agent";
 
     preservation'.os.directories = [ "/etc/secrets/initrd" ];

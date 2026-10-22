@@ -28,13 +28,9 @@ let
       mountOptions = btrfsOptions;
     };
 
-    # /tmp 放磁碟,不與根共用 tmpfs:一次解大壓縮檔就把根吃滿,而根一滿是整個
-    # 系統癱掉。代價是跨重啟累積,因此搭配 boot.tmp.cleanOnBoot 在開機時清空。
-    # 既有機器不必重灌,建立 subvolume 後重開機即可(nofail 讓它還沒建立時
-    # 退回根 tmpfs,不至於開不了機):
+    # /tmp 放在磁碟而非根 tmpfs,解壓大檔時才不會撐滿根目錄;開機時由
+    # cleanOnBoot 清空。nofail 讓尚未建立此 subvolume 的機器仍可開機:
     #   sudo btrfs subvolume create /btr_pool/@tmp
-    # 權限 1777 由 cleanOnBoot 設定;但「先 switch 才手動掛載」時 tmpfiles 已
-    # 跑完,得自己 chmod 1777 /tmp。
     "@tmp" = {
       mountpoint = "/tmp";
       mountOptions = btrfsOptions ++ [
@@ -67,8 +63,7 @@ let
     ];
     inherit subvolumes;
   };
-  # GPT partlabel 由屬性名生成(disk-main-<name>)。加密時沿用既有磁碟的 luks
-  # 標籤,改名會使 crypttab 找不到設備。
+  # GPT partlabel 由屬性名生成(disk-main-<name>),改名會讓 crypttab 找不到裝置。
   dataPartitionName = if cfg.luks.enable then "luks" else "data";
 in
 {
@@ -117,16 +112,12 @@ in
       }
     ];
 
-    # cleanOnBoot 只追加一條開機 tmpfiles 規則(D! /tmp 1777 root root),不會改變
-    # /tmp 的位置——只有 /tmp 在磁碟上時才有意義,與上面的 @tmp 成對使用。
+    # 只在開機時清空 /tmp,不改變其位置;與上方的 @tmp 搭配。
     boot.tmp.cleanOnBoot = true;
 
-    # 只讓 initrd 認得已登記的 FIDO2 鑰匙,不替磁碟登記;鑰匙是 USB HID,
-    # 不放進 initrd 就看不到。操作對象是 /dev/disk/by-partlabel/disk-main-luks,
-    # 不要對 /dev/mapper/crypted;每次只插一把鑰匙。列出槽位(槽 0 通常是密碼),
-    # 或加 --password 增設密碼槽:
-    #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks
-    # 加 FIDO2(預設要 PIN 再觸摸;加 --fido2-with-client-pin=no 則只觸摸):
+    # 讓 initrd 能以已登記的 FIDO2 鑰匙解鎖(需要 USB HID 驅動)。登記需手動,
+    # 對分割區而非 /dev/mapper/crypted 操作,每次只插一把鑰匙:
+    #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks   # 列出槽位
     #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
     boot.initrd = lib.mkIf cfg.luks.fido2.enable {
       systemd.enable = true;
@@ -197,7 +188,7 @@ in
                         ]
                         ++ lib.optionals cfg.luks.fido2.enable [
                           "fido2-device=auto"
-                          # 不必空等預設的 30 秒。單位是秒。
+                          # 未插鑰匙時 5 秒後改用密碼,預設要等 30 秒。
                           "token-timeout=5"
                         ];
                       };

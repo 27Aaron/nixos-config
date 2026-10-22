@@ -22,7 +22,7 @@
       };
     };
 
-    # 由 hosts/default.nix 以 specialArgs 傳入,值即 hosts/<名稱> 的目錄名。
+    # hostName 即 hosts/ 下的目錄名,由 hosts/default.nix 傳入。
     networking.hostName = hostName;
 
     time.timeZone = lib.mkDefault "Asia/Singapore";

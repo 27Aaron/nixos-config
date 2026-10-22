@@ -13,7 +13,7 @@
 
     # 與既有 settings.json 合併,同名項目以此為準。
     userSettings = {
-      # 版本由 Nix 更新,不要讓編輯器自己下載新版本。
+      # 由 Nix 負責更新。
       auto_update = false;
 
       telemetry = {
@@ -42,13 +42,12 @@
       ui_font_family = "LXGW WenKai TC";
       agent_ui_font_family = "LXGW WenKai TC";
 
-      # 與 kitty 相同的等寬字型;緩衝區與終端機維持等寬。
+      # 與 kitty 相同的等寬字型。
       buffer_font_family = "Maple Mono NF";
       buffer_font_size = 14;
       cursor_blink = false;
 
-      # 底部狀態列按鈕的停靠位置。Zed 1.24 預設是 Agentic 佈局:
-      # 專案、Git 在右,Agent 在左。這裡改成專案與 Git 在左,Agent 在右。
+      # 專案與 Git 面板放左側,Agent 放右側(Zed 1.24 預設相反)。
       project_panel.dock = "left";
       git_panel.dock = "left";
       agent = {
@@ -63,11 +62,11 @@
         blinking = "off";
       };
 
-      # 用 fish 的 direnv hook,讓 .envrc 進入編輯器與內建終端。
+      # 透過 shell 的 direnv hook 載入 .envrc。
       load_direnv = "shell_hook";
 
-      # 語言伺服器優先用 PATH 上的(mise、uv、direnv,或 core/toolchain.nix)。
-      # 找不到才會下載;下載的原生二進位在 NixOS 上通常跑不起來。
+      # 語言伺服器優先使用 PATH 上的版本;Zed 自行下載的二進位在 NixOS 上
+      # 通常無法執行。
       lsp = {
         nixd.binary.path_lookup = true;
         basedpyright.binary.path_lookup = true;
@@ -85,7 +84,7 @@
         ];
         formatter.external = {
           command = "nixfmt";
-          # 裸呼叫 nixfmt 讀標準輸入已棄用,要顯式傳 '-'。
+          # 從標準輸入讀取需明確傳入 '-'。
           arguments = [ "-" ];
         };
         format_on_save = "on";
@@ -94,8 +93,8 @@
     };
   };
 
-  # 擴充功能、工作區資料庫與登入態在 .local/share/zed。
-  # settings.json 由上面合併寫入 .config/zed,其餘檔案(快捷鍵、片段)由程式自己寫。
+  # .config/zed 存放合併後的 settings.json 與快捷鍵、片段;擴充功能、
+  # 工作區資料庫與登入狀態在 .local/share/zed。
   persist'.directories = [
     ".config/zed"
     ".local/share/zed"

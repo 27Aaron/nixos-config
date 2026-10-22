@@ -8,8 +8,8 @@
 let
   cfg = config.services'.dae;
 
-  # 憑據在 nix-secrets 的 services/dae.yaml,鍵名與片段同名,sops 逐鍵解密成
-  # .dae 後與其他片段同目錄,供 dae include。
+  # 憑證位於 nix-secrets 的 services/dae.yaml,sops 將每個鍵解密成同名的
+  # .dae 片段,與其餘片段放在同一目錄供 include。
   secretFile = "${inputs.secrets}/services/dae.yaml";
 
   secretFragments = [
@@ -108,11 +108,11 @@ let
     path = config.sops.secrets."${name}.dae".path;
   }) secretFragments;
 
-  # dae 要求 include 的檔案位於入口配置目錄下且同組不可寫、他人不可讀;store
-  # 檔案是 0444,直接交給 dae 會被拒絕,linkFarm 這裡只作複製來源。
+  # dae 要求被 include 的檔案位於入口設定目錄下,且群組不可寫、其他人不可讀;
+  # store 檔案為 0444 會被拒絕,linkFarm 只作為複製來源。
   configDir = pkgs.linkFarm "dae-config" configEntries;
 
-  # /etc 由 store 組成,不能就地改權限,因此執行時複製到 /etc/dae 並以 0600 交付。
+  # 啟動時複製到 /etc/dae 並設為 0600。
   runtimeConfig = "/etc/dae/config.dae";
 
   assembleConfig = pkgs.writeShellScript "assemble-dae-config" ''
@@ -154,7 +154,7 @@ in
       # 片段要等 sops 解密後才存在,組裝必須排在它後面。
       after = [ "sops-install-secrets.service" ];
       serviceConfig = {
-        # NixOS 模組只複製入口配置,include 的 config.d 會找不到。
+        # 上游模組只複製入口設定,include 的 config.d 會遺失,因此改為自行組裝。
         LoadCredential = lib.mkForce [ ];
         ExecStartPre = lib.mkForce [
           ""

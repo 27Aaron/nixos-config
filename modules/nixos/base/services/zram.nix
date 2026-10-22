@@ -34,9 +34,9 @@ in
       #   https://wiki.archlinux.org/title/Zram#Optimizing_swap_on_zram
       #   https://github.com/pop-os/default-settings/pull/163
       kernel.sysctl = {
-        # 記憶體型 swap 隨機 IO 遠快於檔案系統,可取 100+(見 kernel 的 vm 文檔)
+        # 記憶體型 swap 的隨機 IO 遠快於檔案系統,可取 100 以上(見 kernel 的 vm 文件)。
         "vm.swappiness" = 180;
-        # 關閉 swap 預讀;壓縮 swap 預讀只是浪費,r/Fedora 實測 0 最優
+        # 關閉 swap 預讀;對壓縮 swap 預讀只是浪費,r/Fedora 實測 0 最佳。
         "vm.page-cluster" = 0;
         # 避免回收後水位提升造成的卡頓尖峰;並讓 kswapd 更早、更平滑地回收。
         "vm.watermark_boost_factor" = 0;
