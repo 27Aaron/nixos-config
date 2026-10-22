@@ -1,8 +1,5 @@
-{
-  lib,
-  vars,
-  ...
-}:
+# 倉庫共用的輔助函式,由 hosts/default.nix 與各平臺入口匯入。
+{ lib }:
 let
   # 遞迴收集模組:一般 .nix 檔,以及含 default.nix 的子目錄(不再深入)。
   listModules =
@@ -25,10 +22,5 @@ let
     ];
 in
 {
-  # 主要使用者的選項別名。
-  imports = [
-    (lib.mkAliasOptionModule [ "user'" ] [ "users" "users" vars.username ])
-    (lib.mkAliasOptionModule [ "hm'" ] [ "home-manager" "users" vars.username ])
-  ]
-  ++ listModules ./.;
+  inherit listModules;
 }

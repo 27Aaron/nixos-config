@@ -6,52 +6,54 @@ This repository is a Nix flake for NixOS hosts using a "tmpfs as root" layout: t
 
 ```text
 flake.nix                 # inputs and outputs
+lib/default.nix           # listModules: the recursive module collector
 hosts/
-├── default.nix           # host discovery: every hosts/<name>/ becomes nixosConfigurations.<name>
-└── <name>/               # one directory per host
-    ├── default.nix       # feature switches and host metadata
-    └── ...               # host-local modules (e.g. hardware.nix)
+├── default.nix           # host discovery: every hosts/nixos/<name>/ becomes nixosConfigurations.<name>
+├── nixos/<name>/         # one directory per NixOS host
+│   ├── default.nix       # feature switches and host metadata
+│   └── ...               # host-local modules (e.g. hardware.nix)
+└── darwin/               # reserved: nix-darwin hosts
 modules/
-├── default.nix           # recursively imports every module; defines user'/hm' aliases
-├── README.md             # the layout rules; read it before adding a module
-├── base/                 # reserved: settings identical on NixOS and nix-darwin
+├── base/                 # system modules shared by NixOS and nix-darwin (aliases.nix)
 ├── darwin/               # reserved: nix-darwin system modules
 ├── nixos/
-│   ├── base/core/        # identity, users, nix, i18n, sops, firewall, logging (core'.*)
+│   ├── base/core/        # identity, users, nix, Home Manager integration, logging (core'.*)
 │   ├── base/hardware/    # disko, persistence, boot/, gpu, bluetooth, brightness (hardware'.*)
-│   ├── base/services/    # daemons: openssh, networkmanager, pipewire, zram, ... (services'.*)
+│   ├── base/services/    # daemons usable on any NixOS host, servers included (services'.*)
 │   ├── desktop/          # greetd, niri, noctalia, fcitx5, fonts, file-manager (desktop'.*)
-│   └── server/           # reserved: headless-only modules
+│   └── server/           # reserved: server-only modules (server'.*)
 └── home/
-    ├── default.nix       # platform entry: imports ./base plus ./nixos
-    ├── base/
-    │   ├── default.nix   # shared list: persist' options, account settings, bucket imports
-    │   ├── core/         # draws nothing of its own (shell, git, CLI packages)
+    ├── base/             # Home Manager modules shared by Linux and macOS
+    │   ├── home.nix      # account settings
+    │   ├── persist.nix   # persist' options
+    │   ├── cli/          # draws nothing of its own (shell, git, toolchain)
     │   ├── tui/          # takes over the terminal (agents, lazygit, monitors)
     │   └── gui/          # opens a window (terminal, browsers, editors, theme)
-    ├── nixos/            # Home Manager settings only NixOS needs (systemd.user, ...)
+    ├── nixos/            # Home Manager settings only Linux needs (systemd.user, ...)
     └── darwin/           # reserved: Home Manager settings only macOS needs
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
 ```
 
+Every major directory has a `README.md` with its placement rules; read it before adding a file there.
+
 ## Host discovery
 
-Every directory under `hosts/` that contains a `default.nix` becomes a host; the directory name is the host name, passed to modules as `hostName`. Adding a host means creating `hosts/<name>/default.nix` — nothing else in the flake changes.
+Every directory under `hosts/nixos/` that contains a `default.nix` becomes a host; the directory name is the host name, passed to modules as `hostName`. Adding a host means creating `hosts/nixos/<name>/default.nix` — nothing else in the flake changes. `hosts/darwin/` is reserved; the first Mac also needs a `nix-darwin` input and `darwinConfigurations` in `hosts/default.nix`.
 
 Host files are ordinary NixOS modules:
 
-- `hosts/<name>/default.nix` states what makes the host different: feature switches, timezone, and imports of host-local files.
+- `hosts/nixos/<name>/default.nix` states what makes the host different: feature switches, timezone, and imports of host-local files.
 - Platform-specific settings (disk layout, boot, firmware, services bound to this machine's hardware) belong in host-local modules such as `hardware.nix`; user-facing services stay in `default.nix`.
 
 ## Module conventions
 
-- A file under `modules/nixos/`, `modules/darwin/` or `modules/base/` is imported automatically. A file under `modules/home/` must be added to the import list in `modules/home/base/default.nix`; `modules/home/default.nix` stops the walk and is the platform entry.
-- System modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`, `desktop'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory: `nixos/base/core` → `core'.*`, `nixos/desktop` → `desktop'.*`.
-- `modules/default.nix` defines the aliases `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`).
+- Modules are collected automatically by `listModules` in `lib/default.nix`: a NixOS host loads `modules/base` and `modules/nixos`, and its Home Manager user loads `modules/home/base` and `modules/home/nixos`. A subdirectory with a `default.nix` is loaded through that file only.
+- Place a module at the most general level where it works: `base/` for both system platforms, `nixos/base/` for any NixOS host including servers, `nixos/desktop/` only with a screen, `nixos/server/` only on servers. `modules/README.md` lists the full order.
+- System modules expose options under a prime-namespaced attribute (`core'.*`, `hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory.
+- `modules/base/aliases.nix` defines the aliases `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`).
 - Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`.
-- Prefer a shared module over copying settings into hosts; keep one reusable capability per module.
-- Read `modules/README.md` before deciding where a new module goes. In short: `nixos/base` if any NixOS host may use it, `nixos/desktop` if it only makes sense with a screen, `home/base/{core,tui,gui}` by what the program draws, `home/nixos` for Home Manager settings that need systemd or Linux-only packages.
+- Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
 
 ## Persistence and secrets
 
@@ -97,7 +99,7 @@ type(scope): description
 
 - Allowed types are `feat`, `fix`, `refactor`, `chore`, and `WIP`. Use `WIP` only for an explicitly temporary work-in-progress snapshot.
 - The commit title uses lowercase English text and never ends with a period. Keep the body readable with normal capitalization when it contains proper names or explanatory sentences.
-- The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `desktop`, `home`, `modules`) for shared modules, `flake` for flake-level files and host discovery, `docs` for documentation.
+- The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `desktop`, `server`, `darwin`, `home`, `modules`) for shared modules, `flake` for flake-level files, `lib/` and host discovery, `docs` for documentation.
 - Keep the title concise and describe the resulting change, not the list of edited files.
 
 ### Flake lock bumps

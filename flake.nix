@@ -86,6 +86,6 @@
         }
       );
 
-      nixosConfigurations = import ./hosts { inherit inputs; };
+      inherit (import ./hosts { inherit inputs; }) nixosConfigurations;
     };
 }

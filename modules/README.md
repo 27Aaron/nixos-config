@@ -1,41 +1,53 @@
-# 模組目錄
+# 模組
 
-這裡放所有可重用的 NixOS、nix-darwin 與 Home Manager 模組，按平臺與用途分類。
-`hosts/<name>/` 只負責開關功能，具體實作都在這裡。
-
-## 目錄結構
+所有可重用的設定都在這裡，依「能在哪裡執行」分層。主機只負責開關，實作都在模組裡。
 
 ```text
 modules/
-├── default.nix              # 走訪整棵樹，定義 user' 與 hm' 別名
-├── base/                    # 預留：NixOS 與 nix-darwin 完全相同的設定
-├── darwin/                  # 預留：nix-darwin 系統模組
-├── nixos/
-│   ├── base/                # 每一臺 NixOS 都可能用到
-│   │   ├── core/            # 身分、使用者與管理面（core'.*）
-│   │   ├── hardware/        # 機器物理上有什麼（hardware'.*）
-│   │   │   └── boot/        # 開機管理與 initrd
-│   │   └── services/        # 常駐守護行程（services'.*）
-│   ├── desktop/             # 有螢幕的主機（desktop'.*）
-│   └── server/              # 預留：無頭主機專用
-└── home/                    # Home Manager
-    ├── default.nix          # 平臺入口：import ./base 與 ./nixos
-    ├── base/
-    │   ├── default.nix      # 共用清單：persist' 選項與帳號設定
-    │   ├── core/            # 自己不畫介面
-    │   ├── tui/             # 接管整個終端（agents/、git/）
-    │   └── gui/             # 開一個視窗（agents 等子目錄）
-    ├── nixos/               # 只有 NixOS 需要的設定
-    └── darwin/              # 預留：只有 macOS 需要的設定
+├── base/        # NixOS 與 nix-darwin 系統層共用
+├── nixos/       # 只有 NixOS(桌面、伺服器、路由器)
+├── darwin/      # 只有 nix-darwin(macOS)
+└── home/        # Home Manager,使用者層
 ```
 
-## 持久化
+各目錄的細節見其中的 `README.md`。
 
-根目錄是 tmpfs，重開機即清空，只有登記過的路徑會留下。
+## 載入方式
 
-- **系統側**用 `preservation'.os.*`、`preservation'.user.*`。
-- **Home Manager 側**用 `persist'.directories`、`persist'.files`（相對於家目錄），
-  由 `nixos/base/hardware/persistence.nix` 併進 `preservation'.user`。
+模組由 `lib/default.nix` 的 `listModules` 自動收集，不需要手動加進匯入清單：
 
-`~/.cache` 不整體持久化：它幾乎全是可重建內容且成長很快，只有真正需要的快取
-才逐項登記。
+- 一般 `.nix` 檔直接載入。
+- 子目錄若含 `default.nix`，只載入該檔，由它自行匯入其餘檔案。
+- 子目錄若不含 `default.nix`，繼續往下收集。
+
+各平臺收集的範圍：
+
+| 主機 | 系統層 | Home Manager |
+|---|---|---|
+| NixOS | `base/` + `nixos/` | `home/base/` + `home/nixos/` |
+| nix-darwin | `base/` + `darwin/` | `home/base/` + `home/darwin/` |
+
+## 放在哪裡
+
+由通用到專用，選第一個符合的位置：
+
+1. Mac 和 Linux 的系統層都能用 → `base/`
+2. 任何 NixOS 都能用，包括伺服器 → `nixos/base/`
+3. 只有接螢幕的 NixOS 才用 → `nixos/desktop/`
+4. 只有伺服器才用 → `nixos/server/`
+5. 只有 macOS 才用 → `darwin/`
+6. 使用者層的程式與設定 → `home/`，見 `home/README.md`
+
+## 撰寫慣例
+
+- 一個檔案只負責一個程式或一個面向；安裝、設定與持久化放在同一個檔案。
+- 設定多到一個檔案放不下時，改成資料夾，以 `default.nix` 為入口。
+- 同類檔案有兩個以上才建子目錄。
+- 選項放在依目錄命名的命名空間，例如 `nixos/base/services/` → `services'.*`。
+
+## 別名
+
+`base/aliases.nix` 定義兩個別名，指向主要使用者：
+
+- `user'.*` → `users.users.<使用者>`
+- `hm'.*` → `home-manager.users.<使用者>`
