@@ -1,10 +1,6 @@
 # Security
 
-This repository configures one personal laptop, `river`. This document records what the configuration protects against, where the trust boundaries are, how each control is checked, and what is still missing. A control written in Nix is not proof that it is active on the running machine; the [runtime checks](#runtime-checks) below are.
-
-## Reporting problems
-
-Open an issue for configuration mistakes, with secrets and exploit details left out. For anything sensitive, contact the owner privately through their GitHub profile first.
+This repository configures one personal laptop, `river`. This document records what the configuration protects against, where the trust boundaries are, and how each control is checked. A control written in Nix is not proof that it is active on the running machine; the [runtime checks](#runtime-checks) below are. Temporary workarounds and accepted exceptions live in [WORKAROUNDS.md](WORKAROUNDS.md), each with a removal condition.
 
 ## Threat model
 
@@ -29,6 +25,16 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
 | Desktop apps | Nagram runs in a nixpak sandbox: it sees only its data directory and `~/Downloads/Telegram`, reaches other files through the file chooser portal, and talks to a filtered D-Bus. Trust prompts stay on in Zed, VS Code and Claude Code. | The other apps, including closed-source ones, can still read `~/.ssh`, browser profiles and tokens. |
 | Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. |
+
+## Application sandboxes
+
+An app gets a nixpak sandbox when it is third-party, handles untrusted content, and does not need the user's files. Nagram is the only one that fits. Decided against:
+
+- **magpie:** the owner's own program, trusted like the rest of this repository.
+- **dsh-desktop, Claude Desktop:** coding agents that read projects and run commands by design; a sandbox would remove what they are for.
+- **Chrome, Firefox:** they already sandbox their content processes, and wrapping them breaks security keys, file transfer and password managers.
+- **VS Code, Zed:** development tools need the whole project.
+- **Binding only the app's closure** (`bindEntireStore = false`): the GPU driver link and the font configuration point at store paths outside the closure and would have to be listed by hand, while the store holds no secret river relies on. The sandbox therefore sees the whole store read-only.
 
 ## Flake inputs
 
@@ -120,23 +126,7 @@ Check for updates at least weekly, and immediately when an actively exploited vu
 ## If compromise is suspected
 
 1. Disconnect the network.
-2. From another trusted machine, rotate what the laptop held: the account password in nix-secrets, SSH keys (and remove the old public keys from `vars/` and GitHub), GitHub and agent tokens, and the age key if root was compromised.
+2. From another trusted machine, rotate what the laptop held: the account password in nix-secrets, SSH keys (and remove the old public keys from `vars/` and GitHub), and GitHub and agent tokens. River's `~/.ssh/id_ed25519` decrypts every secret in nix-secrets and is readable without root, so treat all of them as exposed even if root was not compromised: replace the key as described under [Secrets](#secrets), and change the server secrets too.
 3. Reinstall from this flake rather than cleaning the running system, and copy back only data you have checked.
 
 Switching to an older generation does not undo a compromise: it only changes the system configuration, not stolen secrets or modified data.
-
-## Application sandboxes
-
-An app gets a nixpak sandbox when it is third-party, handles untrusted content, and does not need the user's files. Nagram is the only one that fits. Decided against:
-
-- **magpie:** the owner's own program, trusted like the rest of this repository.
-- **dsh-desktop, Claude Desktop:** coding agents that read projects and run commands by design; a sandbox would remove what they are for.
-- **Chrome, Firefox:** they already sandbox their content processes, and wrapping them breaks security keys, file transfer and password managers.
-- **VS Code, Zed:** development tools need the whole project.
-- **Binding only the app's closure** (`bindEntireStore = false`): the GPU driver link and the font configuration point at store paths outside the closure and would have to be listed by hand, while the store holds no secret river relies on. The sandbox therefore sees the whole store read-only.
-
-## Remaining work
-
-Nothing is planned at the moment. Add new items here with a priority.
-
-Record temporary exceptions in [WORKAROUNDS.md](WORKAROUNDS.md) with a removal condition.
