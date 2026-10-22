@@ -23,7 +23,7 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 | Boundary | Current design | Limitation |
 |---|---|---|
 | Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon. | Code running as the user can wait for the password to be typed. |
-| Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) and 12345/tcp+udp (dae) are open. | The dae port may be unnecessary ([WA-014](WORKAROUNDS.md#security-exceptions)). |
+| Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) is open. dae's tproxy listener lives in its own network namespace. | sshd is reachable on every network the laptop joins. |
 | Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | The kernel and initrd sit on the unencrypted ESP. |
 | Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation. | One shared host key and no offline recovery key ([WA-016](WORKAROUNDS.md#security-exceptions)); unencrypted files in that repository land in the world-readable store ([WA-015](WORKAROUNDS.md#security-exceptions)). |
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
@@ -112,6 +112,5 @@ Switching to an older generation does not undo a compromise: it only changes the
 | P1 | Fix the nix-secrets exposure and key layout | [WA-015](WORKAROUNDS.md#security-exceptions), [WA-016](WORKAROUNDS.md#security-exceptions); work in the nix-secrets repository. |
 | P2 | Sandbox the remaining third-party GUI apps | Nagram is done; next candidates are dsh-desktop and magpie. Test input method and file chooser for each. |
 | P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, the age key, `resume_offset`. |
-| P3 | Verify whether dae needs its open port | [WA-014](WORKAROUNDS.md#security-exceptions) |
 
 Record temporary exceptions in [WORKAROUNDS.md](WORKAROUNDS.md) with a removal condition.

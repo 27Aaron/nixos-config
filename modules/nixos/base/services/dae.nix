@@ -141,11 +141,9 @@ in
       package = pkgs.dae;
       configFile = "${configDir}/config.dae";
 
-      # 是否真的需要開放這個埠尚未驗證,見 WORKAROUNDS.md 的 WA-014。
-      openFirewall = {
-        enable = true;
-        port = 12345;
-      };
+      # tproxy 監聽器在 dae 自己的 daens 網路命名空間,經 dae0 接到主機;主機的
+      # 防火牆不在這條路徑上,上游預設開放的埠只會暴露在每個網路上。
+      openFirewall.enable = false;
     };
 
     systemd.services.dae = {
