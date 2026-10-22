@@ -56,6 +56,30 @@ let
     "/etc/NetworkManager/system-connections"
   ];
 
+  # 每臺主機的核心參數基準與禁止載入的模組。
+  kernelSysctl = {
+    "kernel.dmesg_restrict" = 1;
+    "kernel.kptr_restrict" = 1;
+    "kernel.yama.ptrace_scope" = 1;
+    "kernel.perf_event_paranoid" = 2;
+    "kernel.unprivileged_bpf_disabled" = 2;
+    "net.core.bpf_jit_harden" = 1;
+    "vm.unprivileged_userfaultfd" = 0;
+    "dev.tty.ldisc_autoload" = 0;
+    "fs.protected_symlinks" = 1;
+    "fs.protected_hardlinks" = 1;
+    "fs.protected_fifos" = 2;
+    "fs.protected_regular" = 2;
+  };
+  blockedModules = [
+    "esp4"
+    "esp6"
+    "rxrpc"
+    "sctp"
+    "rds"
+    "tipc"
+  ];
+
   sorted = list: lib.sort lib.lessThan (lib.unique list);
 in
 {
@@ -229,6 +253,37 @@ in
         zed = lib.optionalAttrs zed.enable { trust_all_worktrees = false; };
         vscode = lib.optionalAttrs vscode.enable { workspaceTrust = true; };
         bypassAliases = { };
+      };
+    };
+
+  # 模組只靠 blacklist 擋不住明確的 modprobe,要同時有 install 規則。
+  kernel =
+    host@{ config, ... }:
+    let
+      blocked =
+        module:
+        lib.elem module config.boot.blacklistedKernelModules
+        && lib.hasInfix "install ${module} " config.boot.extraModprobeConfig;
+    in
+    {
+      expr = {
+        sysctl = lib.mapAttrs (key: _: config.boot.kernel.sysctl.${key} or null) kernelSysctl;
+        modules = lib.genAttrs blockedModules blocked;
+        # Nix 的建置沙箱需要 user namespaces;休眠需要可寫入的核心映像。
+        inherit (config.security) allowUserNamespaces;
+        protectKernelImage = config.boot.resumeDevice != "" && config.security.protectKernelImage;
+        # 一般的主機設定就能覆寫基準,不需要 mkForce。
+        hostOverride =
+          (host.extendModules {
+            modules = [ { boot.kernel.sysctl."fs.protected_regular" = 1; } ];
+          }).config.boot.kernel.sysctl."fs.protected_regular";
+      };
+      expected = {
+        sysctl = kernelSysctl;
+        modules = lib.genAttrs blockedModules (_: true);
+        allowUserNamespaces = true;
+        protectKernelImage = false;
+        hostOverride = 1;
       };
     };
 
