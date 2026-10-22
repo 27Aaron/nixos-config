@@ -24,5 +24,15 @@
         rightcontrol = "rightcontrol";
       };
     };
+
+    # Razer Orochi V2(接收器):前側鍵複製、後側鍵貼上。
+    # 接收器另外宣告了一個同 ID 的鍵盤介面,用 m: 只比對滑鼠。
+    orochi = {
+      ids = [ "m:1532:0094" ];
+      settings.main = {
+        mouse2 = "C-c";
+        mouse1 = "C-v";
+      };
+    };
   };
 }
