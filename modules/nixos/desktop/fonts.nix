@@ -28,6 +28,7 @@ in
         fonts.lxgw-wenkai-tc
         fonts.lxgw-wenkai
 
+        noto-fonts
         noto-fonts-color-emoji
       ];
 
