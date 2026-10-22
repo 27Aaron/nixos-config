@@ -1,7 +1,8 @@
 # 鍵盤映射:內建鍵盤的 Copilot 鍵與 HHKB 的右側 ◇ 鍵都改成右 Ctrl。
 {
-  services'.keyd.enable = true;
-  services'.keyd.keyboards = {
+  # 直接使用上游的 services.keyd;它的選項已經夠用,不另外包一層。
+  services.keyd.enable = true;
+  services.keyd.keyboards = {
     # 內建鍵盤(AT Translated Set 2 keyboard)。
     default = {
       ids = [ "0001:0001" ];

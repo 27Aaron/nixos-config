@@ -17,7 +17,7 @@ modules/
 ├── base/core/            # always-on system modules shared by NixOS and nix-darwin (aliases, fish, nix)
 ├── darwin/               # reserved: nix-darwin system modules
 ├── nixos/
-│   ├── base/core/        # always on: users, hostname, locale, firewall, logging, nix tools, Home Manager
+│   ├── base/core/        # always on: users, hostname, locale, firewall, logging, ssh client fix, nh, Home Manager
 │   ├── base/hardware/    # disko, persistence, boot/, gpu, bluetooth, yubikey (hardware'.*)
 │   ├── base/services/    # daemons usable on any NixOS host, servers included (services'.*)
 │   ├── desktop/          # greetd, niri, noctalia, input-method/, power/, pipewire (desktop'.*)
@@ -25,7 +25,7 @@ modules/
 └── home/
     ├── base/             # Home Manager modules shared by Linux and macOS
     │   ├── core/         # always on: account settings, persist' options
-    │   ├── cli/          # draws nothing of its own: shell, git, toolchain (cli'.*)
+    │   ├── cli/          # draws nothing of its own: shell, git, ssh, toolchain (cli'.*)
     │   ├── tui/          # takes over the terminal: agents, lazygit, monitors (tui'.*)
     │   └── gui/          # opens a window: browsers, editors, kitty (gui'.*)
     ├── nixos/            # Linux only: gui/ (GTK/Qt theme, XDG, Linux-only apps)

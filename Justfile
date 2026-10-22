@@ -15,9 +15,9 @@ check:
     @deadnix --fail .
     @nix flake check --no-build --all-systems
 
-# 建置主機設定,不啟用。
+# 建置主機設定,不啟用;顯示與目前系統的差異,結果連結至 ./result。
 build target=host:
-    @nixos-rebuild build --flake .#{{target}}
+    @nh os build path:. -H {{target}} --out-link result
 
 # 建置並啟用主機設定。
 switch target=host:

@@ -1,0 +1,36 @@
+# SSH 客戶端:主機別名與使用者金鑰。sshd 伺服器在 nixos/base/services/openssh.nix。
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
+let
+  cfg = config.cli'.ssh;
+
+  # 客戶端主機別名,來自 nix-secrets;不含金鑰。
+  sshConfig = inputs.secrets + "/openssh/config";
+in
+{
+  options.cli'.ssh.enable = lib.mkEnableOption "the SSH client configuration";
+
+  config = lib.mkIf cfg.enable {
+    # OpenSSH 10 要求 ~/.ssh/config 屬於使用者本人,home.file 的 store 連結
+    # 屬於 root,因此改在啟用時複製成一般檔案。
+    home.activation.installSshConfig = lib.mkIf (builtins.pathExists sshConfig) (
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        install -d -m 700 "$HOME/.ssh"
+        rm -f "$HOME/.ssh/config"
+        install -m 600 ${sshConfig} "$HOME/.ssh/config"
+      ''
+    );
+
+    # 客戶端金鑰與 known_hosts。
+    persist'.directories = [
+      {
+        directory = ".ssh";
+        mode = "0700";
+      }
+    ];
+  };
+}

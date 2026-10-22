@@ -7,7 +7,7 @@ home/
 ├── base/                    # Mac 和 Linux 共用
 │   ├── core/                # 一律生效:帳號設定、persist' 選項
 │   ├── cli/                 # 命令列工具,不佔用整個終端機(cli'.*)
-│   │                        #   development、git、packages、shell、toolchain
+│   │                        #   development、git、packages、shell、ssh、toolchain
 │   ├── tui/                 # 佔用整個終端機的介面(tui'.*)
 │   │   ├── agents/          #   claude-code、dsh
 │   │   └── lazygit.nix、monitoring.nix
