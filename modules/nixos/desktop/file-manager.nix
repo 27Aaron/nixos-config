@@ -38,6 +38,12 @@ in
         directory = ".local/share/nautilus";
         mode = "0700";
       }
+
+      # 縮圖可能洩漏私人檔案內容,限本人讀取;保留可免去重新產生。
+      {
+        directory = ".cache/thumbnails";
+        mode = "0700";
+      }
     ];
   };
 }

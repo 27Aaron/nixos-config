@@ -14,6 +14,11 @@ in
 
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
+      # nixfmt-rs 提供 nixfmt 指令,Zed 的格式化設定用的就是它。
+      nixd
+      nixfmt-rs
+      deadnix
+
       # Python 版本切換交給 uv 或 direnv。
       python3
       basedpyright
@@ -35,5 +40,8 @@ in
       # package.json 相依套件的版本提示,避免編輯器自行下載。
       package-version-server
     ];
+
+    # Go 的建置快取;保留可免去重開機後重新編譯。
+    persist'.directories = [ ".cache/go-build" ];
   };
 }

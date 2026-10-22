@@ -16,7 +16,6 @@ home/
 │       ├── editors/         #   vscode、zed
 │       └── kitty.nix、claude-desktop.nix
 ├── nixos/                   # 只有 Linux
-│   ├── core/                # 一律生效:快取登記
 │   └── gui/                 # GTK/Qt 主題、游標、XDG、Linux 專屬程式(gui'.*)
 └── darwin/                  # 只有 macOS,預留
 ```
@@ -51,4 +50,5 @@ NixOS 主機由 `nixos/base/core/home-manager.nix` 自動收集 `base/` 與 `nix
 在 NixOS 上，家目錄同樣位於 tmpfs。模組以 `persist'.directories`、`persist'.files`
 回報要保留的路徑（相對於家目錄）。其他平臺不讀取這兩個選項，宣告了也沒有影響。
 
-`~/.cache` 不整體保留，只有真正需要的快取才逐項登記。
+`~/.cache` 不整體保留，只有真正需要的快取才逐項登記，而且登記在產生它的模組裡，
+例如 go-build 在 `cli/toolchain.nix`、縮圖在 `nixos/desktop/file-manager.nix`。

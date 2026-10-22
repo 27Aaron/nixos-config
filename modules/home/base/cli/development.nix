@@ -32,6 +32,10 @@ in
       ".local/share/direnv"
       ".local/share/mise"
       ".local/share/uv"
+
+      # 專案套件管理器的下載快取。
+      ".cache/pnpm"
+      ".cache/bun"
     ];
   };
 }

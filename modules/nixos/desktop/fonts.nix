@@ -3,12 +3,14 @@
   inputs,
   lib,
   pkgs,
+  vars,
   ...
 }:
 let
   cfg = config.desktop'.fonts;
 
   fonts = inputs.fonts.packages.${pkgs.stdenv.hostPlatform.system};
+  names = vars.appearance.fonts;
 in
 {
   options.desktop'.fonts = {
@@ -33,15 +35,15 @@ in
 
       fontconfig.defaultFonts = {
         serif = [
-          "LXGW WenKai TC"
-          "LXGW WenKai"
+          names.sans
+          names.sansSimplified
         ];
         sansSerif = [
-          "LXGW WenKai TC"
-          "LXGW WenKai"
+          names.sans
+          names.sansSimplified
         ];
-        monospace = [ "Maple Mono NF" ];
-        emoji = [ "Noto Color Emoji" ];
+        monospace = [ names.mono ];
+        emoji = [ names.emoji ];
       };
     };
   };

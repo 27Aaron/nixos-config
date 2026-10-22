@@ -28,9 +28,11 @@ modules/
     │   ├── cli/          # draws nothing of its own: shell, git, toolchain (cli'.*)
     │   ├── tui/          # takes over the terminal: agents, lazygit, monitors (tui'.*)
     │   └── gui/          # opens a window: browsers, editors, kitty (gui'.*)
-    ├── nixos/            # Linux only: core/ (cache entries), gui/ (GTK/Qt theme, XDG, Linux-only apps)
+    ├── nixos/            # Linux only: gui/ (GTK/Qt theme, XDG, Linux-only apps)
     └── darwin/           # reserved: Home Manager modules only macOS needs
-vars/default.nix          # shared non-secret user values
+vars/
+├── default.nix           # shared non-secret user values
+└── appearance.nix        # fonts and the Catppuccin theme, the single source for every module
 Justfile                  # task recipes
 ```
 

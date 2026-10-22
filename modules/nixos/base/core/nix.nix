@@ -1,17 +1,10 @@
-# NixOS 專屬的 nix 工具;nix 本身的設定在 modules/base/nix.nix。
+# nh 與 flake 倉庫的持久化;nix 本身的設定在 modules/base/core/nix.nix。
 {
   lib,
-  pkgs,
   vars,
   ...
 }:
 {
-  environment.systemPackages = with pkgs; [
-    deadnix
-    nixd
-    nixfmt-rs
-  ];
-
   programs.nh = {
     enable = true;
     flake = lib.mkDefault "/home/${vars.username}/nixos-config";
