@@ -86,13 +86,6 @@
         }
       );
 
-      nixosConfigurations = import ./hosts {
-        inputs = inputs;
-        nixpkgs = inputs.nixpkgs;
-        disko = inputs.disko;
-        preservation = inputs.preservation;
-        home-manager = inputs.home-manager;
-        sops-nix = inputs.sops-nix;
-      };
+      nixosConfigurations = import ./hosts { inherit inputs; };
     };
 }

@@ -1,15 +1,9 @@
-{
-  inputs,
-  nixpkgs,
-  disko,
-  preservation,
-  home-manager,
-  sops-nix,
-  ...
-}:
+{ inputs }:
 
 let
-  inherit (nixpkgs) lib;
+  inherit (inputs.nixpkgs) lib;
+
+  vars = import ../vars;
 
   hosts = lib.filterAttrs (
     name: type: type == "directory" && builtins.pathExists ./${name}/default.nix
@@ -22,14 +16,14 @@ let
         hostName = name;
         inherit inputs;
         secrets = inputs.secrets;
-        vars = import ../vars;
+        inherit vars;
       };
       modules = [
         ../modules
-        disko.nixosModules.default
-        preservation.nixosModules.preservation
-        home-manager.nixosModules.home-manager
-        sops-nix.nixosModules.sops
+        inputs.disko.nixosModules.default
+        inputs.preservation.nixosModules.preservation
+        inputs.home-manager.nixosModules.home-manager
+        inputs.sops-nix.nixosModules.sops
         {
           home-manager = {
             useGlobalPkgs = true;
@@ -38,8 +32,7 @@ let
 
             # NixOS 的 specialArgs 不會自動傳入 Home Manager 模組,需顯式轉交。
             extraSpecialArgs = {
-              inherit inputs;
-              vars = import ../vars;
+              inherit inputs vars;
             };
           };
         }
