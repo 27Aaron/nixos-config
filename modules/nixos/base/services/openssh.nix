@@ -25,6 +25,7 @@ in
       # 位);home.file 產生的 store 連結屬於 root,通不過檢查,所有 ssh 都會噴
       # Bad owner or permissions。改成啟用時複製成真實檔案,每次切換重寫。
       hm'.home.activation.installSshConfig = hmLib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        install -d -m 700 "$HOME/.ssh"
         rm -f "$HOME/.ssh/config"
         install -m 600 ${sshConfig} "$HOME/.ssh/config"
       '';
