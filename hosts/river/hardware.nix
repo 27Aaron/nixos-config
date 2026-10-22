@@ -85,81 +85,41 @@
     HandleLidSwitchDocked = "ignore";
   };
 
-  # 恢復後的兩個補救動作。這裡刻意不用 powerManagement.resumeCommands:
-  # 在這個 nixpkgs 版本它不會產生任何 systemd 單元,寫了也不會執行
-  # (2026-10-22 的恢復完全沒有留下它的輸出,證實沒跑過)。
-  # 改用 After=sleep.target 的一次性服務,單元確實會被 sleep.target 拉起來。
-
-  # 一、觸控板。走 I2C(AMDI0010 控制器上的 UNIW0001:00)。
-  # 從休眠恢復時 i2c-hid 不會重新列舉,觸控板因此整個消失,
-  # 2026-10-22 早上只能切 tty 重開機。USB 裝置有重新列舉的紀錄,
-  # 只有 I2C 這條路徑漏了,所以恢復後手動重綁 i2c_hid_acpi 逼它重新探測。
-  systemd.services.touchpad-resume-rebind = {
-    description = "Re-bind the I2C HID touchpad after resuming";
-    after = [ "sleep.target" ];
-    wants = [ "sleep.target" ];
-    wantedBy = [ "sleep.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      # 綁定失敗不該讓整個 sleep.target 變成失敗狀態。
-      SuccessExitStatus = "0 1";
-    };
-    script = ''
-      # 只有真的接在 i2c_hid_acpi 上才需要重綁;裝置不存在就安靜跳過。
-      for dev in /sys/bus/i2c/devices/i2c-UNIW*; do
-        [ -e "$dev" ] || continue
-        drv="$(basename "$(readlink -f "$dev/driver" 2>/dev/null)")"
-        [ "$drv" = "i2c_hid_acpi" ] || continue
-        name="$(basename "$dev")"
-        echo "re-binding $name"
-        echo "$name" > /sys/bus/i2c/drivers/i2c_hid_acpi/unbind || true
-        # 讓裝置有時間完成 teardown,太快重綁會拿到 EBUSY。
-        sleep 0.5
-        echo "$name" > /sys/bus/i2c/drivers/i2c_hid_acpi/bind || true
-      done
-    '';
-  };
-
-  # 二、蓋子狀態。logind 在休眠期間收不到 input 事件,若它最後一次認知是
-  # 「關閉」,喚醒後就沒有機會自己修正,於是每次醒來都判定蓋子仍關著,
-  # 再掛起一次,形成「解鎖後立刻被鎖回去」的迴圈。
-  # 2026-10-22 09:51 與 09:51:55 兩次掛起前都沒有任何 Lid 事件,
-  # 正是這個快取造成的。
-  #
-  # 恢復後比對 ACPI 的真實狀態與 logind 的認知,不一致就重新綁定 ACPI
-  # button 裝置,逼驅動重新回報目前狀態。只在真的不一致時才動手,
-  # 平常恢復不會被碰。
-  systemd.services.lid-state-resync = {
-    description = "Re-sync the cached lid state after resuming";
-    after = [ "sleep.target" ];
-    wants = [ "sleep.target" ];
-    wantedBy = [ "sleep.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      SuccessExitStatus = "0 1";
-    };
-    script = ''
-      lid_acpi=$(cat /proc/acpi/button/lid/*/state 2>/dev/null | awk '{print $2}')
-      lid_logind=$(busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
-        org.freedesktop.login1.Manager LidClosed 2>/dev/null | awk '{print $2}')
-
-      echo "lid after resume: acpi=''${lid_acpi:-unknown} logind_closed=''${lid_logind:-unknown}"
-
-      if { [ "$lid_acpi" = "open" ] && [ "$lid_logind" = "true" ]; } ||
-         { [ "$lid_acpi" = "closed" ] && [ "$lid_logind" = "false" ]; }; then
-        echo "lid state mismatch, re-probing the ACPI button device"
-        for dev in /sys/bus/acpi/devices/PNP0C0D:*; do
-          [ -e "$dev" ] || continue
-          name="$(basename "$dev")"
-          driver="$(readlink -f "$dev/driver" 2>/dev/null)"
-          [ -n "$driver" ] || continue
-          echo "$name" > "$driver/unbind" 2>/dev/null || true
-          sleep 0.3
-          echo "$name" > "$driver/bind" 2>/dev/null || true
-        done
+  # 休眠恢復後的蓋子狀態(詳見 #177)。HibernateMode=shutdown 會完全斷電,
+  # 開蓋不產生事件;_LID 讀取的 ACPI 變數又隨記憶體映像還原為「關」,
+  # logind 因而反覆掛起。恢復必經電源鍵,蓋子必然開啟,故僅在此時以
+  # lid_init_state=open 重綁 acpi-button。驅動於輸入裝置首次開啟時才回報
+  # 初始狀態,open 須保留至下次睡眠前再還原;醒著時的開合仍由韌體事件回報。
+  environment.etc."systemd/system-sleep/lid-after-hibernate".source =
+    pkgs.writeShellScript "lid-after-hibernate" ''
+      params=/sys/module/button/parameters/lid_init_state
+      driver=/sys/bus/platform/drivers/acpi-button
+      if [ "$1" = pre ]; then
+        echo method > "$params"
+        exit 0
       fi
+      [ "$1" = post ] && [ "$SYSTEMD_SLEEP_ACTION" = hibernate ] || exit 0
+      echo "lid: resumed from hibernation, re-binding acpi-button as open"
+      echo open > "$params"
+      echo PNP0C0D:00 > "$driver/unbind" || true
+      ${pkgs.coreutils}/bin/sleep 0.3
+      echo PNP0C0D:00 > "$driver/bind" || true
     '';
-  };
+
+  # 觸控板(I2C,UNIW0001:00)休眠恢復後不會重新列舉,需重綁 i2c_hid_acpi。
+  # resumeCommands 於恢復後執行,PATH 僅含 coreutils、grep、sed 與 systemd。
+  powerManagement.resumeCommands = ''
+    for dev in /sys/bus/i2c/devices/i2c-UNIW*; do
+      [ -e "$dev/driver" ] || continue
+      [ "$(basename "$(readlink -f "$dev/driver")")" = "i2c_hid_acpi" ] || continue
+      name="$(basename "$dev")"
+      echo "touchpad: re-binding $name"
+      echo "$name" > /sys/bus/i2c/drivers/i2c_hid_acpi/unbind || true
+      # 立即重綁會回傳 EBUSY。
+      sleep 0.5
+      echo "$name" > /sys/bus/i2c/drivers/i2c_hid_acpi/bind || true
+    done
+  '';
 
   # 韌體與週邊驅動。
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
