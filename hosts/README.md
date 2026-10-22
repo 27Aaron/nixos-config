@@ -8,6 +8,11 @@ hosts/
 ├── default.nix        # 探索 nixos/<名稱>/,產生 nixosConfigurations.<名稱>
 ├── nixos/
 │   └── river/         # MECHREVO 無界 14X 筆電
+│       ├── default.nix    # 開關、時區、stateVersion
+│       ├── hardware.nix   # 核心、initrd、韌體與週邊
+│       ├── storage.nix    # 磁碟佈局、持久化、zram、Btrfs 維護
+│       ├── power.nix      # 休眠、睡眠、蓋子與觸控板的恢復修補
+│       └── keyboard.nix   # keyd 鍵位映射
 └── darwin/            # 預留:nix-darwin 主機
 ```
 

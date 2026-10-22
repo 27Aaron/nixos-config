@@ -33,5 +33,11 @@ in
         vulkan-tools
       ];
     };
+
+    # Mesa/RADV 的 shader 快取,由驅動自行管理;保留可免去重開機後重新編譯。
+    preservation'.user.directories = [
+      ".cache/mesa_shader_cache"
+      ".cache/radv_builtin_shaders"
+    ];
   };
 }
