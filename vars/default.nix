@@ -8,8 +8,6 @@
   # 改用 hashedPasswordFile 指向 /persistent 下的文件並從此處移除。
   hashedPassword = "$y$j9T$ssZgTIeq9iObnQ5SWCLoN0$rVag2jJiBbEOgeYcphtYPZ5pbTvpF1ukKcdMBkDK0z0";
 
-  appearance = import ./appearance.nix;
-
   sshAuthorizedKeys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6xNNhF6jaPKuch8vSHwHTGlbyn4i2zSHxrqGOiacxG Aaron@Deployment"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKHjMAQUXfyMv8TG1NfqjmQJG3gqZkh25KAvAMvxVrWS Aaron@MacBook-Pro"

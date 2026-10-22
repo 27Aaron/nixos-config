@@ -1,19 +1,10 @@
 {
   config,
   lib,
-  vars,
   ...
 }:
 let
   cfg = config.gui'.zed;
-  inherit (vars.appearance) catppuccin fonts;
-
-  # 主題與圖示主題共用同一組風味名稱。
-  catppuccinTheme = {
-    mode = "system";
-    dark = "Catppuccin ${lib.toSentenceCase catppuccin.dark}";
-    light = "Catppuccin ${lib.toSentenceCase catppuccin.light}";
-  };
 in
 {
   options.gui'.zed.enable = lib.mkEnableOption "the Zed editor";
@@ -48,14 +39,22 @@ in
         session.trust_all_worktrees = true;
 
         # 跟隨系統深淺色。
-        theme = catppuccinTheme;
-        icon_theme = catppuccinTheme;
+        theme = {
+          mode = "system";
+          dark = "Catppuccin Mocha";
+          light = "Catppuccin Latte";
+        };
+        icon_theme = {
+          mode = "system";
+          dark = "Catppuccin Mocha";
+          light = "Catppuccin Latte";
+        };
 
-        ui_font_family = fonts.sans;
-        agent_ui_font_family = fonts.sans;
+        ui_font_family = "LXGW WenKai TC";
+        agent_ui_font_family = "LXGW WenKai TC";
 
         # 與 kitty 相同的等寬字型。
-        buffer_font_family = fonts.mono;
+        buffer_font_family = "Maple Mono NF";
         buffer_font_size = 14;
         cursor_blink = false;
 
@@ -69,7 +68,7 @@ in
 
         terminal = {
           dock = "bottom";
-          font_family = fonts.mono;
+          font_family = "Maple Mono NF";
           font_size = 14;
           blinking = "off";
         };
