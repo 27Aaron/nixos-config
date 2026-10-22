@@ -20,6 +20,10 @@
     file-manager.enable = true;
     trash.enable = true;
     steam.enable = true;
+    lsfg-vk = {
+      enable = true;
+      dllPath = "/games/SteamLibrary/steamapps/common/Lossless Scaling/lsfg-vk.dll";
+    };
     pipewire.enable = true;
     fcitx5.enable = true;
     vinput = {
