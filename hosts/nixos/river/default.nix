@@ -11,11 +11,11 @@
   hardware'.yubikey.enable = true;
 
   desktop' = {
-    greetd.enable = true;
-    niri = {
+    greetd = {
       enable = true;
       autoLogin = true;
     };
+    niri.enable = true;
     noctalia.enable = true;
     fonts.enable = true;
     file-manager.enable = true;
