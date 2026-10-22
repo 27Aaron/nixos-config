@@ -19,6 +19,7 @@
     fonts.enable = true;
     file-manager.enable = true;
     trash.enable = true;
+    steam.enable = true;
     pipewire.enable = true;
     fcitx5.enable = true;
     vinput = {

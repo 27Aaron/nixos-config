@@ -33,6 +33,7 @@ An app gets a nixpak sandbox when it is third-party, handles untrusted content, 
 - **magpie:** the owner's own program, trusted like the rest of this repository.
 - **dsh-desktop, Claude Desktop:** coding agents that read projects and run commands by design; a sandbox would remove what they are for.
 - **Chrome, Firefox:** they already sandbox their content processes, and wrapping them breaks security keys, file transfer and password managers.
+- **Steam:** it runs games in its own bubblewrap containers (pressure-vessel), which nest badly inside nixpak, and gaming mode needs it to drive the whole session. Steam and every game run as the user, unsandboxed; Jovian also widens device access ([WA-018](WORKAROUNDS.md#security-exceptions)).
 - **VS Code, Zed:** development tools need the whole project.
 - **Binding only the app's closure** (`bindEntireStore = false`): the GPU driver link and the font configuration point at store paths outside the closure and would have to be listed by hand, while the store holds no secret river relies on. The sandbox therefore sees the whole store read-only.
 
@@ -51,6 +52,7 @@ Every input below can change what runs on the machine. Those that provide NixOS 
 | `nagram` | Nagram desktop, from an upstream binary | user | default branch |
 | `fcitx5-vinput` | fcitx5 add-on and daemon, which see every keystroke; trusted cache | user | tag `v2.4.2` ([WA-001](WORKAROUNDS.md#pins)) |
 | `nixpak` | sandbox wrapper for desktop apps (bubblewrap, xdg-dbus-proxy) | user | default branch (no releases) |
+| `jovian` | NixOS module and packages for Steam's gaming mode: gamescope, steamos-manager and inputplumber as root services, a polkit rule and udev rules; no binary cache, so its packages build locally | root and user | `development` branch (no releases) |
 | `nur-packages`, `fonts`, `secrets` | owner's own repositories | user, data | default branch |
 
 Review an update to these as a supply-chain event; the procedure is in `AGENTS.md` under *Flake lock bumps*.

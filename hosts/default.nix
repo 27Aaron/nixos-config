@@ -27,6 +27,7 @@ let
           inputs.preservation.nixosModules.preservation
           inputs.home-manager.nixosModules.home-manager
           inputs.sops-nix.nixosModules.sops
+          inputs.jovian.nixosModules.default
           ./nixos/${name}
         ];
     };

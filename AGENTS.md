@@ -22,7 +22,7 @@ modules/
 │   ├── base/core/        # always on: users and sops, hostname, locale, firewall, kernel hardening, logging, nix and nh, ssh client fix, Home Manager
 │   ├── base/hardware/    # hardware'.*: disko, persistence, boot/, amdgpu, bluetooth, brightness, yubikey
 │   ├── base/services/    # services'.*: daemons any NixOS host may run, servers included
-│   ├── desktop/          # desktop'.*: greetd, niri, noctalia, fonts, file manager, trash, pipewire, input-method/, power/
+│   ├── desktop/          # desktop'.*: greetd, niri, noctalia, fonts, file manager, trash, pipewire, steam, input-method/, power/
 │   └── server/           # server'.*: fail2ban, initrd-ssh
 └── home/
     ├── base/             # Home Manager modules that also work on macOS
