@@ -11,6 +11,13 @@
           "leftshift+leftmeta+f23" = "rightcontrol";
           # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
           rightcontrol = "rightcontrol";
+          # 用 overloadt2 而非 overloadt:快速按 Caps+C 時,C 在 100 毫秒內放開也算按住。
+          capslock = "overloadt2(caps, capslock, 100)";
+        };
+        caps = {
+          c = "C-c";
+          v = "C-v";
+          z = "C-z";
         };
       };
     };
