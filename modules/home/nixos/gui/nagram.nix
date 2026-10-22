@@ -13,6 +13,7 @@ let
   # 上游二進位內建的 libxkbcommon 只找 /usr/share/X11/xkb,在 NixOS 上會於
   # Wayland 回呼中段錯誤,因此包裝並指定 XKB_CONFIG_ROOT。D-Bus 服務檔也要
   # 指向包裝後的執行檔,否則 DBusActivatable 會繞過包裝。
+  # 移除條件見 WORKAROUNDS.md 的 WA-007。
   nagram-desktop = pkgs.symlinkJoin {
     name = "nagram-desktop-wrapped";
     paths = [ nagram ];

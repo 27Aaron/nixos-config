@@ -141,6 +141,7 @@ in
       package = pkgs.dae;
       configFile = "${configDir}/config.dae";
 
+      # 是否真的需要開放這個埠尚未驗證,見 WORKAROUNDS.md 的 WA-014。
       openFirewall = {
         enable = true;
         port = 12345;
@@ -152,6 +153,7 @@ in
       after = [ "sops-install-secrets.service" ];
       serviceConfig = {
         # 上游模組只複製入口設定,include 的 config.d 會遺失,因此改為自行組裝。
+        # 移除條件見 WORKAROUNDS.md 的 WA-009。
         LoadCredential = lib.mkForce [ ];
         ExecStartPre = lib.mkForce [
           ""

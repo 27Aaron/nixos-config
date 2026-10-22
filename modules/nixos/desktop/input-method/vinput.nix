@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.desktop'.vinput;
+  # 輸入來源釘在發行標籤且不 follow nixpkgs,見 WORKAROUNDS.md 的 WA-001。
   packages = inputs.fcitx5-vinput.packages.${pkgs.stdenv.hostPlatform.system};
 
   vinput = if cfg.lite then packages.fcitx5-vinput-lite else packages.fcitx5-vinput;
@@ -49,6 +50,7 @@ in
         RestartSec = 3;
 
         # 命令列辨識器不看 LD_LIBRARY_PATH,找不到 libopus 就會退出。
+        # 移除條件見 WORKAROUNDS.md 的 WA-012。
         Environment = "VINPUT_ASR_LIBOPUS_PATH=${lib.getLib pkgs.libopus}/lib/libopus.so";
       };
       Install.WantedBy = [ "graphical-session.target" ];

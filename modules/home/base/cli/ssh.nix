@@ -17,6 +17,7 @@ in
   config = lib.mkIf cfg.enable {
     # OpenSSH 10 要求 ~/.ssh/config 屬於使用者本人,home.file 的 store 連結
     # 屬於 root,因此改在啟用時複製成一般檔案。
+    # 移除條件見 WORKAROUNDS.md 的 WA-006。
     home.activation.installSshConfig = lib.mkIf (builtins.pathExists sshConfig) (
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         install -d -m 700 "$HOME/.ssh"

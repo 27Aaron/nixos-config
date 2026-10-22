@@ -23,6 +23,7 @@
     kernelModules = [ "kvm-amd" ];
 
     # 開機畫面不顯示 ACPI 這類錯誤,記錄仍在 journal 裡。
+    # 移除條件見 WORKAROUNDS.md 的 WA-004。
     consoleLogLevel = 3;
 
     initrd.availableKernelModules = [

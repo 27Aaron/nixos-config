@@ -38,6 +38,10 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 | [`tests/`](tests/README.md) | eval tests for security settings, run by `just check` |
 | `lib/` | the module collector |
 
+## Security
+
+[SECURITY.md](SECURITY.md) describes the threat model, trust boundaries and how each control is checked; [WORKAROUNDS.md](WORKAROUNDS.md) lists temporary workarounds and accepted exceptions with their removal conditions.
+
 ## References
 
 - [Misterio77/Foundry](https://github.com/Misterio77/Foundry)
