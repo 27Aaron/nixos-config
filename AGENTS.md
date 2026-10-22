@@ -99,8 +99,16 @@ type(scope): description
 
 - Allowed types are `feat`, `fix`, `refactor`, `chore`, and `WIP`. Use `WIP` only for an explicitly temporary work-in-progress snapshot.
 - The commit title uses lowercase English text and never ends with a period. Keep the body readable with normal capitalization when it contains proper names or explanatory sentences.
+- Keep the title within 50 characters, `type(scope): ` included. GitHub truncates titles past 72 characters, and a squash merge appends ` (#123)`, so 50 leaves room. Name one resulting change; drop articles and filler words, and move lists and details into the body.
+- Wrap the body at 72 characters.
+- A pull request title becomes the squash-merge commit title, so it follows the same rules.
 - The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `desktop`, `server`, `darwin`, `home`, `modules`) for shared modules, `flake` for flake-level files, `lib/` and host discovery, `docs` for documentation.
-- Keep the title concise and describe the resulting change, not the list of edited files.
+- Describe the resulting change, not the list of edited files.
+
+```text
+refactor(home): bind flake packages by name instead of their package set   # 72, too long
+refactor(home): bind flake packages directly                               # 44
+```
 
 ### Flake lock bumps
 
@@ -126,4 +134,4 @@ When updating an input in `flake.lock`, describe the upstream change instead of 
    - summarize another relevant file or commit
    ```
 
-For multiple inputs, name all of them in the title or split the updates into separate commits. Do not claim details that are not supported by the upstream changelog or the local diff.
+For multiple inputs, use `chore(flake): update flake inputs` and list each input in the body, or split the updates into separate commits. Do not claim details that are not supported by the upstream changelog or the local diff.
