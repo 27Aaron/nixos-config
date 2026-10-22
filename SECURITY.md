@@ -125,11 +125,20 @@ Check for updates at least weekly, and immediately when an actively exploited vu
 
 Switching to an older generation does not undo a compromise: it only changes the system configuration, not stolen secrets or modified data.
 
+## Application sandboxes
+
+An app gets a nixpak sandbox when it is third-party, handles untrusted content, and does not need the user's files. Nagram is the only one that fits. Decided against:
+
+- **magpie:** the owner's own program, trusted like the rest of this repository.
+- **dsh-desktop, Claude Desktop:** coding agents that read projects and run commands by design; a sandbox would remove what they are for.
+- **Chrome, Firefox:** they already sandbox their content processes, and wrapping them breaks security keys, file transfer and password managers.
+- **VS Code, Zed:** development tools need the whole project.
+- **Binding only the app's closure** (`bindEntireStore = false`): the GPU driver link and the font configuration point at store paths outside the closure and would have to be listed by hand, while the store holds no secret river relies on. The sandbox therefore sees the whole store read-only.
+
 ## Remaining work
 
 | Priority | Work | Notes |
 |---|---|---|
-| P2 | Sandbox the remaining third-party GUI apps | Nagram is done; next candidates are dsh-desktop and magpie. Test input method and file chooser for each. |
-| P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, the age key, `resume_offset`. |
+| P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, restoring river's SSH key for sops, `resume_offset`. |
 
 Record temporary exceptions in [WORKAROUNDS.md](WORKAROUNDS.md) with a removal condition.

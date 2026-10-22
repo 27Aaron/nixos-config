@@ -48,15 +48,15 @@ in
       (sloth.concat' sloth.xdgCacheHome "/mesa_shader_cache")
     ];
 
-    # 只掛需要的 socket,不掛整個 $XDG_RUNTIME_DIR:裡面還有 niri 的控制
-    # socket(可執行任意程式)、ssh-agent 與 GPG agent。
+    # 只掛這兩個 socket,不掛整個 $XDG_RUNTIME_DIR:裡面還有 niri 的控制
+    # socket(可執行任意程式)、ssh-agent 與 GPG agent。PulseAudio 不用內建的
+    # sockets.pulse:它以唯讀掛載目錄,libpulse 會因無法 chmod 而失敗。
+    sockets = {
+      wayland = true;
+      pipewire = true;
+    };
+
     bind.ro = [
-      (sloth.concat [
-        sloth.runtimeDir
-        "/"
-        (sloth.env "WAYLAND_DISPLAY")
-      ])
-      (runtime "/pipewire-0")
       "/etc/fonts"
       "/etc/localtime"
       "/etc/zoneinfo"
