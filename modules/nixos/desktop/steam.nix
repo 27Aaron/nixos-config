@@ -17,6 +17,35 @@ in
     # polkit 規則與電源鍵設定見 WORKAROUNDS.md 的 WA-018。
     jovian.steam.enable = true;
 
+    # 沒有 SDDM 時,Steam 的「切換到桌面」改呼叫 steamos-session-select,而 Jovian
+    # 只提供走 SDDM 的 holo-session-select,畫面因此卡住。這裡停掉遊戲模式的 target,
+    # start-gamescope-session 隨之結束,greetd 回到 tuigreet。見 WORKAROUNDS.md 的 WA-019。
+    # 遊戲模式的 steam-launcher 寫死 jovianPackages.steam,programs.steam.extraPackages
+    # 碰不到它,所以改覆寫套件本身,字型也一併放入,否則遊戲模式的中文全是方塊;
+    # mkAfter 讓這個 overlay 排在 Jovian 的之後。
+    nixpkgs.overlays = lib.mkAfter [
+      (final: prev: {
+        jovianPackages = prev.jovianPackages.overrideScope (
+          _: p: {
+            # steam-run 由 steam 衍生,經 jupiter-hw-support 進入 steamos-manager;保留覆寫前的
+            # 版本,改字型時才不必重新編譯 steamos-manager。p 裡的 steam-run 已指向新的 steam。
+            inherit (prev.jovianPackages) steam-run;
+
+            steam = p.steam.override {
+              extraPkgs =
+                _:
+                [
+                  (final.writeShellScriptBin "steamos-session-select" ''
+                    exec ${lib.getExe' final.systemd "systemctl"} --user stop gamescope-session.target
+                  '')
+                ]
+                ++ config.programs.steam.fontPackages;
+            };
+          }
+        );
+      })
+    ];
+
     # SteamOS 預設值含 amd_iommu=off、audit=0 與 split_lock_mitigate=0,會抵銷
     # core/kernel-hardening.nix;zram 與 earlyoom 也與既有設定重複。
     jovian.steamos.useSteamOSConfig = false;
