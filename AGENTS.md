@@ -35,7 +35,7 @@ modules/
 tests/                    # eval tests run by `just check`: security invariants and inventories
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
-SECURITY.md               # threat model, trust boundaries, runtime checks, remaining work
+SECURITY.md               # threat model, trust boundaries, app sandboxes, runtime checks
 WORKAROUNDS.md            # temporary workarounds, pins and security exceptions with removal conditions
 ```
 
@@ -72,7 +72,7 @@ Host files are ordinary NixOS modules:
 
 ## Security
 
-- `SECURITY.md` holds the threat model, trust boundaries, flake input inventory, runtime checks and remaining work. Update it in the same change when a change moves a security boundary, adds an input, or closes an item.
+- `SECURITY.md` holds the threat model, trust boundaries, the app sandbox decisions, the flake input inventory and runtime checks. Update it in the same change when a change moves a security boundary, adds an input, or sandboxes an app.
 - Credentials and secrets belong in the private `nix-secrets` repository and reach the system through sops-nix. `inputs.secrets` is copied into the world-readable `/nix/store`, so read only encrypted files, or files with nothing sensitive in them (like the SSH host aliases), from it at evaluation time. `vars/` holds non-secret values only. Account passwords come from `users/password.yaml` in nix-secrets, decrypted with `neededForUsers` before users are created; never put a password or hash in the configuration. sops is a core module because every host needs it for that. River decrypts with the user's `~/.ssh/id_ed25519` (`sops.age.sshKeyPaths`, read from `/persistent`), never with a key file. See *Secrets* in `SECURITY.md` before changing keys.
 - Do not add users to `nix.settings.trusted-users`: a trusted user can disable signature checks and import arbitrary store paths, which amounts to passwordless root. Only `@wheel` may connect to the daemon (`allowed-users`).
 - Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
