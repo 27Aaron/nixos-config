@@ -19,7 +19,7 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 - **Ephemeral root:** `/` is a tmpfs wiped on every boot; only state registered with [preservation](https://github.com/nix-community/preservation) survives.
 - **Storage:** LUKS2 with FIDO2 unlock, Btrfs subvolumes, btrbk snapshots of the persistent volume, and an encrypted swapfile for hibernation.
 - **Desktop:** niri with the Noctalia shell, greetd, PipeWire, and Fcitx5 with Rime.
-- **Gaming:** Steam in gamescope with FSR upscaling and lsfg-vk frame generation, with its game library on a Btrfs subvolume that snapshots skip.
+- **Gaming:** Steam in gamescope with FSR upscaling, GE-Proton and DW-Proton, GameMode, MangoHud and lsfg-vk frame generation, with its game library on a Btrfs subvolume that snapshots skip.
 - **Secrets:** sops-nix, with the encrypted files kept in a separate private repository.
 - **Modules:** collected automatically and off by default; a host only flips switches.
 

@@ -20,6 +20,7 @@
     file-manager.enable = true;
     trash.enable = true;
     steam.enable = true;
+    gamemode.enable = true;
     gamescope = {
       enable = true;
       # 以螢幕(2880x1800)的一半渲染再用 FSR 放大,像素整數倍縮放最清楚。
@@ -87,6 +88,7 @@
       dsh-desktop.enable = true;
       nagram.enable = true;
       magpie.enable = true;
+      mangohud.enable = true;
       seahorse.enable = true;
       theme.enable = true;
       pointer-cursor.enable = true;
