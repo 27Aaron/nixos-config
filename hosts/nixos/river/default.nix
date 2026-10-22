@@ -20,30 +20,7 @@
     file-manager.enable = true;
     trash.enable = true;
     steam.enable = true;
-    gamescope = {
-      enable = true;
-      # 以螢幕(2880x1800)的一半渲染再用 FSR 放大,像素整數倍縮放最清楚。
-      steam = {
-        enable = true;
-        args = [
-          "-w"
-          "1440"
-          "-h"
-          "900"
-          "-W"
-          "2880"
-          "-H"
-          "1800"
-          "-f"
-          "-F"
-          "fsr"
-        ];
-      };
-    };
-    lsfg-vk = {
-      enable = true;
-      dllPath = "/games/SteamLibrary/steamapps/common/Lossless Scaling/lsfg-vk.dll";
-    };
+    gamemode.enable = true;
     pipewire.enable = true;
     fcitx5.enable = true;
     vinput = {
@@ -87,6 +64,7 @@
       dsh-desktop.enable = true;
       nagram.enable = true;
       magpie.enable = true;
+      mangohud.enable = true;
       seahorse.enable = true;
       theme.enable = true;
       pointer-cursor.enable = true;
