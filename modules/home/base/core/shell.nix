@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   # 兩個 shell 都是刻意啟用的:fish 是主力,由 nixos/base/core/fish.nix 設為
   # 登錄 shell;zsh 是備援,fish 跑不起來的場合改用它,比 bash 好用。
@@ -29,6 +30,8 @@
         mkdir -p "$HOME/.cache/zsh"
         autoload -U compinit && compinit -d "$HOME/.cache/zsh/.zcompdump"
       '';
+
+      history.path = "${config.xdg.stateHome}/zsh/history";
 
       autosuggestion.enable = true;
       initContent = ''
@@ -102,12 +105,9 @@
         directory = ".cache/zsh";
         mode = "0700";
       }
-    ];
-
-    files = [
       {
-        file = ".zsh_history";
-        mode = "0600";
+        directory = ".local/state/zsh";
+        mode = "0700";
       }
     ];
   };
