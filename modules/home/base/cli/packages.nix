@@ -1,30 +1,39 @@
 # 只安裝、不配置的命令列工具;需要配置的各自有模組。
 # 互動式的 ncdu 與 nload 屬 tui,不在這裡。
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
+let
+  cfg = config.cli'.packages;
+in
 {
-  home.packages = with pkgs; [
-    fastfetch
+  options.cli'.packages.enable = lib.mkEnableOption "everyday command-line tools";
 
-    dust
-    duf
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      fastfetch
 
-    fd
-    fzf
-    gawk
-    gnugrep
-    gnused
-    jq
-    ripgrep
+      dust
+      duf
 
-    just
+      fd
+      fzf
+      gawk
+      gnugrep
+      gnused
+      jq
+      ripgrep
 
-    curl
-    iperf3
-    nmap
-    socat
-    wget
-  ];
+      just
+
+      curl
+      iperf3
+      nmap
+      socat
+      wget
+    ];
+  };
 }

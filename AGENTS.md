@@ -24,13 +24,12 @@ modules/
 │   └── server/           # server-only modules: fail2ban, initrd-ssh (server'.*)
 └── home/
     ├── base/             # Home Manager modules shared by Linux and macOS
-    │   ├── home.nix      # account settings
-    │   ├── persist.nix   # persist' options
-    │   ├── cli/          # draws nothing of its own (shell, git, toolchain)
-    │   ├── tui/          # takes over the terminal (agents, lazygit, monitors)
-    │   └── gui/          # opens a window (terminal, browsers, editors, theme)
-    ├── nixos/            # Home Manager settings only Linux needs (systemd.user, ...)
-    └── darwin/           # reserved: Home Manager settings only macOS needs
+    │   ├── core/         # always on: account settings, persist' options
+    │   ├── cli/          # draws nothing of its own: shell, git, toolchain (cli'.*)
+    │   ├── tui/          # takes over the terminal: agents, lazygit, monitors (tui'.*)
+    │   └── gui/          # opens a window: browsers, editors, kitty (gui'.*)
+    ├── nixos/            # Linux only: core/ (cache entries), gui/ (GTK/Qt theme, XDG, Linux-only apps)
+    └── darwin/           # reserved: Home Manager modules only macOS needs
 vars/default.nix          # shared non-secret user values
 Justfile                  # task recipes
 ```
@@ -52,6 +51,7 @@ Host files are ordinary NixOS modules:
 - Place a module at the most general level where it works: `base/` for both system platforms, `nixos/base/` for any NixOS host including servers, `nixos/desktop/` only with a screen, `nixos/server/` only on servers. `modules/README.md` lists the full order.
 - Modules under a `core/` directory are always on and have no `enable` option; keep them limited to what every host needs. Every other system module is off by default: it exposes options under a prime-namespaced attribute (`hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory; grouping subdirectories such as `desktop/input-method/` do not add a level.
 - `modules/base/core/aliases.nix` defines the aliases `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`).
+- Home Manager modules follow the same rule: outside `core/` each one has an `enable` option under `cli'.*`, `tui'.*` or `gui'.*` (by interface, not by platform), and a host turns it on through `hm'`, for example `hm'.gui'.zed.enable = true`. Place a Home Manager module in `home/base/` only if it works on macOS too; anything relying on systemd, XDG or GTK goes to `home/nixos/`.
 - Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`.
 - Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
 

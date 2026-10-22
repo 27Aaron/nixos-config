@@ -1,30 +1,39 @@
 # 全域語言工具鏈與語言伺服器,裝在使用者 PATH 上,供編輯器、終端機與腳本共用。
 # 這裡只放 nixpkgs 的基底版本;專案需要特定版本時由 direnv 或 mise 覆蓋。
 {
+  config,
+  lib,
   pkgs,
   ...
 }:
+let
+  cfg = config.cli'.toolchain;
+in
 {
-  home.packages = with pkgs; [
-    # Python 版本切換交給 uv 或 direnv。
-    python3
-    basedpyright
-    ruff
+  options.cli'.toolchain.enable = lib.mkEnableOption "language toolchains and language servers";
 
-    go
-    gopls
+  config = lib.mkIf cfg.enable {
+    home.packages = with pkgs; [
+      # Python 版本切換交給 uv 或 direnv。
+      python3
+      basedpyright
+      ruff
 
-    rustc
-    cargo
-    rustfmt
-    clippy
-    rust-analyzer
+      go
+      gopls
 
-    nodejs
-    typescript
-    vtsls
+      rustc
+      cargo
+      rustfmt
+      clippy
+      rust-analyzer
 
-    # package.json 相依套件的版本提示,避免編輯器自行下載。
-    package-version-server
-  ];
+      nodejs
+      typescript
+      vtsls
+
+      # package.json 相依套件的版本提示,避免編輯器自行下載。
+      package-version-server
+    ];
+  };
 }

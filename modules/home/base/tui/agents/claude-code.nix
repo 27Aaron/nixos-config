@@ -1,27 +1,35 @@
 # 非自由軟體,需要 nixpkgs.config.allowUnfree。
 {
+  config,
   inputs,
+  lib,
   pkgs,
   ...
 }:
 let
+  cfg = config.tui'.claude-code;
+
   llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
-  home.packages = [ llm.claude-code ];
+  options.tui'.claude-code.enable = lib.mkEnableOption "Claude Code";
 
-  home.shellAliases = {
-    cc = "claude --dangerously-skip-permissions";
-  };
+  config = lib.mkIf cfg.enable {
+    home.packages = [ llm.claude-code ];
 
-  # 登入狀態與設定由程式自行寫入。
-  persist' = {
-    directories = [ ".claude" ];
-    files = [
-      {
-        file = ".claude.json";
-        mode = "0600";
-      }
-    ];
+    home.shellAliases = {
+      cc = "claude --dangerously-skip-permissions";
+    };
+
+    # 登入狀態與設定由程式自行寫入。
+    persist' = {
+      directories = [ ".claude" ];
+      files = [
+        {
+          file = ".claude.json";
+          mode = "0600";
+        }
+      ];
+    };
   };
 }
