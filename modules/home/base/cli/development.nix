@@ -7,7 +7,7 @@
     config.global.hide_env_diff = true;
   };
 
-  # mise 只管專案層級的工具版本,全域版本見 core/toolchain.nix。
+  # mise 只管專案層級的工具版本,全域版本見 cli/toolchain.nix。
   programs.mise = {
     enable = true;
     enableFishIntegration = true;
