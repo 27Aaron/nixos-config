@@ -19,7 +19,7 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 - **Ephemeral root:** `/` is a tmpfs wiped on every boot; only state registered with [preservation](https://github.com/nix-community/preservation) survives.
 - **Storage:** LUKS2 with FIDO2 unlock, Btrfs subvolumes, btrbk snapshots of the persistent volume, and an encrypted swapfile for hibernation.
 - **Desktop:** niri with the Noctalia shell, greetd, PipeWire, and Fcitx5 with Rime.
-- **Gaming:** Steam with the Steam Deck gaming mode from [Jovian-NixOS](https://github.com/Jovian-Experiments/Jovian-NixOS), started as a separate session.
+- **Gaming:** Steam with the Steam Deck gaming mode from [Jovian-NixOS](https://github.com/Jovian-Experiments/Jovian-NixOS), started as a separate session, with Decky Loader plugins.
 - **Secrets:** sops-nix, with the encrypted files kept in a separate private repository.
 - **Modules:** collected automatically and off by default; a host only flips switches.
 
