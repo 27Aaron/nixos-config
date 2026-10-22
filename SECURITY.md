@@ -24,11 +24,11 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 |---|---|---|
 | Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon. | Code running as the user can wait for the password to be typed. |
 | Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) and 12345/tcp+udp (dae) are open. | The dae port may be unnecessary ([WA-014](WORKAROUNDS.md#security-exceptions)). |
-| Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | No Secure Boot: the kernel and initrd on the ESP are unsigned and can be replaced to capture the PIN. |
+| Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | The kernel and initrd sit on the unencrypted ESP. |
 | Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation. | One shared host key and no offline recovery key ([WA-016](WORKAROUNDS.md#security-exceptions)); unencrypted files in that repository land in the world-readable store ([WA-015](WORKAROUNDS.md#security-exceptions)). |
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
 | Desktop apps | Nagram runs in a nixpak sandbox: it sees only its data directory and `~/Downloads/Telegram`, reaches other files through the file chooser portal, and talks to a filtered D-Bus. Trust prompts stay on in Zed, VS Code and Claude Code. | The other apps, including closed-source ones, can still read `~/.ssh`, browser profiles and tokens. |
-| Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk; there is no off-device backup. |
+| Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. |
 
 ## Flake inputs
 
@@ -101,7 +101,7 @@ Check for updates at least weekly, and immediately when an actively exploited vu
 
 1. Disconnect the network.
 2. From another trusted machine, rotate what the laptop held: the account password in nix-secrets, SSH keys (and remove the old public keys from `vars/` and GitHub), GitHub and agent tokens, and the age key if root was compromised.
-3. Reinstall from this flake rather than cleaning the running system, then restore data from a backup taken before the compromise.
+3. Reinstall from this flake rather than cleaning the running system, and copy back only data you have checked.
 
 Switching to an older generation does not undo a compromise: it only changes the system configuration, not stolen secrets or modified data.
 
@@ -109,13 +109,9 @@ Switching to an older generation does not undo a compromise: it only changes the
 
 | Priority | Work | Notes |
 |---|---|---|
-| P1 | Off-device, encrypted backups | Deferred. Snapshots on the same disk do not survive loss or theft; plan: restic to object storage with deletion protection. |
 | P1 | Fix the nix-secrets exposure and key layout | [WA-015](WORKAROUNDS.md#security-exceptions), [WA-016](WORKAROUNDS.md#security-exceptions); work in the nix-secrets repository. |
-| P2 | Secure Boot with lanzaboote | Deferred. Only worth it together with a firmware setup password, otherwise anyone at the keyboard can switch it off. |
 | P2 | Sandbox the remaining third-party GUI apps | Nagram is done; next candidates are dsh-desktop and magpie. Test input method and file chooser for each. |
 | P2 | Document how to reinstall river from scratch | disko, FIDO2 enrollment, the age key, `resume_offset`. |
 | P3 | Verify whether dae needs its open port | [WA-014](WORKAROUNDS.md#security-exceptions) |
-
-Decided against: CI. `just check` runs locally before every pull request, and CI would need access to the private secrets input.
 
 Record temporary exceptions in [WORKAROUNDS.md](WORKAROUNDS.md) with a removal condition.
