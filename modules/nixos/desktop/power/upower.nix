@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.services'.upower;
+  cfg = config.desktop'.upower;
 in
 {
-  options.services'.upower = {
+  options.desktop'.upower = {
     enable = lib.mkEnableOption "UPower power management daemon";
   };
 

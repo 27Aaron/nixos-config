@@ -5,12 +5,12 @@
   ...
 }:
 let
-  cfg = config.core'.sops;
+  cfg = config.services'.sops;
 
   keyFile = "/var/lib/sops-nix/key.txt";
 in
 {
-  options.core'.sops = {
+  options.services'.sops = {
     enable = lib.mkEnableOption "sops-nix secret decryption";
   };
 

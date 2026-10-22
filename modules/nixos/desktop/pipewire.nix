@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.services'.pipewire;
+  cfg = config.desktop'.pipewire;
 in
 {
-  options.services'.pipewire = {
+  options.desktop'.pipewire = {
     enable = lib.mkEnableOption "PipeWire audio stack";
   };
 

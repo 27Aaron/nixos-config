@@ -27,7 +27,7 @@ in
 
     # 刻意不持久化 ~/.local/share/Trash:回收桶須與檔案位於同一檔案系統,
     # bind 到持久卷後,家目錄第一層的檔案就無法丟進回收桶。持久化目錄內的
-    # 檔案會進各自的 .Trash-$uid,由 services'.trash 定期清理。
+    # 檔案會進各自的 .Trash-$uid,由 desktop'.trash 定期清理。
     preservation'.user.directories = [
       # 執行時產生的中繼資料,無法由設定重建。
       {

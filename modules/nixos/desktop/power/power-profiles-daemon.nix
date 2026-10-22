@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.services'.power-profiles-daemon;
+  cfg = config.desktop'.power-profiles-daemon;
 in
 {
-  options.services'.power-profiles-daemon = {
+  options.desktop'.power-profiles-daemon = {
     enable = lib.mkEnableOption "Power profiles management daemon";
   };
 
