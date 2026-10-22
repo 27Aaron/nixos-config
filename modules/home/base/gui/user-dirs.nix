@@ -18,7 +18,7 @@
     configFile."user-dirs.locale".text = "en_US";
   };
 
-  # x-gvfs-trash 讓檔案總管對這些目錄使用共用回收桶。
+  # x-gvfs-trash 讓檔案總管為這些掛載點啟用回收桶。
   persist'.directories =
     map
       (directory: {

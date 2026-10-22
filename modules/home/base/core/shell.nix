@@ -1,7 +1,7 @@
+{ config, ... }:
 {
-  # 兩個 shell 都是刻意啟用的:fish 是主力,由 nixos/base/core/fish.nix 設為
-  # 登錄 shell;zsh 是備援,fish 跑不起來的場合改用它,比 bash 好用。
-  # zsh 沒進 /etc/shells,因為不需要設成登錄 shell。
+  # fish 為主力(登入 shell 由 nixos/base/core/fish.nix 設定);zsh 為備援,
+  # 不需列入 /etc/shells。
   programs = {
     fish = {
       enable = true;
@@ -22,13 +22,14 @@
       enable = true;
       enableCompletion = true;
 
-      # compinit 先寫 .zcompdump.<host>.<pid> 再 mv 成正式檔;直接綁定
-      # .config/zsh/.zcompdump 會讓 mv 撞上 EBUSY,所以放到可整目錄持久化的
-      # .cache/zsh,效果一樣。
+      # compinit 與歷史存檔都以 rename() 寫入,單檔 bind 掛載會導致 EBUSY,
+      # 因此改放在整目錄持久化的 ~/.cache/zsh 與 ~/.local/state/zsh。
       completionInit = ''
         mkdir -p "$HOME/.cache/zsh"
         autoload -U compinit && compinit -d "$HOME/.cache/zsh/.zcompdump"
       '';
+
+      history.path = "${config.xdg.stateHome}/zsh/history";
 
       autosuggestion.enable = true;
       initContent = ''
@@ -77,7 +78,7 @@
       settings = {
         sync_frequency = 0;
         inline_height = 30;
-        # 不記錄無意義的指令,免得搜尋被淹掉。
+        # 過濾瑣碎指令與含敏感參數的指令。
         history_filter = [
           ''^\s+''
           ''^ls($|(\s+((-([a-zA-Z0-9]|-)+)|"(\.|[^/])[^"]*"|'(\.|[^/])*'|(\.|[^/\s-])[^\s]*))*\s*$)''
@@ -102,12 +103,9 @@
         directory = ".cache/zsh";
         mode = "0700";
       }
-    ];
-
-    files = [
       {
-        file = ".zsh_history";
-        mode = "0600";
+        directory = ".local/state/zsh";
+        mode = "0700";
       }
     ];
   };

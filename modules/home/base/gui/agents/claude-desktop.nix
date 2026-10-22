@@ -10,6 +10,6 @@ in
 {
   home.packages = [ llm.claude-desktop ];
 
-  # 桌面端的設定與登入態。
+  # 設定與登入狀態。
   persist'.directories = [ ".config/Claude" ];
 }

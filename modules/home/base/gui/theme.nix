@@ -1,6 +1,6 @@
 { pkgs, ... }:
 let
-  # Latte 是淺色,Frappé 與 Macchiato 介於兩者之間。
+  # 另有 latte(淺色)、frappe 與 macchiato。
   flavor = "mocha";
   accent = "mauve";
 
@@ -27,12 +27,12 @@ in
     };
   };
 
-  # Kvantum 只掃描 share/Kvantum 的子目錄,所以把主題目錄本身連結進去。
+  # Kvantum 只掃描設定目錄下的主題子目錄,因此直接連結主題目錄。
   xdg.configFile."Kvantum/catppuccin-${flavor}-${accent}".source =
     "${kvantumTheme}/share/Kvantum/catppuccin-${flavor}-${accent}";
 
-  # nixpkgs 沒有 Catppuccin 圖示主題,用 Papirus 深色版代替。
-  # GTK3 直接讀 extraConfig;GTK4 不用這個鍵,深色由 Noctalia 決定。
+  # 圖示用 Papirus-Dark(nixpkgs 沒有 Catppuccin 圖示)。GTK3 的深色偏好寫在
+  # extraConfig;GTK4 不讀這個鍵,深淺色由 Noctalia 決定。
   gtk = {
     enable = true;
 
@@ -59,9 +59,8 @@ in
     gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
   };
 
-  # dconf 存放 GTK 應用與 Nautilus 執行時寫入的外觀狀態(游標、視窗大小)。
-  # 本倉庫沒有宣告 dconf.settings,這些內容無法由 rebuild 重建,不登記就會
-  # 每次開機從零開始。
+  # GTK 應用與 Nautilus 執行時寫入 dconf 的狀態;未以 dconf.settings 宣告,
+  # 無法由設定重建。
   persist'.directories = [
     {
       directory = ".config/dconf";

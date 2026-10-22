@@ -1,6 +1,5 @@
-# 平臺入口。modules/default.nix 遇到帶 default.nix 的目錄就停止遞迴,所以
-# 整個 modules/home/ 只有在這裡明確列出才會載入;darwin 主機把 ./nixos 換
-# 成 ./darwin 即可,共用的 base 不必改。
+# Home Manager 的平臺入口。modules/default.nix 遇到含 default.nix 的目錄
+# 即停止遞迴,因此 modules/home/ 只經由這裡載入;darwin 主機改匯入 ./darwin。
 {
   vars,
   ...

@@ -16,7 +16,7 @@ in
       enable = true;
       # 首次一小時;重複違規逐次加長,最長一週,另加最多十分鐘隨機量。
       bantime = "1h";
-      # 十分鐘內五次才封禁;密碼登入已關,剩下的多是掃金鑰,三次太容易誤傷。
+      # 十分鐘內失敗五次才封禁;密碼登入已關閉,放寬次數以免誤封。
       maxretry = 5;
       bantime-increment = {
         enable = true;
@@ -26,7 +26,7 @@ in
       jails.DEFAULT.settings.findtime = "10m";
     };
 
-    # 封禁紀錄與計數,跨重啟才不會把累加歸零。
+    # 保留封禁紀錄,遞增的封禁時間才不會在重開機後歸零。
     preservation'.os.directories = [
       "/var/lib/fail2ban"
     ];

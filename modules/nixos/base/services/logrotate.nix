@@ -12,9 +12,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 進度檔在 tmpfs 上每次開機都消失,輪替會像「從未轉過」。
-    # 持久化整個目錄而非單一檔案:logrotate 以「寫暫存檔再 rename()」原子替換
-    # state 檔,單檔 bind mount 會讓 rename() 撞上 EBUSY。
+    # 保留輪替進度。持久化整個目錄:logrotate 以寫暫存檔再 rename() 更新
+    # 狀態檔,單檔 bind 掛載會導致 EBUSY。
     preservation'.os.directories = [
       "/var/lib/logrotate"
     ];

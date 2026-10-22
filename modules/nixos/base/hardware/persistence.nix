@@ -8,7 +8,7 @@ let
   cfg = config.hardware'.persistence;
   user = vars.username;
 
-  # Home Manager 經由 persist' 回報要保留的狀態;沒載入 HM 模組時此橋接為空。
+  # Home Manager 透過 persist' 回報的狀態;未載入 HM 時為空。
   persist =
     config.hm'.persist' or {
       directories = [ ];
@@ -33,7 +33,7 @@ in
     # preservation 以 initrd 的 tmpfiles 掛載,需要 systemd initrd。
     boot.initrd.systemd.enable = true;
 
-    # 持久分割區得在 initrd 就掛上,才讀得到 machine-id。
+    # initrd 就要掛上持久分割區,才能及早提供 machine-id。
     fileSystems."/persistent".neededForBoot = true;
 
     preservation = {
@@ -44,13 +44,12 @@ in
       ];
     };
 
-    # 基礎使用者狀態;各軟體模組與 Home Manager 回報的會附加在後。
+    # 基本使用者狀態,各模組與 Home Manager 回報的項目附加在後。
     preservation'.user.directories = [
-      # 不整體持久化 ~/.cache:幾乎全是可重建內容且成長很快(實測 3.6G,光
-      # 瀏覽器快取就 1.7G),留在 tmpfs 上重開機即清空。需要跨重啟的快取由
-      # 各模組自行登記。
+      # 不整體保留 ~/.cache:內容幾乎都可重建且成長很快,需要的快取由各模組
+      # 自行登記。
 
-      # 沒有專屬模組可歸的 GPG 金鑰環。鑰匙環見 home/base/gui/seahorse.nix。
+      # GPG 金鑰環;GNOME 鑰匙圈見 home/base/gui/seahorse.nix。
       {
         directory = ".gnupg";
         mode = "0700";
@@ -70,7 +69,7 @@ in
         "/var/lib/lastlog"
         "/var/lib/systemd"
         {
-          # 動態使用者的 systemd 狀態(StateDirectory 服務)。
+          # DynamicUser 服務的 StateDirectory。
           directory = "/var/lib/private";
           mode = "0700";
         }
@@ -80,7 +79,7 @@ in
         }
         "/var/log"
         {
-          # 放持久卷才不會吃掉根 tmpfs;世界可寫,因此比照 /tmp 加 nosuid 與 nodev。
+          # 放在持久卷以免佔用根 tmpfs;所有人可寫,比照 /tmp 加上 nosuid、nodev。
           directory = "/var/tmp";
           mode = "1777";
           mountOptions = [
@@ -98,20 +97,17 @@ in
       ];
     };
 
-    # preservation 掛載的 /var/lib/lastlog 會遮住 lastlog2 套件的 tmpfiles 規則,
-    # 換成空檔避免衝突。
+    # 持久化的 /var/lib/lastlog 與 lastlog2 的 tmpfiles 規則衝突,以空檔覆蓋。
     environment.etc."tmpfiles.d/lastlog2-tmpfiles.conf".text = ''
       # Managed by Preservation.
     '';
 
-    # /var/tmp 在持久卷上,不清理會跨重啟累積(systemd 預設只清 30 天前的)。
-    # D! 在開機時清空內容並保留目錄與權限,等同 boot.tmp.cleanOnBoot。
+    # /var/tmp 在持久卷上,開機時清空(systemd 預設只清 30 天前的檔案)。
     systemd.tmpfiles.rules = [
       "D! /var/tmp 1777 root root"
     ];
 
-    # 用 bind 掛載配方時 commit 式改寫只適用於 symlink 配方,該服務必然失敗,
-    # 對本配置無關緊要,予以抑制。
+    # bind 掛載配方下 systemd-machine-id-commit 必然失敗且無作用,予以抑制。
     systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
   };
 }

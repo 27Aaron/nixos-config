@@ -4,8 +4,7 @@
   ...
 }:
 let
-  # 遞迴收集此目錄下的所有模組:普通 .nix 檔案,
-  # 以及帶有自身 default.nix 的子目錄。
+  # 遞迴收集模組:一般 .nix 檔,以及含 default.nix 的子目錄(不再深入)。
   listModules =
     dir:
     lib.pipe (builtins.readDir dir) [

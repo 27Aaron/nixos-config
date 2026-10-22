@@ -46,6 +46,6 @@ in
     };
   };
 
-  # xdg-open 靠它讓 mimeApps 的關聯生效。
+  # 提供 xdg-open。
   home.packages = [ pkgs.xdg-utils ];
 }

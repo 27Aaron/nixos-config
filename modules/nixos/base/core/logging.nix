@@ -30,14 +30,13 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 上游預設上限是檔案系統的 10%,而這裡 bind 掛載自持久卷,等於允許數十 GB。
+    # 上游預設上限為檔案系統的 10%;/var/log 位於持久卷,等同數十 GB。
     services.journald.settings.Journal = {
       SystemMaxUse = cfg.journalMaxUse;
       RuntimeMaxUse = cfg.journalRuntimeMaxUse;
     };
 
-    # core dump 可能含金鑰,除上限外再由下方 tmpfiles 的 D! 於開機時清空,
-    # 只留當次開機的當機現場。
+    # core dump 可能含金鑰:除了限制大小,開機時也一併清空,只保留本次開機的紀錄。
     systemd.coredump.settings.Coredump.MaxUse = cfg.coredumpMaxUse;
 
     systemd.tmpfiles.rules = [

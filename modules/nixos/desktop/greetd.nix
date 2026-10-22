@@ -42,7 +42,7 @@ in
           cfg.sessionCommand != null
         ) "${lib.getExe pkgs.tuigreet} --remember --time --cmd ${cfg.sessionCommand}";
 
-        # 條件與上方斷言一致,缺指令時由斷言報錯,不在這裡組出無效設定。
+        # 缺少 sessionCommand 時交由上方斷言報錯。
         initial_session = lib.mkIf (cfg.autoLogin && cfg.sessionCommand != null) {
           command = cfg.sessionCommand;
           user = vars.username;

@@ -1,4 +1,4 @@
-# delta 只做差異渲染,不接管畫面所以留在 core;lazygit 在 tui。
+# delta 只渲染差異輸出,屬於 core;lazygit 在 tui。
 {
   pkgs,
   vars,

@@ -22,7 +22,7 @@ in
       sessionVariables.SOPS_AGE_KEY_FILE = "/persistent${keyFile}";
     };
 
-    # 根目錄是 tmpfs,私鑰得在 initrd 掛載持久分割區時就位,否則誰都解不開。
+    # 根目錄是 tmpfs,私鑰須在 initrd 階段就位,解密時才找得到。
     preservation'.os.directories = [
       {
         directory = "/var/lib/sops-nix";
