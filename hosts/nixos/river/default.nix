@@ -29,7 +29,6 @@
   services' = {
     networkmanager.enable = true;
     openssh.enable = true;
-    sops.enable = true;
     dae.enable = true;
     logrotate.enable = true;
     vnstat.enable = true;

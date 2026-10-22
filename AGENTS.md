@@ -18,7 +18,7 @@ modules/
 ├── base/core/            # always on, shared by NixOS and nix-darwin: aliases, fish, nix settings
 ├── darwin/               # reserved: nix-darwin system modules
 ├── nixos/
-│   ├── base/core/        # always on: users, hostname, locale, firewall, logging, nix and nh, ssh client fix, Home Manager
+│   ├── base/core/        # always on: users and sops, hostname, locale, firewall, logging, nix and nh, ssh client fix, Home Manager
 │   ├── base/hardware/    # hardware'.*: disko, persistence, boot/, amdgpu, bluetooth, brightness, yubikey
 │   ├── base/services/    # services'.*: daemons any NixOS host may run, servers included
 │   ├── desktop/          # desktop'.*: greetd, niri, noctalia, fonts, file manager, trash, pipewire, input-method/, power/
@@ -69,7 +69,7 @@ Host files are ordinary NixOS modules:
 
 ## Security
 
-- Credentials and secrets belong in the private `nix-secrets` repository and reach the system through sops-nix. `inputs.secrets` is copied into the world-readable `/nix/store`, so read only encrypted files, or files with nothing sensitive in them (like the SSH host aliases), from it at evaluation time. `vars/` holds non-secret values only; the password hash there is a known exception tracked by a TODO, so do not add more.
+- Credentials and secrets belong in the private `nix-secrets` repository and reach the system through sops-nix. `inputs.secrets` is copied into the world-readable `/nix/store`, so read only encrypted files, or files with nothing sensitive in them (like the SSH host aliases), from it at evaluation time. `vars/` holds non-secret values only. Account passwords come from `users/password.yaml` in nix-secrets, decrypted with `neededForUsers` before users are created; never put a password or hash in the configuration. sops is a core module because every host needs it for that.
 - Do not add users to `nix.settings.trusted-users`: a trusted user can disable signature checks and import arbitrary store paths, which amounts to passwordless root. Only `@wheel` may connect to the daemon (`allowed-users`).
 - Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
 - `security.sudo.execWheelOnly` stays off: the upstream btrbk module runs as its own user and calls `btrfs` through sudo rules.
