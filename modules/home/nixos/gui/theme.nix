@@ -2,14 +2,14 @@
   config,
   lib,
   pkgs,
+  vars,
   ...
 }:
 let
   cfg = config.gui'.theme;
 
-  # 另有 latte(淺色)、frappe 與 macchiato。
-  flavor = "mocha";
-  accent = "mauve";
+  flavor = vars.appearance.catppuccin.dark;
+  inherit (vars.appearance.catppuccin) accent;
 
   gtkTheme = pkgs.catppuccin-gtk.override {
     variant = flavor;
@@ -62,7 +62,7 @@ in
       };
 
       font = {
-        name = "LXGW WenKai TC";
+        name = vars.appearance.fonts.sans;
         size = 12;
       };
 

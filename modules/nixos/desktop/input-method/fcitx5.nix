@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  vars,
   ...
 }:
 let
@@ -60,8 +61,8 @@ in
             Theme = "mellow-wechat";
             DarkTheme = "mellow-wechat-dark";
             UseDarkTheme = true;
-            Font = "LXGW WenKai 12";
-            MenuFont = "LXGW WenKai 12";
+            Font = "${vars.appearance.fonts.sansSimplified} 12";
+            MenuFont = "${vars.appearance.fonts.sansSimplified} 12";
           };
         };
       };
