@@ -41,3 +41,4 @@ nix-trust =
 - `caches`：信任的二進位快取與簽章金鑰。每一個都能把任意 store 路徑送進系統。
 - `privateDirs`、`privateFiles`、`privateSystemDirs`：有持久化就必須只限本人讀取的路徑。
 - `kernelSysctl`、`blockedModules`：每臺主機的核心參數基準與禁止載入的模組。
+- `sandboxedApps`：只能以 nixpak 沙箱版本安裝的程式。

@@ -80,6 +80,11 @@ let
     "tipc"
   ];
 
+  # 必須包在 nixpak 沙箱裡安裝的程式,值為比對套件名稱的正規表示式。
+  sandboxedApps = {
+    nagram = "nagram.*";
+  };
+
   sorted = list: lib.sort lib.lessThan (lib.unique list);
 in
 {
@@ -217,6 +222,20 @@ in
         inline = false;
         hashedPasswordFile = "/run/secrets-for-users/hashedPassword";
       });
+    };
+
+  # 這些程式只能以 nixpak 沙箱版本安裝;換回原始套件時就會失敗。
+  sandboxed-apps =
+    { config, ... }:
+    let
+      names = map (p: p.name or "") config.home-manager.users.${vars.username}.home.packages;
+      unsandboxed =
+        pattern:
+        lib.filter (name: builtins.match pattern name != null && !lib.hasPrefix "nixpak-" name) names;
+    in
+    {
+      expr = lib.mapAttrs (_: unsandboxed) sandboxedApps;
+      expected = lib.mapAttrs (_: _: [ ]) sandboxedApps;
     };
 
   # btrbk 以自己的帳號經 sudo 呼叫 btrfs,開啟 execWheelOnly 會讓快照失敗。

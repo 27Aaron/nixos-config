@@ -7,6 +7,7 @@ This repository is a Nix flake for NixOS hosts using a "tmpfs as root" layout: t
 ```text
 flake.nix                 # inputs and outputs
 lib/default.nix           # listModules: the recursive module collector
+lib/nixpak/               # shared nixpak modules for sandboxed desktop apps (GUI, network)
 hosts/
 ├── default.nix           # host discovery: every hosts/nixos/<name>/ becomes nixosConfigurations.<name>
 ├── nixos/<name>/         # one directory per NixOS host
@@ -77,6 +78,7 @@ Host files are ordinary NixOS modules:
 - Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
 - `security.sudo.execWheelOnly` stays off: the upstream btrbk module runs as its own user and calls `btrfs` through sudo rules.
 - The kernel baseline in `core/kernel-hardening.nix` uses `lib.mkDefault`, so a host overrides a value with a plain definition, never `mkForce`. Keep user namespaces on (the Nix build sandbox needs them), leave `security.protectKernelImage` off (it disables hibernation), and keep `kernel.kptr_restrict` at 1 (dae's eBPF library reads `/proc/kallsyms`). A host that needs a module from `core'.kernel.blockedModules`, such as an IPsec VPN, removes it there.
+- Sandboxed desktop apps use the nixpak modules in `lib/nixpak/` and are listed in `sandboxedApps` in `tests/security.nix`. Bind only the paths an app needs: never the whole `$XDG_RUNTIME_DIR` (it holds the niri control socket, which can spawn programs, and the SSH and GPG agents) and never the unfiltered session bus (systemd's user manager can run commands outside the sandbox). An FHS-packaged app can run inside nixpak; the outer sandbox limits what the inner FHS environment sees.
 - Keep trust prompts on. Do not set Zed's `session.trust_all_worktrees`, disable VS Code's workspace trust, or alias coding agents to permission-bypass modes; a cloned repository must not be able to run code just by being opened.
 - Inputs that do not follow `nixpkgs` (currently `fcitx5-vinput`, for its binary cache) carry their own nixpkgs and only pick up security fixes when upstream updates its lock.
 
