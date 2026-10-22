@@ -18,7 +18,6 @@ let
       specialArgs = {
         hostName = name;
         inherit inputs vars;
-        secrets = inputs.secrets;
       };
       modules =
         listModules ../modules/base

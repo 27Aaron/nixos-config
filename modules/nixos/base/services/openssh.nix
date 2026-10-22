@@ -9,6 +9,11 @@ in
 {
   options.services'.openssh = {
     enable = lib.mkEnableOption "OpenSSH daemon";
+
+    rootLogin = lib.mkEnableOption ''
+      public-key root login, for hosts deployed remotely with
+      `just deploy <target> root@<host>`
+    '';
   };
 
   config = lib.mkIf cfg.enable {
@@ -25,8 +30,9 @@ in
       ];
 
       settings = {
-        # root 用於遠端部署。
-        PermitRootLogin = lib.mkDefault "prohibit-password";
+        # 只有遠端部署的主機才開放 root;其餘主機持有金鑰也只能以一般使用者
+        # 登入,提權仍需 sudo 密碼。
+        PermitRootLogin = lib.mkDefault (if cfg.rootLogin then "prohibit-password" else "no");
         PasswordAuthentication = lib.mkDefault false;
         # 一併關閉,確保只能以公鑰登入。
         KbdInteractiveAuthentication = lib.mkDefault false;

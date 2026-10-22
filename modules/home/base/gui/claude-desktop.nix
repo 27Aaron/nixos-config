@@ -18,6 +18,11 @@ in
     home.packages = [ claude-desktop ];
 
     # 設定與登入狀態。
-    persist'.directories = [ ".config/Claude" ];
+    persist'.directories = [
+      {
+        directory = ".config/Claude";
+        mode = "0700";
+      }
+    ];
   };
 }

@@ -12,7 +12,7 @@ let
 in
 {
   options.desktop'.fonts = {
-    enable = lib.mkEnableOption "System fonts";
+    enable = lib.mkEnableOption "the system fonts and fontconfig defaults";
   };
 
   config = lib.mkIf cfg.enable {

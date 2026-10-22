@@ -23,7 +23,7 @@ build target=host:
 switch target=host:
     @nh os switch path:. -H {{target}}
 
-# 部署遠端 NixOS 主機,於本機建置。
+# 部署遠端 NixOS 主機,於本機建置;以 root 連入,目標須開啟 services'.openssh.rootLogin。
 deploy target remote:
     @nixos-rebuild switch --flake .#{{target}} --target-host {{remote}}
 

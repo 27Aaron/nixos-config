@@ -40,6 +40,13 @@ in
     # 以避開舊選項 boot.initrd.network.ssh.shell 的警告。
     boot.initrd.systemd.users.root.shell = "/bin/systemd-tty-ask-password-agent";
 
-    preservation'.os.directories = [ "/etc/secrets/initrd" ];
+    # initrd 的主機私鑰會以明文附加到未加密 ESP 上的 initrd,必須與系統的
+    # 主機金鑰分開,不可共用。
+    preservation'.os.directories = [
+      {
+        directory = "/etc/secrets/initrd";
+        mode = "0700";
+      }
+    ];
   };
 }

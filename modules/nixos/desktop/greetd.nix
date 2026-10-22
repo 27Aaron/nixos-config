@@ -10,7 +10,7 @@ let
 in
 {
   options.desktop'.greetd = {
-    enable = lib.mkEnableOption "Greetd login manager with Tuigreet";
+    enable = lib.mkEnableOption "the greetd login manager with tuigreet";
 
     sessionCommand = lib.mkOption {
       type = lib.types.nullOr lib.types.str;

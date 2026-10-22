@@ -51,4 +51,18 @@ NixOS 主機由 `nixos/base/core/home-manager.nix` 自動收集 `base/` 與 `nix
 回報要保留的路徑（相對於家目錄）。其他平臺不讀取這兩個選項，宣告了也沒有影響。
 
 `~/.cache` 不整體保留，只有真正需要的快取才逐項登記，而且登記在產生它的模組裡，
-例如 go-build 在 `cli/toolchain.nix`、縮圖在 `nixos/desktop/file-manager.nix`。
+例如 go-build 在 `base/cli/toolchain.nix`。系統層模組不經過 `persist'`，直接寫
+`preservation'.user`，例如縮圖在 `modules/nixos/desktop/file-manager.nix`。
+
+含憑證、登入狀態或歷史紀錄的目錄一律加上 `mode = "0700"`：
+
+```nix
+persist'.directories = [
+  {
+    directory = ".config/gh";
+    mode = "0700";
+  }
+];
+```
+
+preservation 每次開機都會把目錄權限設回宣告的值，未宣告時是 `0755`。

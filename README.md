@@ -12,6 +12,31 @@
   </a>
 </p>
 
+## Overview
+
+A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
+
+- **Ephemeral root:** `/` is a tmpfs wiped on every boot; only state registered with [preservation](https://github.com/nix-community/preservation) survives.
+- **Storage:** LUKS2 with FIDO2 unlock, Btrfs subvolumes, btrbk snapshots of the persistent volume, and an encrypted swapfile for hibernation.
+- **Desktop:** niri with the Noctalia shell, greetd, PipeWire, and Fcitx5 with Rime.
+- **Secrets:** sops-nix, with the encrypted files kept in a separate private repository.
+- **Modules:** collected automatically and off by default; a host only flips switches.
+
+## Hosts
+
+| Host | Machine | Role |
+|---|---|---|
+| `river` | MECHREVO WUJIE 14XA, Ryzen 7 8845HS | laptop, niri desktop |
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` entry |
+| [`modules/`](modules/README.md) | system and Home Manager modules, grouped by where they run |
+| `vars/` | shared non-secret values such as the user name and SSH public keys |
+| `lib/` | the module collector |
+
 ## References
 
 - [Misterio77/Foundry](https://github.com/Misterio77/Foundry)

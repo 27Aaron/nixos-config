@@ -10,7 +10,7 @@ let
 in
 {
   options.desktop'.niri = {
-    enable = lib.mkEnableOption "Niri desktop environment";
+    enable = lib.mkEnableOption "the niri Wayland compositor";
   };
 
   config = lib.mkIf cfg.enable {

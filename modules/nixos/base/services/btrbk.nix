@@ -23,6 +23,8 @@ in
       }
     ];
 
+    # 上游模組以 btrbk 帳號執行,經由 sudo 規則呼叫 btrfs;因此不能開啟
+    # security.sudo.execWheelOnly,否則快照會失敗。
     services.btrbk = {
       # 降低清理舊快照時的優先權,開機補跑時才不會拖慢系統。
       niceness = 15;
