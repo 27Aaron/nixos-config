@@ -20,6 +20,7 @@
     file-manager.enable = true;
     trash.enable = true;
     steam.enable = true;
+    decky-loader.enable = true;
     pipewire.enable = true;
     fcitx5.enable = true;
     vinput = {

@@ -52,6 +52,7 @@ let
   privateSystemDirs = [
     "/var/lib/bluetooth"
     "/etc/NetworkManager/system-connections"
+    "/var/lib/decky-loader"
   ];
 
   # 每臺主機的核心參數基準與禁止載入的模組。
