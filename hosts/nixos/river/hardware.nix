@@ -15,7 +15,7 @@
 
   # 開機:載入器、核心與 initrd。systemd initrd 由 disko 與 persistence
   # 模組啟用。
-  hardware'.systemd-boot.enable = true;
+  hardware'.lanzaboote.enable = true;
 
   boot = {
     # Motorcomm YT6801 乙太網路需要 Linux 7.0 以上。
