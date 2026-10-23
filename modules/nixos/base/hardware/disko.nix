@@ -121,6 +121,12 @@ in
       systemd-cryptenroll, as the comment in this module describes
     '';
 
+    luks.tpm2.enable = lib.mkEnableOption ''
+      TPM2 unlocking for the LUKS partition, tried before FIDO2 and the passphrase.
+      Like FIDO2, this only lets the initrd use a key that is already enrolled, bound
+      to PCR 7, so it requires Secure Boot through hardware'.lanzaboote
+    '';
+
     bios.enable = lib.mkEnableOption "a BIOS boot partition for GRUB";
   };
 
@@ -129,6 +135,15 @@ in
       {
         assertion = cfg.luks.fido2.enable -> cfg.luks.enable;
         message = "hardware'.disko.luks.fido2.enable requires hardware'.disko.luks.enable.";
+      }
+      {
+        assertion = cfg.luks.tpm2.enable -> cfg.luks.enable;
+        message = "hardware'.disko.luks.tpm2.enable requires hardware'.disko.luks.enable.";
+      }
+      {
+        # 沒有 Secure Boot 時,PCR 7 不會因換掉 initrd 而改變,TPM 會照樣交出金鑰。
+        assertion = cfg.luks.tpm2.enable -> config.hardware'.lanzaboote.enable;
+        message = "hardware'.disko.luks.tpm2.enable requires Secure Boot through hardware'.lanzaboote.";
       }
     ];
 
@@ -144,6 +159,13 @@ in
     # 不接鍵盤的主機改為只要觸摸、不要求 PIN(見 WORKAROUNDS.md 的 WA-022);
     # PIN 的要求記在 LUKS token 裡,開機時自動判斷,設定不必改:
     #   sudo systemd-cryptenroll --fido2-device=auto --fido2-with-client-pin=no /dev/disk/by-partlabel/disk-main-luks
+    #
+    # TPM2 只綁 PCR 7(Secure Boot 狀態與驗證開機程式的憑證),系統更新不必重新登記:
+    #   sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
+    # 不加 --tpm2-with-pin=yes 時開機不需任何秘密即可解鎖,主機就不能自動登入,
+    # 睡眠前也必須鎖定工作階段。
+    # 更換 Secure Boot 金鑰後 PCR 7 會變,需加上 --wipe-slot=tpm2 重新登記。
+    # systemd-cryptsetup 依序嘗試 TPM2、FIDO2,最後才詢問密碼。
     # LUKS 密碼槽位保留作備援,金鑰遺失時仍可解鎖。
     boot.initrd = lib.mkIf cfg.luks.enable {
       systemd.enable = true;
@@ -212,6 +234,7 @@ in
                           "same-cpu-crypt"
                           "submit-from-crypt-cpus"
                         ]
+                        ++ lib.optionals cfg.luks.tpm2.enable [ "tpm2-device=auto" ]
                         ++ lib.optionals cfg.luks.fido2.enable [
                           "fido2-device=auto"
                           # 未插鑰匙時 5 秒後改用密碼,預設要等 30 秒。

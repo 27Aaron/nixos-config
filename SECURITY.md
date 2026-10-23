@@ -16,6 +16,7 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 | sops decrypts only with the user's SSH key, no key file | `modules/nixos/base/core/sops.nix`, `modules/darwin/core/sops.nix` | `sops-key` |
 | systemd-boot editor off (also under lanzaboote), immutable users | `modules/nixos/base/hardware/boot/`, `users.nix` | `boot-and-accounts` |
 | Secure Boot with owner-generated keys through lanzaboote; keys persisted as `0700` (river) | `modules/nixos/base/hardware/boot/lanzaboote.nix` | `boot-and-accounts`, `private-state` |
+| TPM2 disk unlocking only on Secure Boot hosts, bound to PCR 7 | `modules/nixos/base/hardware/disko.nix` | module assertion |
 | Kernel sysctl baseline, blocked modules, user namespaces kept, hibernation compatible | `modules/nixos/base/core/kernel-hardening.nix` | `kernel` |
 | Editor and agent trust prompts on | `modules/home/nixos/gui/editors/`, `modules/home/*/tui/agents/` | `editor-and-agent-trust` |
 | Credential and history directories persisted as `0700` | each module's `persist` entries | `private-state` |
@@ -113,6 +114,16 @@ Add `--microsoft` to `enroll-keys` if the host must boot Microsoft-signed media,
 sudo nix shell nixpkgs#tpm2-tools -c sh -c 'tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements' | grep -c EV_EFI_BOOT_SERVICES_DRIVER
 sudo nix shell nixpkgs#tpm2-tools -c sh -c 'tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements' | grep -c EventType
 ```
+
+Once Secure Boot is on, a host with `hardware'.disko.luks.tpm2` can unlock its disk with the TPM. Bind the key to PCR 7 only, which records the Secure Boot state and the certificate that verified the boot loader, so system updates need no re-enrollment:
+
+```bash
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
+```
+
+Without `--tpm2-with-pin=yes`, the disk unlocks at boot with no secret, so the host must not log in automatically and must lock the session before suspend and hibernation. Record such a host in `WORKAROUNDS.md`.
+
+The initrd tries TPM2 first, then FIDO2, then the passphrase. After changing the Secure Boot keys, PCR 7 changes: re-enroll with `--wipe-slot=tpm2` added. Keep the passphrase slot as a fallback.
 
 The NixOS installer is not signed with these keys; disable Secure Boot in the firmware to boot it for recovery. For a host that fails signature checks after an interrupted install, see [lanzaboote's troubleshooting guide](https://github.com/nix-community/lanzaboote/blob/v1.2.0/docs/explanation/troubleshooting.md).
 
