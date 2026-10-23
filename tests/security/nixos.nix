@@ -3,17 +3,16 @@ let
   vars = import ../../vars;
 
   # 各主機對外開放的連接埠。服務新開了埠,要在這裡登記才能通過測試。
+  # 每臺都開 sshd 與 avahi 的 mDNS。
   openPorts = {
-    # sshd。
     river = {
       tcp = [ 233 ];
-      udp = [ ];
+      udp = [ 5353 ];
     };
     router = {
       tcp = [ 233 ];
-      udp = [ ];
+      udp = [ 5353 ];
     };
-    # sshd 與 avahi 的 mDNS。
     elaina = {
       tcp = [ 233 ];
       udp = [ 5353 ];

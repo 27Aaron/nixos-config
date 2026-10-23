@@ -14,6 +14,7 @@
   };
 
   services' = {
+    avahi.enable = true;
     # 區網裝置以這臺為閘道,一併經 dae 分流。
     dae = {
       enable = true;
