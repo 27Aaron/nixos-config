@@ -1,11 +1,15 @@
 {
   config,
   lib,
+  osConfig,
   pkgs,
   ...
 }:
 let
   cfg = config.gui.karabiner;
+
+  # nix-darwin 會把 cask 正規化成 attrset,因此比對 name 欄位。
+  installed = lib.any (c: (c.name or c) == "karabiner-elements") osConfig.homebrew.casks;
 
   generatedConfig = builtins.toFile "karabiner.json" (
     builtins.toJSON {
@@ -87,8 +91,11 @@ let
   );
 in
 {
-  # Karabiner-Elements 本身由 programs'.homebrew 的 cask 安裝,這裡只管設定檔。
-  options.gui.karabiner.enable = lib.mkEnableOption "the Karabiner-Elements configuration";
+  # Karabiner-Elements 本身由 programs'.homebrew 的 cask 安裝,這裡只管設定檔;
+  # cask 清單裡有它就預設啟用,主機不必另外打開。
+  options.gui.karabiner.enable = lib.mkEnableOption "the Karabiner-Elements configuration" // {
+    default = installed;
+  };
 
   config = lib.mkIf cfg.enable {
     # Karabiner 的 GUI 會改寫設定檔,唯讀的 store 連結會讓它無法儲存;

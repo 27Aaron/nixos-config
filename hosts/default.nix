@@ -23,6 +23,6 @@ let
     };
 in
 {
-  # hosts/nixos/<名稱>/ 成為 nixosConfigurations.<名稱>;hosts/darwin/ 預留給 nix-darwin。
+  # hosts/nixos/<名稱>/ 成為 nixosConfigurations.<名稱>;hosts/darwin/ 尚未接上 nix-darwin。
   nixosConfigurations = lib.mapAttrs mkNixos (hostsIn ./nixos);
 }
