@@ -14,7 +14,7 @@ Temporary workarounds, version pins and accepted security exceptions, each with 
 
 | ID | What and where | Why | Remove when | Added |
 |---|---|---|---|---|
-| WA-001 | `fcitx5-vinput` pinned to tag `v2.4.2` and not following `nixpkgs` — `flake.nix`, used by `modules/nixos/desktop/input-method/vinput.nix` | The `fcitx5-vinput.cachix.org` binaries are built against upstream's own lock; following `nixpkgs` would compile sherpa-onnx locally. The cost is a second nixpkgs that only gets security fixes when upstream updates its lock, and a trusted binary cache. | The package reaches nixpkgs, or a local build becomes acceptable; then follow `nixpkgs` and drop the cache from `modules/base/core/nix.nix` and `tests/security.nix`. Bump the tag deliberately until then. | 2026-10-18 (#152) |
+| WA-001 | `fcitx5-vinput` pinned to tag `v2.4.2` and not following `nixpkgs` — `flake.nix`, used by `modules/nixos/desktop/input-method/vinput.nix` | The `fcitx5-vinput.cachix.org` binaries are built against upstream's own lock; following `nixpkgs` would compile sherpa-onnx locally. The cost is a second nixpkgs that only gets security fixes when upstream updates its lock, and a trusted binary cache. | The package reaches nixpkgs, or a local build becomes acceptable; then follow `nixpkgs` and drop the cache from `modules/base/core/nix.nix` and `tests/security/shared.nix`. Bump the tag deliberately until then. | 2026-10-18 (#152) |
 
 ## Workarounds
 
