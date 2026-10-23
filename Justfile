@@ -1,6 +1,9 @@
 # 預設主機為本機的主機名稱。
 host := env("HOST", `hostname -s`)
 
+# nh 依平臺分成 os 與 darwin 子命令。
+nh_platform := if os() == "macos" { "darwin" } else { "os" }
+
 # 列出所有可用的配方。
 default:
     @just --list
@@ -17,11 +20,11 @@ check:
 
 # 建置主機設定,不啟用;顯示與目前系統的差異,結果連結至 ./result。
 build target=host:
-    @nh os build path:. -H {{target}} --out-link result
+    @nh {{nh_platform}} build path:. -H {{target}} --out-link result
 
 # 建置並啟用主機設定。
 switch target=host:
-    @nh os switch path:. -H {{target}}
+    @nh {{nh_platform}} switch path:. -H {{target}}
 
 # 部署遠端 NixOS 主機,於本機建置;以 root 連入,目標須開啟 services'.openssh.rootLogin。
 deploy target remote:

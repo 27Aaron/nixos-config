@@ -6,7 +6,7 @@
 modules/
 ├── base/      # NixOS 與 nix-darwin 系統層共用
 ├── nixos/     # 只有 NixOS
-├── darwin/    # 只有 nix-darwin,尚無主機載入
+├── darwin/    # 只有 nix-darwin
 └── home/      # Home Manager,使用者層
 ```
 

@@ -44,7 +44,8 @@ Every input below can change what runs on the machine. Those that provide NixOS 
 | Input | Provides | Runs as | Tracks |
 |---|---|---|---|
 | `nixpkgs` | everything | root and user | `nixos-unstable` |
-| `home-manager` | NixOS module, user environment | root (activation service) and user | default branch |
+| `nix-darwin` | nix-darwin system, macOS defaults and Homebrew activation | root | default branch |
+| `home-manager` | NixOS and nix-darwin module, user environment | root (activation service) and user | default branch |
 | `disko` | NixOS module (file systems) | root | default branch |
 | `preservation` | NixOS module (bind mounts in the initrd) | root | default branch |
 | `sops-nix` | NixOS module, secret decryption | root | default branch |

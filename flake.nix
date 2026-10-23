@@ -7,6 +7,11 @@
       # url = "github:NixOS/nixpkgs/nixos-unstable-small";
     };
 
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -92,7 +97,7 @@
         }
       );
 
-      inherit (import ./hosts { inherit inputs; }) nixosConfigurations;
+      inherit (import ./hosts { inherit inputs; }) nixosConfigurations darwinConfigurations;
 
       checks = forAllSystems (system: {
         eval-tests = import ./tests {
