@@ -15,7 +15,7 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 | No password or hash in the configuration; passwords decrypted before users are created | `modules/nixos/base/core/users.nix` | `password-source` |
 | sops decrypts only with the user's SSH key, no key file | `modules/nixos/base/core/sops.nix`, `modules/darwin/core/sops.nix` | `sops-key` |
 | systemd-boot editor off (also under lanzaboote), immutable users | `modules/nixos/base/hardware/boot/`, `users.nix` | `boot-and-accounts` |
-| Secure Boot with owner-generated keys through lanzaboote; keys persisted as `0700` (river) | `modules/nixos/base/hardware/boot/lanzaboote.nix` | `boot-and-accounts`, `private-state` |
+| Secure Boot with owner-generated keys through lanzaboote; keys persisted as `0700` (river, elaina) | `modules/nixos/base/hardware/boot/lanzaboote.nix` | `boot-and-accounts`, `private-state` |
 | TPM2 disk unlocking only on Secure Boot hosts, bound to PCR 7 | `modules/nixos/base/hardware/disko.nix` | module assertion |
 | Kernel sysctl baseline, blocked modules, user namespaces kept, hibernation compatible | `modules/nixos/base/core/kernel-hardening.nix` | `kernel` |
 | Editor and agent trust prompts on | `modules/home/nixos/gui/editors/`, `modules/home/*/tui/agents/` | `editor-and-agent-trust` |
