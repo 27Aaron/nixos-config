@@ -4,20 +4,20 @@
 
 ## Repository layout
 
-| 路徑 | 內容 |
-|---|---|
-| [`flake.nix`](flake.nix) | 輸入與輸出 |
-| [`lib/`](lib/) | 模組收集器與共用的 nixpak 沙箱模組 |
-| [`hosts/`](hosts/) | 每臺主機一個目錄，自動探索 |
-| [`modules/`](modules/) | 所有可重用的模組，依能在哪裡執行分層 |
-| [`modules/base/`](modules/base/) | NixOS 與 nix-darwin 共用的系統模組 |
-| [`modules/nixos/`](modules/nixos/) | NixOS 系統模組：[`base/`](modules/nixos/base/)、[`desktop/`](modules/nixos/desktop/)、[`server/`](modules/nixos/server/) |
-| [`modules/darwin/`](modules/darwin/) | nix-darwin 系統模組 |
-| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/)、[`nixos/`](modules/home/nixos/)、[`darwin/`](modules/home/darwin/) 可開關 |
-| [`tests/`](tests/) | `just check` 執行的 eval 測試 |
-| [`vars/`](vars/) | 共用的非機密值 |
-| [`SECURITY.md`](SECURITY.md) | 安全控制與對應測試、flake 輸入、機密與更新流程 |
-| [`WORKAROUNDS.md`](WORKAROUNDS.md) | 暫時性的權宜做法、版本釘選與安全例外 |
+```text
+flake.nix          # 輸入與輸出
+lib/               # 模組收集器與共用的 nixpak 沙箱模組
+hosts/             # 每臺主機一個目錄，自動探索
+modules/
+├── base/          # NixOS 與 nix-darwin 共用的系統模組
+├── nixos/         # NixOS 系統模組：base/、desktop/、server/
+├── darwin/        # nix-darwin 系統模組
+└── home/          # Home Manager 模組：base/ 一律生效；shared/、nixos/、darwin/ 可開關
+tests/             # `just check` 執行的 eval 測試
+vars/              # 共用的非機密值
+SECURITY.md        # 安全控制與對應測試、flake 輸入、機密與更新流程
+WORKAROUNDS.md     # 暫時性的權宜做法、版本釘選與安全例外
+```
 
 每個主要目錄都有一份 `README.md`，說明哪些東西該放在那裡。新增檔案前先讀它，變更讓它過時的時候也要一併更新。
 
