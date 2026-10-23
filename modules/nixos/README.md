@@ -19,5 +19,4 @@ nixos/
 
 ## 持久化
 
-根目錄是 tmpfs，只有登記過的路徑會留下。系統狀態登記在 `preservation'.os`，使用者狀態登記在
-`preservation'.user`。含金鑰、憑證或私人資料的目錄加上 `mode = "0700"`。
+根目錄是 tmpfs，只有登記過的路徑會留下。系統狀態登記在 `preservation'.os`，使用者狀態登記在 `preservation'.user`。含金鑰、憑證或私人資料的目錄加上 `mode = "0700"`。

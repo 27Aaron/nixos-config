@@ -10,8 +10,7 @@ modules/
 └── home/      # Home Manager,使用者層
 ```
 
-模組由 `lib/default.nix` 自動收集，不必手動匯入。子目錄若含 `default.nix`，只載入該檔。
-NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/shared/`、`home/nixos/`；nix-darwin 主機則把 `nixos/`、`home/nixos/` 換成 `darwin/`、`home/darwin/`。
+模組由 `lib/default.nix` 自動收集，不必手動匯入；子目錄若含 `default.nix`，只載入該檔。NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/shared/`、`home/nixos/`；nix-darwin 主機則以 `darwin/`、`home/darwin/` 取代 `nixos/`、`home/nixos/`。
 
 ## 放在哪裡
 
@@ -26,5 +25,4 @@ NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/shared/`、`
 
 ## 開關
 
-`core/` 目錄與 `home/base/` 的模組一律生效，沒有開關，只放每臺機器都需要的東西。
-其他模組預設關閉，由主機在 `default.nix` 打開，伺服器因此只會帶入自己開啟的功能。
+`core/` 目錄與 `home/base/` 的模組一律生效、沒有開關，只放每臺機器都需要的東西。其他模組預設關閉，由主機在 `default.nix` 打開，所以伺服器只會帶入自己開啟的功能。
