@@ -11,7 +11,7 @@ modules/
 ```
 
 模組由 `lib/default.nix` 自動收集，不必手動匯入。子目錄若含 `default.nix`，只載入該檔。
-NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/nixos/`；nix-darwin 主機則換成 `darwin/` 與 `home/darwin/`。
+NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/shared/`、`home/nixos/`；nix-darwin 主機則把 `nixos/`、`home/nixos/` 換成 `darwin/`、`home/darwin/`。
 
 ## 放在哪裡
 

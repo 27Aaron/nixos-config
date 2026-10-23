@@ -19,7 +19,8 @@ in
       inherit inputs vars;
     };
 
-    # 平臺專屬的使用者模組由 nixos/、darwin/ 各自補上。
-    users.${vars.username}.imports = listModules ../../home/base;
+    # base 一律生效,shared 是兩個平臺都能開關的功能;平臺專屬的使用者模組由
+    # nixos/、darwin/ 各自補上。
+    users.${vars.username}.imports = listModules ../../home/base ++ listModules ../../home/shared;
   };
 }

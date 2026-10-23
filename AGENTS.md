@@ -12,7 +12,7 @@ modules/
 ├── base/          # system modules shared by NixOS and nix-darwin
 ├── nixos/         # NixOS system modules: base/, desktop/, server/
 ├── darwin/        # nix-darwin system modules
-└── home/          # Home Manager modules: base/ always on, nixos/ switchable
+└── home/          # Home Manager modules: base/ always on; shared/, nixos/, darwin/ switchable
 tests/             # eval tests run by `just check`
 vars/              # shared non-secret values
 SECURITY.md        # threat model, trust boundaries, app sandboxes, runtime checks
@@ -28,7 +28,7 @@ Every `hosts/nixos/<name>/default.nix` becomes `nixosConfigurations.<name>`, and
 ## Module conventions
 
 - Modules are collected automatically by `listModules` in `lib/default.nix`; a subdirectory with a `default.nix` is loaded through that file only.
-- Place a module at the most general level where it works; `modules/README.md` lists the order. Home Manager modules go to `home/base/` only if every host needs them and they work on macOS too; switchable ones go to `home/nixos/`.
+- Place a module at the most general level where it works; `modules/README.md` lists the order. Home Manager modules go to `home/base/` only if every host needs them and they work on macOS too; switchable ones go to `home/shared/` when they work on both platforms, otherwise to `home/nixos/` or `home/darwin/`.
 - Modules under `core/` and in `home/base/` are always on and have no `enable` option. Every other module is off by default and follows neighboring modules for its option namespace and `enable` switch.
 - Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
 
