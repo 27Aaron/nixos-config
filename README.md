@@ -14,7 +14,7 @@
 
 ## Overview
 
-A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
+A flake for NixOS and nix-darwin hosts.
 
 - **Ephemeral root:** `/` is a tmpfs wiped on every boot; only state registered with [preservation](https://github.com/nix-community/preservation) survives.
 - **Storage:** LUKS2 with FIDO2 unlock, Btrfs subvolumes, btrbk snapshots of the persistent volume, and an encrypted swapfile for hibernation.
@@ -28,13 +28,13 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 | Host | Machine | Role |
 |---|---|---|
 | `river` | MECHREVO WUJIE 14XA, Ryzen 7 8845HS | laptop, niri desktop |
-| `luna` | MacBook Pro 16-inch (2023), Apple M2 Max | laptop, macOS; not built until nix-darwin is wired up |
+| `luna` | MacBook Pro 16-inch (2023), Apple M2 Max | laptop, macOS (nix-darwin) |
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` entry |
+| [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` or `darwinConfigurations` entry |
 | [`modules/`](modules/README.md) | system and Home Manager modules, grouped by where they run |
 | `vars/` | shared non-secret values such as the user name and SSH public keys |
 | [`tests/`](tests/README.md) | eval tests for security settings, run by `just check` |

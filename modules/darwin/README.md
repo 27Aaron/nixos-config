@@ -12,8 +12,7 @@ darwin/
 
 子目錄只用來分組，不增加命名空間層級。
 
-目前沒有 nix-darwin 主機，此目錄的模組尚未經過評估與建置。加入第一臺 Mac 時，需要先在 flake
-加入 `nix-darwin` 輸入，並由 `hosts/default.nix` 收集 `base/` 與這裡的模組。
+nix-darwin 主機由 `hosts/default.nix` 收集 `base/` 與這裡的模組。
 
 ## 系統偏好設定
 

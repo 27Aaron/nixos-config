@@ -11,7 +11,7 @@ hosts/             # one directory per host, discovered automatically
 modules/
 ├── base/          # system modules shared by NixOS and nix-darwin
 ├── nixos/         # NixOS system modules: base/, desktop/, server/
-├── darwin/        # nix-darwin system modules, not loaded by any host yet
+├── darwin/        # nix-darwin system modules
 └── home/          # Home Manager modules: base/ always on, nixos/ switchable
 tests/             # eval tests run by `just check`
 vars/              # shared non-secret values
@@ -23,7 +23,7 @@ Every major directory has a `README.md` saying what belongs there. Read it befor
 
 ## Host discovery
 
-Every `hosts/nixos/<name>/default.nix` becomes `nixosConfigurations.<name>`; the directory name is passed to modules as `hostName`. `default.nix` holds the host's feature switches, timezone and `stateVersion`; settings bound to this machine's hardware go into host-local files split by topic. Anything a second machine could reuse becomes a module under `modules/`. `hosts/darwin/luna` is configured but not built yet; it needs a `nix-darwin` input and `darwinConfigurations` in `hosts/default.nix` first.
+Every `hosts/nixos/<name>/default.nix` becomes `nixosConfigurations.<name>`, and every `hosts/darwin/<name>/default.nix` becomes `darwinConfigurations.<name>`; the directory name is passed to modules as `hostName`. `default.nix` holds the host's feature switches, timezone and `stateVersion`; settings bound to this machine's hardware go into host-local files split by topic. Anything a second machine could reuse becomes a module under `modules/`.
 
 ## Module conventions
 

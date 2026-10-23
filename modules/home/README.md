@@ -6,7 +6,7 @@
 home/
 ├── base/      # 一律生效、沒有開關,伺服器、桌面、macOS 都能用:core/、cli/、tui/、gui/
 ├── nixos/     # 主機可以選擇開關的功能:cli/、tui/、gui/
-└── darwin/    # 只有 macOS,尚無主機載入:core/、gui/
+└── darwin/    # 只有 macOS:core/、gui/
 ```
 
 ## 放在哪裡
