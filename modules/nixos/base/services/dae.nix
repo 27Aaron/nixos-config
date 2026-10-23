@@ -8,6 +8,11 @@
 let
   cfg = config.services'.dae;
 
+  # 接在 wan_interface 那一行之後,未設定時不會多出空行。
+  lanInterface = lib.optionalString (
+    cfg.lanInterface != null
+  ) "\n  lan_interface: ${cfg.lanInterface}";
+
   # 憑證位於 nix-secrets 的 services/dae.yaml,sops 將每個鍵解密成同名的
   # .dae 片段,與其餘片段放在同一目錄供 include。
   secretFile = "${inputs.secrets}/services/dae.yaml";
@@ -30,7 +35,7 @@ let
           log_level: info
           check_interval: 30s
           check_tolerance: 50ms
-          wan_interface: auto
+          wan_interface: auto${lanInterface}
           # domain 在快取未命中時會明文直連探測域名(引導解析器預設為
           # 119.29.29.29 與 223.5.5.5);domain++ 跳過這次探測,仍按嗅探到
           # 的域名重分流。
@@ -127,6 +132,13 @@ in
 {
   options.services'.dae = {
     enable = lib.mkEnableOption "dae transparent proxy";
+
+    lanInterface = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "eth0";
+      description = "LAN interface whose clients dae also proxies, for a host that acts as their gateway; null proxies only this host.";
+    };
   };
 
   config = lib.mkIf cfg.enable {

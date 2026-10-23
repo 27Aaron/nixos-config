@@ -29,7 +29,7 @@ A flake for NixOS and nix-darwin hosts.
 |---|---|---|
 | `river` | MECHREVO WUJIE 14XA, Ryzen 7 8845HS | laptop, niri desktop |
 | `luna` | MacBook Pro 16-inch (2023), Apple M2 Max | laptop, macOS (nix-darwin) |
-| `router` | Proxmox VM, 4 vCPU, 1 GB | headless server |
+| `router` | Proxmox VM, 4 vCPU, 1 GB | headless server, LAN gateway with dae |
 
 ## Layout
 

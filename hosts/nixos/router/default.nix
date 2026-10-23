@@ -14,12 +14,16 @@
   };
 
   services' = {
+    # 區網裝置以這臺為閘道,一併經 dae 分流。
+    dae = {
+      enable = true;
+      lanInterface = "eth0";
+    };
     openssh = {
       enable = true;
       rootLogin = true;
     };
     vnstat.enable = true;
-    zram.enable = true;
   };
 
   server'.fail2ban.enable = true;
