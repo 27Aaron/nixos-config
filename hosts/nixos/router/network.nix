@@ -10,9 +10,9 @@
   systemd.network.networks."10-eth0" = {
     matchConfig.Name = "eth0";
     # IPv4 用固定位址;IPv6 位址與路由由 DHCPv6 和路由器通告取得。
-    address = [ "10.77.77.66/24" ];
-    gateway = [ "10.77.77.1" ];
-    dns = [ "10.77.77.1" ];
+    address = [ "192.168.2.1/24" ];
+    gateway = [ "192.168.2.2" ];
+    dns = [ "192.168.2.2" ];
     networkConfig.DHCP = "ipv6";
   };
 }

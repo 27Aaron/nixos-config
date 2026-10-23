@@ -9,7 +9,7 @@ Proxmox 上的 NixOS 虛擬機。
 | 平臺 | Proxmox VE 虛擬機（QEMU/KVM） |
 | CPU | 4 vCPU |
 | 記憶體 | 1 GB |
-| 磁碟 | 32 GB（`/dev/sda`，ESP 256M） |
+| 磁碟 | 20 GB（`/dev/sda`，ESP 256M） |
 
 ## 部署
 
