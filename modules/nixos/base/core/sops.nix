@@ -1,10 +1,13 @@
 {
   config,
+  inputs,
   pkgs,
   vars,
   ...
 }:
 {
+  imports = [ inputs.sops-nix.nixosModules.sops ];
+
   # 每臺主機的使用者密碼都由 sops 解密(見 users.nix),因此一律啟用。
   #
   # 解密金鑰是使用者自己的 SSH 金鑰,不另外保存金鑰檔;它必須是 ed25519 且沒有

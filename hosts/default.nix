@@ -19,16 +19,7 @@ let
         hostName = name;
         inherit inputs vars;
       };
-      modules =
-        listModules ../modules/base
-        ++ listModules ../modules/nixos
-        ++ [
-          inputs.disko.nixosModules.default
-          inputs.preservation.nixosModules.preservation
-          inputs.home-manager.nixosModules.home-manager
-          inputs.sops-nix.nixosModules.sops
-          ./nixos/${name}
-        ];
+      modules = listModules ../modules/base ++ listModules ../modules/nixos ++ [ ./nixos/${name} ];
     };
 in
 {

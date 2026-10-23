@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   vars,
   ...
@@ -16,8 +17,8 @@ let
     };
 in
 {
-  # preservation 本體由 hosts/default.nix 引入,這裡只定義選項別名。
   imports = [
+    inputs.preservation.nixosModules.preservation
     (lib.mkAliasOptionModule [ "preservation'" "os" ] [ "preservation" "preserveAt" "/persistent" ])
     (lib.mkAliasOptionModule
       [ "preservation'" "user" ]
