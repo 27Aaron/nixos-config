@@ -99,14 +99,19 @@
 
       inherit (import ./hosts { inherit inputs; }) nixosConfigurations darwinConfigurations;
 
-      checks = forAllSystems (system: {
-        eval-tests = import ./tests {
-          inherit (nixpkgs) lib;
-          pkgs = nixpkgs.legacyPackages.${system};
-          nixosConfigurations = nixpkgs.lib.filterAttrs (
-            _: host: host.config.nixpkgs.hostPlatform.system == system
-          ) self.nixosConfigurations;
-        };
-      });
+      checks = forAllSystems (
+        system:
+        let
+          onSystem = nixpkgs.lib.filterAttrs (_: host: host.config.nixpkgs.hostPlatform.system == system);
+        in
+        {
+          eval-tests = import ./tests {
+            inherit (nixpkgs) lib;
+            pkgs = nixpkgs.legacyPackages.${system};
+            nixosConfigurations = onSystem self.nixosConfigurations;
+            darwinConfigurations = onSystem self.darwinConfigurations;
+          };
+        }
+      );
     };
 }

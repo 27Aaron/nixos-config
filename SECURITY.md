@@ -18,7 +18,7 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 
 | Boundary | Current design | Limitation |
 |---|---|---|
-| Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon. GameMode's polkit rule lets the `gamemode` group, which includes the owner, run its CPU governor and GPU helpers as root without a password ([WA-021](WORKAROUNDS.md#security-exceptions)). | Code running as the user can wait for the password to be typed. |
+| Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon (`@admin` on macOS). GameMode's polkit rule lets the `gamemode` group, which includes the owner, run its CPU governor and GPU helpers as root without a password ([WA-021](WORKAROUNDS.md#security-exceptions)). | Code running as the user can wait for the password to be typed. |
 | Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) is open. dae's tproxy listener lives in its own network namespace. | sshd is reachable on every network the laptop joins. |
 | Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | The kernel and initrd sit on the unencrypted ESP. |
 | Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation, with river's own SSH key; river holds no copy of the shared server key. | The key is readable by the user, not only root, and every secret shares the same recipients ([WA-016](WORKAROUNDS.md#security-exceptions)). |
@@ -63,7 +63,7 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 
 | Control | Where | Test |
 |---|---|---|
-| No Nix trusted users, daemon limited to `@wheel`, signatures required | `modules/base/core/nix.nix`, `modules/nixos/base/core/nix.nix` | `nix-trust` |
+| No Nix trusted users, daemon limited to `@wheel` (`@admin` on macOS), signatures required | `modules/base/core/nix.nix`, `modules/nixos/base/core/nix.nix`, `modules/darwin/core/nix.nix` | `nix-trust`, `daemon-access` |
 | Inventory of trusted substituters and keys | `modules/base/core/nix.nix` | `nix-caches` |
 | sshd: keys only, no root login unless `services'.openssh.rootLogin`, no X11 forwarding | `modules/nixos/base/services/openssh.nix` | `ssh` |
 | Inventory of open firewall ports per host | services that open ports | `firewall` |
@@ -81,7 +81,7 @@ Run these after a switch or reboot that touches security settings:
 
 ```bash
 nix config show trusted-users                      # root
-nix config show allowed-users                      # @wheel
+nix config show allowed-users                      # @wheel (@admin on macOS)
 sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication) '   # no / no
 sudo nft list chain inet nixos-fw input-allow      # only the expected ports
 sysctl fs.protected_fifos fs.protected_regular dev.tty.ldisc_autoload   # 2 2 0
