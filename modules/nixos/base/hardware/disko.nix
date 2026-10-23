@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   ...
 }:
@@ -82,6 +83,8 @@ let
   dataPartitionName = if cfg.luks.enable then "luks" else "data";
 in
 {
+  imports = [ inputs.disko.nixosModules.default ];
+
   options.hardware'.disko = {
     enable = lib.mkEnableOption "the disko-managed ephemeral NixOS layout";
 

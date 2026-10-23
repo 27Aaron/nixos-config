@@ -9,6 +9,8 @@ let
   inherit (import ../../../../lib { inherit lib; }) listModules;
 in
 {
+  imports = [ inputs.home-manager.nixosModules.home-manager ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
