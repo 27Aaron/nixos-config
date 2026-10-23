@@ -30,6 +30,7 @@
   };
 
   services' = {
+    avahi.enable = true;
     networkmanager.enable = true;
     openssh.enable = true;
     dae.enable = true;

@@ -22,8 +22,6 @@
       development.enable = true;
       toolchain.enable = true;
     };
-
-    tui.claude-code.enable = true;
   };
 
   system.stateVersion = "23.05";
