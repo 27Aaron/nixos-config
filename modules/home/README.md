@@ -4,9 +4,11 @@
 
 ```text
 home/
-├── base/
-│   └── core/                # 一律生效,伺服器、桌面、macOS 都能用
-│                            #   home、persist、shell、git、ssh、packages、lazygit、monitoring
+├── base/                    # 一律生效、沒有開關,伺服器、桌面、macOS 都能用
+│   ├── core/                # 無法依介面分類的:home、persist
+│   ├── cli/                 #   git、packages、shell、ssh
+│   ├── tui/                 #   lazygit、monitoring
+│   └── gui/                 #   目前沒有內容,以 .gitkeep 佔位
 ├── nixos/                   # 可開關的功能,預設關閉
 │   ├── cli/                 # 命令列工具,不佔用整個終端機(cli'.*)
 │   │                        #   development、toolchain
@@ -21,18 +23,20 @@ home/
 
 ## 放在哪裡
 
-1. 每臺主機都需要、不用開關，而且在伺服器、桌面與 macOS 上都能用 → `base/core/`。
-   只放簡單、通用的東西，例如 shell、Git、日常命令列工具。
+1. 每臺主機都需要、不用開關，而且在伺服器、桌面與 macOS 上都能用 → `base/`。
+   只放簡單、通用的東西，例如 shell、Git、日常命令列工具。依介面放進 `cli/`、
+   `tui/`、`gui/`；無法分類但每臺都需要的，例如帳號設定與 `persist'` 選項，放 `core/`。
+   四個目錄都要保留，沒有內容時以 `.gitkeep` 佔位。
 2. 主機要能選擇開或不開的功能 → `nixos/`，例如開發環境、程式語言工具鏈、
    AI agent、圖形介面程式。
 3. 只有 macOS 才用 → `darwin/`。
 
-`nixos/` 底下依介面分類：不佔用終端機的放 `cli/`，佔用整個終端機的放 `tui/`，
+`base/` 與 `nixos/` 底下都依介面分類：不佔用終端機的放 `cli/`，佔用整個終端機的放 `tui/`，
 開啟視窗的放 `gui/`。選項命名空間跟著介面分類：`nixos/gui/theme.nix` 的選項是 `gui'.theme`。
 
 ## 開關
 
-`base/core/` 的模組一律生效，沒有 `enable`。`nixos/` 的模組都預設關閉，主機在
+`base/` 的模組一律生效，沒有 `enable`。`nixos/` 的模組都預設關閉，主機在
 `default.nix` 以 `hm'` 打開：
 
 ```nix
