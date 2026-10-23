@@ -6,7 +6,8 @@
 home/
 ├── base/                    # 一律生效、沒有開關,伺服器、桌面、macOS 都能用
 │   ├── core/                # 無法依介面分類的:home、persist
-│   ├── cli/                 #   git、packages、shell、ssh
+│   ├── cli/                 #   git、packages、ssh
+│   │   └── shell/           #   fish、zsh、starship、eza、zoxide、atuin
 │   ├── tui/                 #   lazygit、monitoring
 │   └── gui/                 #   目前沒有內容,以 .gitkeep 佔位
 ├── nixos/                   # 可開關的功能,預設關閉
