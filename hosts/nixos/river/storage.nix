@@ -7,7 +7,8 @@
     swapSize = "32769M";
     games.enable = true;
     luks.enable = true;
-    luks.fido2.enable = true;
+    # TPM2 不設 PIN,開機自動解鎖;見 WORKAROUNDS.md 的 WA-023。
+    luks.tpm2.enable = true;
   };
 
   # 狀態持久化。

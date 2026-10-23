@@ -9,11 +9,7 @@
   hardware'.yubikey.enable = true;
 
   desktop' = {
-    # 磁碟解鎖已需要 FIDO2 加 PIN,見 WORKAROUNDS.md 的 WA-017。
-    greetd = {
-      enable = true;
-      autoLogin = true;
-    };
+    greetd.enable = true;
     niri.enable = true;
     noctalia.enable = true;
     fonts.enable = true;
