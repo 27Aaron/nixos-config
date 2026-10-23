@@ -1,83 +1,82 @@
 # Agent Instructions
 
-This repository is a Nix flake for NixOS hosts using a "tmpfs as root" layout: the root filesystem is wiped on every boot, and only state registered with the [preservation](https://github.com/nix-community/preservation) module survives, on a LUKS-encrypted Btrfs volume. Keep the configuration declarative, composable, and easy to validate before deployment.
+這個儲存庫是 NixOS 主機的 Nix flake，採用「tmpfs 當根目錄」的配置：根檔案系統每次開機都會清空，只有登記到 [preservation](https://github.com/nix-community/preservation) 模組的狀態會留下，存放在以 LUKS 加密的 Btrfs 磁碟區上。設定要保持宣告式、可組合，並且在部署前容易驗證。
 
 ## Repository layout
 
 ```text
-flake.nix          # inputs and outputs
-lib/               # module collector and shared nixpak sandbox modules
-hosts/             # one directory per host, discovered automatically
+flake.nix          # 輸入與輸出
+lib/               # 模組收集器與共用的 nixpak 沙箱模組
+hosts/             # 每臺主機一個目錄，自動探索
 modules/
-├── base/          # system modules shared by NixOS and nix-darwin
-├── nixos/         # NixOS system modules: base/, desktop/, server/
-├── darwin/        # nix-darwin system modules
-└── home/          # Home Manager modules: base/ always on; shared/, nixos/, darwin/ switchable
-tests/             # eval tests run by `just check`
-vars/              # shared non-secret values
-SECURITY.md        # security controls and their tests, flake inputs, secrets and update procedures
-WORKAROUNDS.md     # temporary workarounds, pins and security exceptions
+├── base/          # NixOS 與 nix-darwin 共用的系統模組
+├── nixos/         # NixOS 系統模組：base/、desktop/、server/
+├── darwin/        # nix-darwin 系統模組
+└── home/          # Home Manager 模組：base/ 一律生效；shared/、nixos/、darwin/ 可開關
+tests/             # `just check` 執行的 eval 測試
+vars/              # 共用的非機密值
+SECURITY.md        # 安全控制與對應測試、flake 輸入、機密與更新流程
+WORKAROUNDS.md     # 暫時性的權宜做法、版本釘選與安全例外
 ```
 
-Every major directory has a `README.md` saying what belongs there. Read it before adding a file, and update it when a change makes it stale.
+每個主要目錄都有一份 `README.md`，說明哪些東西該放在那裡。新增檔案前先讀它，變更讓它過時的時候也要一併更新。
 
 ## Host discovery
 
-Every `hosts/nixos/<name>/default.nix` becomes `nixosConfigurations.<name>`, and every `hosts/darwin/<name>/default.nix` becomes `darwinConfigurations.<name>`; the directory name is passed to modules as `hostName`. `default.nix` holds the host's feature switches, timezone and `stateVersion`; settings bound to this machine's hardware go into host-local files split by topic. Anything a second machine could reuse becomes a module under `modules/`.
+每個 `hosts/nixos/<name>/default.nix` 會成為 `nixosConfigurations.<name>`，每個 `hosts/darwin/<name>/default.nix` 會成為 `darwinConfigurations.<name>`；目錄名稱以 `hostName` 傳給模組。`default.nix` 放主機的功能開關、時區與 `stateVersion`；綁定這臺機器硬體的設定依主題拆到主機目錄下的檔案。第二臺機器也能重用的東西，就做成 [`modules/`](modules/) 底下的模組。
 
 ## Module conventions
 
-- Modules are collected automatically by `listModules` in `lib/default.nix`; a subdirectory with a `default.nix` is loaded through that file only.
-- Place a module at the most general level where it works; `modules/README.md` lists the order. Home Manager modules go to `home/base/` only if every host needs them and they work on macOS too; switchable ones go to `home/shared/` when they work on both platforms, otherwise to `home/nixos/` or `home/darwin/`.
-- Modules under `core/` and in `home/base/` are always on and have no `enable` option. Every other module is off by default and follows neighboring modules for its option namespace and `enable` switch.
-- Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
+- 模組由 [`lib/default.nix`](lib/default.nix) 的 `listModules` 自動收集；含 `default.nix` 的子目錄只透過該檔載入。
+- 模組放在它能運作的最通用層級；順序列在 [`modules/README.md`](modules/README.md)。Home Manager 模組只有在每臺主機都需要、而且也能在 macOS 上運作時才放進 [`home/base/`](modules/home/base/)；可開關的模組在兩個平臺都能用時放 [`home/shared/`](modules/home/shared/)，否則放 [`home/nixos/`](modules/home/nixos/) 或 [`home/darwin/`](modules/home/darwin/)。
+- `core/` 底下與 [`home/base/`](modules/home/base/) 裡的模組一律生效，沒有 `enable` 選項。其他模組預設關閉，選項命名空間與 `enable` 開關比照相鄰的模組。
+- 一個檔案只放一個程式或一件事。模組大到一個檔案放不下時，改成以 `default.nix` 為入口的目錄。
 
 ## Persistence
 
-- With a tmpfs root, nothing outside the registered paths survives a reboot. System modules register state in `preservation'.os` or `preservation'.user`; Home Manager modules use `persist`, which the persistence module merges into `preservation'.user`.
-- Register state in the module that creates it. `~/.cache` is never persisted as a whole; list only the caches worth keeping.
-- Give directories that hold credentials, sessions, keys or history `mode = "0700"`. Preservation's default is `0755`, and it is re-applied on every boot.
-- When an upstream module may also enable a service, gate its persisted state on the service's final state (such as `config.hardware.bluetooth.enable`), not on this module's switch.
-- Programs that update a file by writing a temporary file and calling `rename()` (logrotate, zsh) fail with `EBUSY` on a single-file bind mount; persist the parent directory instead.
-- The machine-id uses the bind-mount recipe plus a suppressed `systemd-machine-id-commit.service`; do not mix in the symlink recipe's commit override.
+- 根目錄是 tmpfs，登記路徑以外的東西重開機後都不會留下。系統模組把狀態登記在 `preservation'.os` 或 `preservation'.user`；Home Manager 模組用 `persist`，由持久化模組合併進 `preservation'.user`。
+- 狀態在產生它的模組裡登記。`~/.cache` 從不整個持久化，只列出值得保留的快取。
+- 存放憑證、工作階段、金鑰或歷史紀錄的目錄要設 `mode = "0700"`。preservation 的預設是 `0755`，而且每次開機都會重新套用。
+- 上游模組也可能啟用某個服務時，持久化狀態要依該服務的最終狀態（例如 `config.hardware.bluetooth.enable`）決定，而不是依這個模組的開關。
+- 以「寫入暫存檔再呼叫 `rename()`」方式更新檔案的程式（logrotate、zsh），在單一檔案的 bind mount 上會以 `EBUSY` 失敗；改成持久化上層目錄。
+- machine-id 採用 bind mount 做法，並抑制 `systemd-machine-id-commit.service`；不要混用 symlink 做法的 commit 覆寫。
 
 ## Security
 
-- `SECURITY.md` holds the security controls and their tests, the flake input inventory, runtime checks, and the secret, update and incident procedures. Update it in the same change when a change adds or moves a control, adds an input, or sandboxes an app. This repository is public: record what a control does and how it is checked, not personal setup details or the weaknesses an attacker could use.
-- Credentials and secrets belong in the private `nix-secrets` repository and reach the system through sops-nix. `inputs.secrets` is copied into the world-readable `/nix/store`, so read only encrypted files, or files with nothing sensitive in them (like the SSH host aliases), from it at evaluation time. `vars/` holds non-secret values only. Account passwords come from `users/password.yaml` in nix-secrets, decrypted with `neededForUsers` before users are created; never put a password or hash in the configuration. sops is a core module because every host needs it for that. Hosts decrypt with the user's `~/.ssh/id_ed25519` (`sops.age.sshKeyPaths`; river reads it from `/persistent`), never with a key file. See *Secrets* in `SECURITY.md` before changing keys.
-- Do not add users to `nix.settings.trusted-users`: a trusted user can disable signature checks and import arbitrary store paths, which amounts to passwordless root. Only `@wheel` may connect to the daemon (`allowed-users`); on macOS, where `wheel` holds only root, it is `@admin`.
-- Root SSH login is opt-in per host through `services'.openssh.rootLogin`, for remote deployment targets only. Other hosts accept the user's key and escalate with `sudo`. Root keeps its authorized keys because initrd SSH unlock uses them.
-- `security.sudo.execWheelOnly` stays off: the upstream btrbk module runs as its own user and calls `btrfs` through sudo rules.
-- The kernel baseline in `core/kernel-hardening.nix` uses `lib.mkDefault`, so a host overrides a value with a plain definition, never `mkForce`. Keep user namespaces on (the Nix build sandbox needs them), leave `security.protectKernelImage` off (it disables hibernation), and keep `kernel.kptr_restrict` at 1 (dae's eBPF library reads `/proc/kallsyms`). A host that needs a module from `core'.kernel.blockedModules`, such as an IPsec VPN, removes it there.
-- Sandboxed desktop apps use the nixpak modules in `lib/nixpak/` and are listed in `sandboxedApps` in `tests/security/shared.nix`. Bind only the paths an app needs: never the whole `$XDG_RUNTIME_DIR` (it holds the niri control socket, which can spawn programs, and the SSH and GPG agents) and never the unfiltered session bus (systemd's user manager can run commands outside the sandbox). An FHS-packaged app can run inside nixpak; the outer sandbox limits what the inner FHS environment sees.
-- Keep trust prompts on. Do not set Zed's `session.trust_all_worktrees`, disable VS Code's workspace trust, or alias coding agents to permission-bypass modes; a cloned repository must not be able to run code just by being opened.
-- Inputs that do not follow `nixpkgs` (currently `fcitx5-vinput`, for its binary cache) carry their own nixpkgs and only pick up security fixes when upstream updates its lock.
+- [`SECURITY.md`](SECURITY.md) 記錄安全控制與對應測試、flake 輸入清單、執行期檢查，以及機密、更新與事件處理流程。變更新增或搬移控制、新增輸入，或把程式放進沙箱時，要在同一個變更裡更新它。這個儲存庫是公開的：記錄控制做什麼、怎麼檢查，不要寫個人設定細節，也不要寫攻擊者可利用的弱點。
+- 憑證與機密放在私人的 `nix-secrets` 儲存庫，透過 sops-nix 送進系統。`inputs.secrets` 會被複製到所有人可讀的 `/nix/store`，因此求值時只能從中讀取加密檔案，或不含敏感內容的檔案（例如 SSH 主機別名）。[`vars/`](vars/) 只放非機密值。帳號密碼來自 nix-secrets 的 `users/password.yaml`，以 `neededForUsers` 在建立使用者之前解密；絕不在設定裡放密碼或雜湊。sops 是 core 模組，因為每臺主機都需要它來做這件事。主機以使用者的 `~/.ssh/id_ed25519` 解密（`sops.age.sshKeyPaths`；river 從 `/persistent` 讀取），絕不使用金鑰檔。更換金鑰前先讀 [`SECURITY.md` 的〈Secrets〉](SECURITY.md#secrets)。
+- 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查並匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）；macOS 上 `wheel` 只有 root，所以改用 `@admin`。
+- root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行選擇開啟，只用於遠端部署目標。其他主機接受使用者的金鑰，再以 `sudo` 提權。root 保留授權金鑰，因為 initrd 的 SSH 解鎖會用到。
+- `security.sudo.execWheelOnly` 維持關閉：上游的 btrbk 模組以自己的使用者執行，並透過 sudo 規則呼叫 `btrfs`。
+- [`core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) 的核心基準使用 `lib.mkDefault`，主機以一般定義覆寫，絕不用 `mkForce`。user namespace 保持開啟（Nix 建置沙箱需要），`security.protectKernelImage` 保持關閉（它會停用休眠），`kernel.kptr_restrict` 維持 1（dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`）。需要 `core'.kernel.blockedModules` 中某個模組的主機（例如 IPsec VPN），就在那裡把它移除。
+- 沙箱化的桌面程式使用 [`lib/nixpak/`](lib/nixpak/) 的 nixpak 模組，並列在 [`tests/security/shared.nix`](tests/security/shared.nix) 的 `sandboxedApps`。只綁定程式需要的路徑：絕不綁定整個 `$XDG_RUNTIME_DIR`（裡面有能啟動程式的 niri 控制 socket，以及 SSH 與 GPG agent），也絕不綁定未經過濾的 session bus（systemd 的使用者管理器能在沙箱外執行指令）。以 FHS 打包的程式可以在 nixpak 裡執行；外層沙箱會限制內層 FHS 環境看得到的東西。
+- 不 follow `nixpkgs` 的輸入（目前是 `fcitx5-vinput`，為了它的二進位快取）帶有自己的 nixpkgs，只有在上游更新 lock 時才會拿到安全修正。
 
 ## Workarounds
 
-Record every temporary workaround, version pin and accepted security exception in `WORKAROUNDS.md` in the same change that introduces it: give it the next `WA-NNN` ID and a concrete removal condition, and mention the ID in a comment next to the code. When the condition is met, delete the code and the row and name the ID in the commit message. After a nixpkgs, kernel or BIOS update, recheck the rows that depend on it.
+每一個暫時性的權宜做法、版本釘選與已接受的安全例外，都要在引入它的同一個變更裡記錄到 [`WORKAROUNDS.md`](WORKAROUNDS.md)：給它下一個 `WA-NNN` 編號與具體的移除條件，並在程式碼旁的註解裡提到這個編號。條件達成時，刪除程式碼與該列，並在提交訊息裡寫出編號。nixpkgs、核心或 BIOS 更新後，重新檢查依賴它們的各列。
 
 ## Style and formatting
 
-- Two spaces for indentation, no tabs, LF line endings, a final newline, and no trailing whitespace.
-- Run the repository formatter with `nix fmt` after editing Nix files.
-- Format files changed by the task; do not reformat unrelated files.
-- Top-level documents (`README.md`, `AGENTS.md`, `SECURITY.md`, `WORKAROUNDS.md`), option descriptions and commit messages are in English. Directory READMEs and Nix comments are in Traditional Chinese with Taiwanese usage (設定, 檔案, 預設, 支援). Markdown prose uses full-width punctuation; Nix comments use half-width `,;:()` with full-width `。、`.
-- Comments explain why: a constraint, an upstream quirk, or a rejected alternative. Do not restate what the next line does, and do not add file header comments.
+- 縮排用兩個空格，不用 tab，LF 換行，檔案結尾要有換行，行尾不留空白。
+- 編輯 Nix 檔案後執行儲存庫的格式化工具 `nix fmt`。
+- 只格式化這次任務改到的檔案；不要重新格式化無關的檔案。
+- `README.md`、選項說明（option description）與提交訊息用英文。`AGENTS.md`、[`SECURITY.md`](SECURITY.md)、[`WORKAROUNDS.md`](WORKAROUNDS.md)、各目錄的 README 與 Nix 註解用臺灣慣用的繁體中文（設定、檔案、預設、支援）；前三者的標題維持英文，讓錨點連結保持穩定。Markdown 內文用全形標點；Nix 註解用半形 `,;:()` 搭配全形 `。、`。
+- 註解說明「為什麼」：限制、上游的怪癖，或被否決的替代方案。不要重述下一行在做什麼，也不要加檔案開頭的說明註解。
 
 ## Validation
 
 ```bash
 nix fmt
-just check    # fmt --check, deadnix, and nix flake check --no-build --all-systems (includes the eval tests)
-just build    # build a host; defaults to the local hostname, or pass one explicitly
+just check    # fmt --check、deadnix，以及 nix flake check --no-build --all-systems（包含 eval 測試）
+just build    # 建置一臺主機；預設為本機主機名稱，也可以明確指定
 ```
 
-A focused change may be validated by evaluating the affected options, for example `nix eval .#nixosConfigurations.<name>.config.<option>`. Build every affected host when changing host discovery, shared modules, or flake inputs.
+範圍集中的變更可以只求值受影響的選項來驗證，例如 `nix eval .#nixosConfigurations.<name>.config.<option>`。變更主機探索、共用模組或 flake 輸入時，要建置每一臺受影響的主機。
 
-The eval tests in `tests/` assert the security rules above on every host and keep inventories of open ports, trusted binary caches and private persisted paths. When a change deliberately alters one of these (a service opens a port, a cache is added, a host is added), update the expectation in `tests/security/` (`shared.nix`, `nixos.nix` or `darwin.nix`) in the same change and say why. Never weaken a test only to make it pass; see `tests/README.md`.
+[`tests/`](tests/) 的 eval 測試會在每臺主機上檢查上述安全規則，並維護對外連接埠、受信任二進位快取與私密持久化路徑的清單。變更刻意改動其中一項時（服務開了連接埠、新增快取、新增主機），要在同一個變更裡更新 [`tests/security/`](tests/security/)（[`shared.nix`](tests/security/shared.nix)、[`nixos.nix`](tests/security/nixos.nix) 或 [`darwin.nix`](tests/security/darwin.nix)）的預期值並說明理由。絕不只為了讓測試通過而放寬測試；見 [`tests/README.md`](tests/README.md)。
 
-For a refactor or comment-only change that should not alter the system, record the toplevel derivation before and after and compare them:
+不應改變系統的重構或純註解變更，要在前後記錄 toplevel derivation 並比對：
 
 ```bash
 nix eval --raw .#nixosConfigurations.<name>.config.system.build.toplevel.drvPath
@@ -86,56 +85,56 @@ nix run nixpkgs#nix-diff -- <old.drv> <new.drv>
 
 ## Deployment
 
-Deployment is manual and must be explicitly requested; never run a switch or remote deployment as a side effect of validation.
+部署是手動的，必須明確要求；絕不把 switch 或遠端部署當成驗證的附帶動作。
 
 ```bash
-just switch [target]                # apply a host's configuration locally
-just install [target]               # first nix-darwin activation on a fresh Mac; afterwards use just switch
-just deploy <target> root@<host>    # remote deployment; the target needs services'.openssh.rootLogin
+just switch [target]                # 在本機套用主機設定
+just install [target]               # 新 Mac 上第一次啟用 nix-darwin；之後用 just switch
+just deploy <target> root@<host>    # 遠端部署；目標需要 services'.openssh.rootLogin
 ```
 
-Persistence-related changes only take effect across a reboot; reboot before trusting them.
+與持久化相關的變更要重開機後才生效；重開機之後再相信它們。
 
 ## Commit messages
 
-Use Conventional Commit titles with a path-based scope:
+使用 Conventional Commit 標題，scope 以路徑為準：
 
 ```text
 type(scope): description
 ```
 
-- Allowed types are `feat`, `fix`, `refactor`, `chore`, and `WIP`. Use `WIP` only for an explicitly temporary work-in-progress snapshot.
-- The commit title uses lowercase English text and never ends with a period. Keep the body readable with normal capitalization when it contains proper names or explanatory sentences.
-- Keep the title within 50 characters, `type(scope): ` included. GitHub truncates titles past 72 characters, and a squash merge appends ` (#123)`, so 50 leaves room. Name one resulting change; drop articles and filler words, and move lists and details into the body.
-- Wrap the body at 72 characters.
-- A pull request title becomes the squash-merge commit title, so it follows the same rules.
-- The scope reflects the changed path or component: `{host}` or `{host}/{service}` for host-specific changes, the module area (`core`, `hardware`, `services`, `desktop`, `server`, `darwin`, `home`, `modules`) for shared modules, `flake` for flake-level files, `lib/` and host discovery, `docs` for documentation.
-- Describe the resulting change, not the list of edited files.
+- 允許的類型有 `feat`、`fix`、`refactor`、`chore` 與 `WIP`。`WIP` 只用於明確標示為暫時的進行中快照。
+- 提交標題用小寫英文，結尾不加句點。內文含專有名詞或說明句時，照一般大小寫書寫以保持易讀。
+- 標題含 `type(scope): ` 在內不超過 50 個字元。GitHub 會截斷超過 72 個字元的標題，squash merge 又會附加 ` (#123)`，50 個字元能留下餘裕。只寫一個結果性的變更；省略冠詞與贅字，清單與細節移到內文。
+- 內文在 72 個字元處換行。
+- pull request 標題會成為 squash merge 的提交標題，因此遵守相同規則。
+- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`desktop`、`server`、`darwin`、`home`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
+- 描述變更的結果，而不是列出編輯過的檔案。
 
 ```text
-refactor(home): bind flake packages by name instead of their package set   # 72, too long
+refactor(home): bind flake packages by name instead of their package set   # 72，太長
 refactor(home): bind flake packages directly                               # 44
 ```
 
 ### Flake lock bumps
 
-When updating an input in `flake.lock`, describe the upstream change instead of only mentioning the lock file or revision hashes.
+更新 [`flake.lock`](flake.lock) 中的輸入時，要描述上游的變更，而不是只提到 lock 檔或修訂雜湊。
 
-1. Run `nix flake update <input>` and record the old and new revisions from its output or from `git diff -- flake.lock`.
-2. Identify the upstream repository and inspect the change range. For a GitHub input, use the compare API or `gh`:
+1. 執行 `nix flake update <input>`，從輸出或 `git diff -- flake.lock` 記下新舊修訂。
+2. 找出上游儲存庫並檢視變更範圍。GitHub 上的輸入可用 compare API 或 `gh`：
 
    ```bash
    curl -s https://api.github.com/repos/<owner>/<repo>/compare/<old>...<new>
-   # or
+   # 或
    gh api repos/<owner>/<repo>/compare/<old>...<new>
    ```
 
-3. Treat the update as a supply-chain event. For each input that moved, check what this repository consumes from it (see the input table in `SECURITY.md`):
-   - For inputs that provide NixOS or Home Manager modules (`home-manager`, `disko`, `preservation`, `sops-nix`), read the changes to the module files that are imported and look for `nix.settings` substituters, trusted keys or trusted users; activation scripts, root services, sudo or polkit rules; `environment.etc` or `home.file` entries that widen ownership or mode; `lib.mkForce` overrides; and import-from-derivation.
-   - For package inputs, confirm that the packages used here changed only as described.
-   - `just check` catches new caches and open ports; `just build` prints the package diff against the running system.
-4. Keep only meaningful changes in the commit body, and call out security fixes explicitly.
-5. Use a title naming the input, followed by the short revision range and a brief bullet list:
+3. 把更新當成一次供應鏈事件。對每個有變動的輸入，檢查這個儲存庫從中使用了什麼（見 [`SECURITY.md` 的輸入表](SECURITY.md#flake-inputs)）：
+   - 提供 NixOS 或 Home Manager 模組的輸入（`home-manager`、`disko`、`preservation`、`sops-nix`），閱讀被匯入的模組檔案的變更，留意 `nix.settings` 的 substituter、受信任金鑰或受信任使用者；啟用腳本、root 服務、sudo 或 polkit 規則；放寬擁有者或權限的 `environment.etc` 或 `home.file` 項目；`lib.mkForce` 覆寫；以及 import-from-derivation。
+   - 套件輸入要確認這裡用到的套件只有如描述般的變更。
+   - `just check` 會抓到新增的快取與對外連接埠；`just build` 會印出與執行中系統的套件差異。
+4. 提交內文只保留有意義的變更，並明確點出安全修正。
+5. 標題寫出輸入名稱，內文接著簡短的修訂範圍與精簡的條列：
 
    ```text
    chore(flake): update home-manager input
@@ -145,6 +144,6 @@ When updating an input in `flake.lock`, describe the upstream change instead of 
    - summarize another relevant file or commit
    ```
 
-Pin a new third-party input to a release tag or a commit when the project publishes releases, rather than tracking a branch; record a pin that exists for a temporary reason in `WORKAROUNDS.md`.
+新的第三方輸入若有發布版本，釘在發行標籤或某個提交上，而不是追蹤分支；因暫時性原因而存在的釘選要記錄在 [`WORKAROUNDS.md`](WORKAROUNDS.md)。
 
-For multiple inputs, use `chore(flake): update flake inputs` and list each input in the body, or split the updates into separate commits. Do not claim details that are not supported by the upstream changelog or the local diff.
+多個輸入時，使用 `chore(flake): update flake inputs` 並在內文列出每個輸入，或拆成多個提交。不要宣稱上游變更紀錄或本機差異無法佐證的細節。
