@@ -42,7 +42,7 @@ in
 
     # initrd 的主機私鑰會以明文附加到未加密 ESP 上的 initrd,必須與系統的
     # 主機金鑰分開,不可共用。
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/etc/secrets/initrd";
         mode = "0700";

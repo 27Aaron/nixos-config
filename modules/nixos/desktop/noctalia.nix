@@ -22,7 +22,7 @@ in
     };
 
     # 設定由 Noctalia 介面管理,不由 Nix 生成。
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = ".config/noctalia";
         mode = "0700";

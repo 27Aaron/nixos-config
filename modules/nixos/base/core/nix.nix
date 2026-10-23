@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   vars,
   ...
@@ -20,7 +21,7 @@
   };
 
   # nh 從固定路徑讀取 flake,倉庫本身須持久化。
-  preservation'.user.directories = [
+  preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
     {
       directory = "nixos-config";
       mode = "0700";

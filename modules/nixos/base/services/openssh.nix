@@ -47,7 +47,7 @@ in
 
     # 只持久化主機金鑰;保留整個 /etc/ssh 會遮住 NixOS 生成的 sshd_config
     # 與 authorized_keys.d(配方取自 preservation 的遷移指南)。
-    preservation'.os.files = [
+    preservation'.os.files = lib.mkIf config.hardware'.persistence.enable [
       {
         file = "/etc/ssh/ssh_host_ed25519_key";
         how = "symlink";

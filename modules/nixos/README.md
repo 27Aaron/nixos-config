@@ -32,7 +32,10 @@ nixos/
 - 系統狀態用 `preservation'.os.*`。
 - 使用者狀態用 `preservation'.user.*`；Home Manager 模組改用 `persist'`，
   由 `base/hardware/persistence.nix` 併入。
+- 不是每臺主機都用 tmpfs 根目錄，因此每個登記都要以
+  `lib.mkIf config.hardware'.persistence.enable` 包起來，主機沒開持久化時不留下任何設定。
 - 含金鑰、憑證或私人資料的目錄加上 `mode = "0700"`；未宣告時為 `0755`，
   而且每次開機都會套用。
 - 服務也可能由上游模組啟用時，依服務的最終狀態登記，例如
-  `lib.optionals config.hardware.bluetooth.enable [ ... ]`，而不是看本模組的開關。
+  `lib.mkIf (config.hardware'.persistence.enable && config.hardware.bluetooth.enable) [ ... ]`，
+  而不是看本模組的開關。

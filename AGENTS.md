@@ -66,10 +66,11 @@ Host files are ordinary NixOS modules:
 ## Persistence
 
 - With a tmpfs root, nothing outside the registered paths survives a reboot. Anything a program must keep must appear in `preservation'.os.*`, `preservation'.user.*`, or the `persist'` bridge.
+- Not every host uses a tmpfs root, so every persistence entry is gated on the host's switch: system modules wrap `preservation'.*` in `lib.mkIf config.hardware'.persistence.enable`, and Home Manager modules wrap `persist'.*` in `lib.mkIf config.persist'.enable`, which the persistence module turns on together with `hardware'.persistence`.
 - Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`. System modules write `preservation'.user` directly.
 - Register state in the module that creates it. `~/.cache` is never persisted as a whole; list only the caches worth keeping.
 - Give directories that hold credentials, sessions, keys or history `mode = "0700"`. Preservation's default is `0755`, and it is re-applied on every boot.
-- When a system module persists state for a service that an upstream module may also enable, gate it on the service's final state (`lib.optionals config.hardware.bluetooth.enable [ ... ]`), not on the module's own switch.
+- When a system module persists state for a service that an upstream module may also enable, gate it on the service's final state (`lib.mkIf (config.hardware'.persistence.enable && config.hardware.bluetooth.enable) [ ... ]`), not on the module's own switch.
 - Programs that update a file by writing a temporary file and calling `rename()` (logrotate, zsh) fail with `EBUSY` on a single-file bind mount; persist the parent directory instead.
 - The machine-id uses the bind-mount recipe plus a suppressed `systemd-machine-id-commit.service`; do not mix in the symlink recipe's commit override.
 

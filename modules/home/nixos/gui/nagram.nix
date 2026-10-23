@@ -59,7 +59,7 @@ in
     home.packages = [ sandboxed.config.env ];
 
     # 工作階段與設定;tdata 等同帳號登入權限。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".local/share/NagramDesktop";
         mode = "0700";

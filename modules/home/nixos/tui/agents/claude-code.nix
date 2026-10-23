@@ -24,7 +24,7 @@ in
     };
 
     # 登入憑證、設定與對話紀錄由程式自行寫入。
-    persist' = {
+    persist' = lib.mkIf config.persist'.enable {
       directories = [
         {
           directory = ".claude";

@@ -27,7 +27,7 @@ in
     };
 
     # 保留封禁紀錄,遞增的封禁時間才不會在重開機後歸零。
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       "/var/lib/fail2ban"
     ];
   };

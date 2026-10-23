@@ -26,7 +26,7 @@ in
     ];
 
     # OATH 憑證存於鑰匙本身,這裡只保留應用程式設定。
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = ".local/share/com.yubico.yubioath";
         mode = "0700";

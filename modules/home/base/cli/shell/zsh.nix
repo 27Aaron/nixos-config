@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   # fish 為主力,zsh 只作備援,不需列入 /etc/shells。
   programs.zsh = {
@@ -18,7 +18,7 @@
     syntaxHighlighting.enable = true;
   };
 
-  persist'.directories = [
+  persist'.directories = lib.mkIf config.persist'.enable [
     {
       directory = ".cache/zsh";
       mode = "0700";

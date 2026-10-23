@@ -42,6 +42,6 @@ in
     ];
 
     # Go 的建置快取;保留可免去重開機後重新編譯。
-    persist'.directories = [ ".cache/go-build" ];
+    persist'.directories = lib.mkIf config.persist'.enable [ ".cache/go-build" ];
   };
 }

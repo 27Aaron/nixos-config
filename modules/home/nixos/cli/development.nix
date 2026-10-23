@@ -38,7 +38,7 @@ in
     '';
 
     # .envrc 允許清單、mise 工具鏈、uv 直譯器。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       ".local/share/direnv"
       ".local/share/mise"
       ".local/share/uv"

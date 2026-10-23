@@ -30,7 +30,7 @@ in
     };
 
     # x-gvfs-trash 讓檔案總管為這些掛載點啟用回收桶。
-    persist'.directories =
+    persist'.directories = lib.mkIf config.persist'.enable (
       map
         (directory: {
           inherit directory;
@@ -43,6 +43,7 @@ in
           "Music"
           "Pictures"
           "Videos"
-        ];
+        ]
+    );
   };
 }

@@ -38,7 +38,7 @@ in
     # 金鑰與用量在 .config/magpie,WebKit 資料在 .local/share/magpie;
     # ~/.cache/magpie 含 agents/sessions 狀態,清理時保留 agents-state.json
     # 與 sessions.json 即可。
-    persist' = {
+    persist' = lib.mkIf config.persist'.enable {
       directories = [
         {
           directory = ".config/magpie";
