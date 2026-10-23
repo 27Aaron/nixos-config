@@ -3,18 +3,22 @@ let
   vars = import ../../vars;
 
   # 每個快取都能把任意 store 路徑送進系統並以 root 執行;新增時要同時改
-  # modules/base/core/nix.nix 與這裡。
+  # modules/base/core/nix.nix(或啟用它的模組)與這裡。
   caches = {
     substituters = [
       "https://cache.nixos.org/"
       "https://cache.numtide.com"
-      "https://fcitx5-vinput.cachix.org"
     ];
     keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-      "fcitx5-vinput.cachix.org-1:XpX3AA6+dDIX4qJhb1QM7sbTwX6/qSlGvW8Z5NK6XdU="
     ];
+  };
+
+  # 只有啟用 desktop'.vinput 的主機才信任,見 WA-001。
+  vinputCache = {
+    substituters = [ "https://fcitx5-vinput.cachix.org" ];
+    keys = [ "fcitx5-vinput.cachix.org-1:XpX3AA6+dDIX4qJhb1QM7sbTwX6/qSlGvW8Z5NK6XdU=" ];
   };
 
   # 必須包在 nixpak 沙箱裡安裝的程式,值為比對套件名稱的正規表示式。
@@ -44,13 +48,16 @@ in
     { config, ... }:
     let
       s = config.nix.settings;
+      vinput = config.desktop'.vinput.enable or false;
     in
     {
       expr = {
         substituters = sorted (s.substituters ++ s.extra-substituters ++ s.trusted-substituters);
         keys = sorted (s.trusted-public-keys ++ s.extra-trusted-public-keys);
       };
-      expected = lib.mapAttrs (_: sorted) caches;
+      expected = lib.mapAttrs (
+        name: list: sorted (list ++ lib.optionals vinput vinputCache.${name})
+      ) caches;
     };
 
   # 這些程式只能以 nixpak 沙箱版本安裝;換回原始套件時就會失敗。

@@ -20,4 +20,4 @@ hosts/
 
 1. 建立 `hosts/nixos/<名稱>/default.nix`，Mac 則是 `hosts/darwin/<名稱>/default.nix`。
 2. 需要遠端部署的主機，開啟 `services'.openssh.rootLogin`，之後以 `just deploy <名稱> root@<位址>` 部署。
-3. 執行 `just build <名稱>` 確認能建置。
+3. 執行 `just build <名稱>` 確認能建置。全新的 Mac 第一次以 `just install <名稱>` 啟用 nix-darwin。

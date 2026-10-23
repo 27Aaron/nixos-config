@@ -31,6 +31,14 @@ in
       }
     ];
 
+    # 上游以自己的 lock 建置的二進位快取,只在啟用時信任;見 WA-001。
+    nix.settings = {
+      extra-substituters = [ "https://fcitx5-vinput.cachix.org" ];
+      extra-trusted-public-keys = [
+        "fcitx5-vinput.cachix.org-1:XpX3AA6+dDIX4qJhb1QM7sbTwX6/qSlGvW8Z5NK6XdU="
+      ];
+    };
+
     environment.systemPackages = [ vinput ];
 
     # addon 只載入外掛,執行檔另外放進 PATH。

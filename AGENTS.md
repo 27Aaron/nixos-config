@@ -90,6 +90,7 @@ Deployment is manual and must be explicitly requested; never run a switch or rem
 
 ```bash
 just switch [target]                # apply a host's configuration locally
+just install [target]               # first nix-darwin activation on a fresh Mac; afterwards use just switch
 just deploy <target> root@<host>    # remote deployment; the target needs services'.openssh.rootLogin
 ```
 

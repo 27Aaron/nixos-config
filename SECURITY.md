@@ -64,7 +64,7 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 | Control | Where | Test |
 |---|---|---|
 | No Nix trusted users, daemon limited to `@wheel` (`@admin` on macOS), signatures required | `modules/base/core/nix.nix`, `modules/nixos/base/core/nix.nix`, `modules/darwin/core/nix.nix` | `nix-trust`, `daemon-access` |
-| Inventory of trusted substituters and keys | `modules/base/core/nix.nix` | `nix-caches` |
+| Inventory of trusted substituters and keys | `modules/base/core/nix.nix`, `modules/nixos/desktop/input-method/vinput.nix` (only with `desktop'.vinput`) | `nix-caches` |
 | sshd: keys only, no root login unless `services'.openssh.rootLogin`, no X11 forwarding | `modules/nixos/base/services/openssh.nix` | `ssh` |
 | Inventory of open firewall ports per host | services that open ports | `firewall` |
 | No password or hash in the configuration; passwords decrypted before users are created | `modules/nixos/base/core/users.nix` | `password-source` |
