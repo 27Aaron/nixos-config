@@ -5,72 +5,39 @@ This repository is a Nix flake for NixOS hosts using a "tmpfs as root" layout: t
 ## Repository layout
 
 ```text
-flake.nix                 # inputs and outputs
-lib/default.nix           # listModules: the recursive module collector
-lib/nixpak/               # shared nixpak modules for sandboxed desktop apps (GUI, network)
-hosts/
-├── default.nix           # host discovery: every hosts/nixos/<name>/ becomes nixosConfigurations.<name>
-├── nixos/<name>/         # one directory per NixOS host
-│   ├── default.nix       # feature switches, timezone, stateVersion
-│   ├── *.nix             # host-local modules split by topic (hardware, storage, power, ...)
-│   └── README.md         # hardware inventory and firmware notes
-└── darwin/               # reserved: nix-darwin hosts
+flake.nix          # inputs and outputs
+lib/               # module collector and shared nixpak sandbox modules
+hosts/             # one directory per host, discovered automatically
 modules/
-├── base/core/            # always on, shared by NixOS and nix-darwin: aliases, fish, nix settings
-├── darwin/               # reserved: nix-darwin system modules
-├── nixos/
-│   ├── base/core/        # always on: users and sops, hostname, locale, firewall, kernel hardening, logging, nix and nh, ssh client fix, Home Manager
-│   ├── base/hardware/    # hardware'.*: disko, persistence, boot/, amdgpu, bluetooth, brightness, yubikey
-│   ├── base/services/    # services'.*: daemons any NixOS host may run, servers included
-│   ├── desktop/          # desktop'.*: greetd, niri, noctalia, fonts, file manager, trash, pipewire, game/, input-method/, power/
-│   └── server/           # server'.*: fail2ban, initrd-ssh
-└── home/
-    ├── base/             # always on for every host, macOS included; no enable options
-    │   ├── core/         # what fits no interface: account settings, persist options
-    │   ├── cli/          # draws nothing of its own (shell/, git, ssh, packages)
-    │   ├── tui/          # takes over the terminal (lazygit, monitors)
-    │   └── gui/          # opens a window (empty placeholder)
-    ├── nixos/            # switchable Home Manager modules
-    │   ├── cli/          # cli.*: draws nothing of its own (development, toolchains)
-    │   ├── tui/          # tui.*: takes over the terminal (agents/)
-    │   └── gui/          # gui.*: opens a window (browsers/, editors/, kitty, theme, XDG, desktop apps)
-    └── darwin/           # reserved: Home Manager modules only macOS needs
-tests/                    # eval tests run by `just check`: security invariants and inventories
-vars/default.nix          # shared non-secret user values
-Justfile                  # task recipes
-SECURITY.md               # threat model, trust boundaries, app sandboxes, runtime checks
-WORKAROUNDS.md            # temporary workarounds, pins and security exceptions with removal conditions
+├── base/          # system modules shared by NixOS and nix-darwin
+├── nixos/         # NixOS system modules: base/, desktop/, server/
+├── darwin/        # reserved: nix-darwin system modules
+└── home/          # Home Manager modules: base/ always on, nixos/ switchable
+tests/             # eval tests run by `just check`
+vars/              # shared non-secret values
+SECURITY.md        # threat model, trust boundaries, app sandboxes, runtime checks
+WORKAROUNDS.md     # temporary workarounds, pins and security exceptions
 ```
 
-Every major directory has a `README.md` with its placement rules. Read it before adding a file there, and update it, together with the tree above, when a change makes either one stale.
+Every major directory has a `README.md` saying what belongs there. Read it before adding a file, and update it when a change makes it stale.
 
 ## Host discovery
 
-Every directory under `hosts/nixos/` that contains a `default.nix` becomes a host; the directory name is the host name, passed to modules as `hostName`. Adding a host means creating `hosts/nixos/<name>/default.nix` — nothing else in the flake changes. `hosts/darwin/` is reserved; the first Mac also needs a `nix-darwin` input and `darwinConfigurations` in `hosts/default.nix`.
-
-Host files are ordinary NixOS modules:
-
-- `hosts/nixos/<name>/default.nix` states what makes the host different: feature switches, timezone, `stateVersion`, and imports of host-local files.
-- Settings bound to this machine's hardware (disk layout, boot, firmware, power and resume quirks, key remaps) go into host-local modules split by topic, such as `hardware.nix` and `storage.nix`. Anything a second machine could reuse becomes a module under `modules/` instead.
+Every `hosts/nixos/<name>/default.nix` becomes `nixosConfigurations.<name>`; the directory name is passed to modules as `hostName`. `default.nix` holds the host's feature switches, timezone and `stateVersion`; settings bound to this machine's hardware go into host-local files split by topic. Anything a second machine could reuse becomes a module under `modules/`. `hosts/darwin/` is reserved; the first Mac also needs a `nix-darwin` input and `darwinConfigurations` in `hosts/default.nix`.
 
 ## Module conventions
 
-- Modules are collected automatically by `listModules` in `lib/default.nix`: a NixOS host loads `modules/base` and `modules/nixos`, and its Home Manager user loads `modules/home/base` and `modules/home/nixos`. A subdirectory with a `default.nix` is loaded through that file only.
-- Place a module at the most general level where it works: `base/` for both system platforms, `nixos/base/` for any NixOS host including servers, `nixos/desktop/` only with a screen, `nixos/server/` only on servers. `modules/README.md` lists the full order.
-- Modules under a `core/` directory are always on and have no `enable` option; keep them limited to what every host needs. A core module may expose tunables under `core'.*` (for example `core'.logging.journalMaxUse`). Every other system module is off by default: it exposes options under a prime-namespaced attribute (`hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory; grouping subdirectories such as `desktop/input-method/` do not add a level.
-- Aliases: `modules/base/core/aliases.nix` defines `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`); `modules/nixos/base/hardware/persistence.nix` defines `preservation'.os.*` and `preservation'.user.*`.
-- Home Manager modules follow the same rule. `home/base/` holds always-on modules without an `enable` option that every host needs and that work on servers, desktops and macOS alike, such as the shell, Git and everyday CLI tools. They are sorted into `cli/`, `tui/` and `gui/` by interface; `core/` keeps what fits none of them, such as account settings and the `persist` options. Keep each of the four directories, with a `.gitkeep` while empty. Anything a host should be able to switch on or off, such as development environments, agents and GUI apps, goes to `home/nixos/` with an `enable` option under `cli.*`, `tui.*` or `gui.*` (by interface), and a host turns it on through `hm'`, for example `hm'.gui.zed.enable = true`.
-- `mkEnableOption` descriptions complete the sentence "Whether to enable …": lowercase, no final period, and the upstream spelling of names (`the greetd login manager`, `power-profiles-daemon`).
+- Modules are collected automatically by `listModules` in `lib/default.nix`; a subdirectory with a `default.nix` is loaded through that file only.
+- Place a module at the most general level where it works; `modules/README.md` lists the order. Home Manager modules go to `home/base/` only if every host needs them and they work on macOS too; switchable ones go to `home/nixos/`.
+- Modules under `core/` and in `home/base/` are always on and have no `enable` option. Every other module is off by default and follows neighboring modules for its option namespace and `enable` switch.
 - Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
 
 ## Persistence
 
-- With a tmpfs root, nothing outside the registered paths survives a reboot. Anything a program must keep must appear in `preservation'.os.*`, `preservation'.user.*`, or the `persist` bridge.
-- Not every host uses a tmpfs root, so every persistence entry is gated on the host's switch: system modules wrap `preservation'.*` in `lib.mkIf config.hardware'.persistence.enable`, and Home Manager modules wrap `persist.*` in `lib.mkIf config.persist.enable`, which the persistence module turns on together with `hardware'.persistence`.
-- Home Manager modules report their runtime state through `persist.directories` and `persist.files`; the persistence module merges them into `preservation'.user`. System modules write `preservation'.user` directly.
+- With a tmpfs root, nothing outside the registered paths survives a reboot. System modules register state in `preservation'.os` or `preservation'.user`; Home Manager modules use `persist`, which the persistence module merges into `preservation'.user`.
 - Register state in the module that creates it. `~/.cache` is never persisted as a whole; list only the caches worth keeping.
 - Give directories that hold credentials, sessions, keys or history `mode = "0700"`. Preservation's default is `0755`, and it is re-applied on every boot.
-- When a system module persists state for a service that an upstream module may also enable, gate it on the service's final state (`lib.mkIf (config.hardware'.persistence.enable && config.hardware.bluetooth.enable) [ ... ]`), not on the module's own switch.
+- When an upstream module may also enable a service, gate its persisted state on the service's final state (such as `config.hardware.bluetooth.enable`), not on this module's switch.
 - Programs that update a file by writing a temporary file and calling `rename()` (logrotate, zsh) fail with `EBUSY` on a single-file bind mount; persist the parent directory instead.
 - The machine-id uses the bind-mount recipe plus a suppressed `systemd-machine-id-commit.service`; do not mix in the symlink recipe's commit override.
 
@@ -95,7 +62,6 @@ Record every temporary workaround, version pin and accepted security exception i
 - Two spaces for indentation, no tabs, LF line endings, a final newline, and no trailing whitespace.
 - Run the repository formatter with `nix fmt` after editing Nix files.
 - Format files changed by the task; do not reformat unrelated files.
-- Preserve existing naming conventions when extending a module.
 - Top-level documents (`README.md`, `AGENTS.md`, `SECURITY.md`, `WORKAROUNDS.md`), option descriptions and commit messages are in English. Directory READMEs and Nix comments are in Traditional Chinese with Taiwanese usage (設定, 檔案, 預設, 支援). Markdown prose uses full-width punctuation; Nix comments use half-width `,;:()` with full-width `。、`.
 - Comments explain why: a constraint, an upstream quirk, or a rejected alternative. Do not restate what the next line does, and do not add file header comments.
 

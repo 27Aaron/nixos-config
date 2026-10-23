@@ -4,28 +4,14 @@
 
 ```text
 modules/
-├── base/        # NixOS 與 nix-darwin 系統層共用
-├── nixos/       # 只有 NixOS(桌面、伺服器、路由器)
-├── darwin/      # 只有 nix-darwin(macOS)
-└── home/        # Home Manager,使用者層
+├── base/      # NixOS 與 nix-darwin 系統層共用
+├── nixos/     # 只有 NixOS
+├── darwin/    # 只有 nix-darwin,預留
+└── home/      # Home Manager,使用者層
 ```
 
-各目錄的細節見其中的 `README.md`。
-
-## 載入方式
-
-模組由 `lib/default.nix` 的 `listModules` 自動收集，不需要手動加進匯入清單：
-
-- 一般 `.nix` 檔直接載入。
-- 子目錄若含 `default.nix`，只載入該檔，由它自行匯入其餘檔案。
-- 子目錄若不含 `default.nix`，繼續往下收集。
-
-各平臺收集的範圍：
-
-| 主機 | 系統層 | Home Manager |
-|---|---|---|
-| NixOS | `base/` + `nixos/` | `home/base/` + `home/nixos/` |
-| nix-darwin | `base/` + `darwin/` | `home/base/` + `home/darwin/` |
+模組由 `lib/default.nix` 自動收集，不必手動匯入。子目錄若含 `default.nix`，只載入該檔。
+NixOS 主機載入 `base/`、`nixos/`，以及 `home/base/`、`home/nixos/`；nix-darwin 主機則換成 `darwin/` 與 `home/darwin/`。
 
 ## 放在哪裡
 
@@ -36,27 +22,9 @@ modules/
 3. 只有接螢幕的 NixOS 才用 → `nixos/desktop/`
 4. 只有伺服器才用 → `nixos/server/`
 5. 只有 macOS 才用 → `darwin/`
-6. 使用者層的程式與設定 → `home/`，見 `home/README.md`
+6. 使用者層的程式與設定 → `home/`
 
 ## 開關
 
-- **`core/` 目錄裡的模組一律生效，沒有開關**：只放每臺機器都必須有的東西，
-  例如帳號、nix 設定、防火牆。需要讓主機微調的數值放在 `core'.*`，
-  例如 `core'.logging.journalMaxUse`，但不提供 `enable`。
-- **其他模組一律預設關閉**，要在主機的 `default.nix` 寫 `enable = true` 才會生效。
-  Home Manager 的 `home/base/` 例外，整個目錄一律生效，見 `home/README.md`。
-  伺服器因此只會帶入自己開啟的功能。
-
-## 撰寫慣例
-
-- 一個檔案只負責一個程式或一個面向；安裝、設定與持久化放在同一個檔案。
-- 設定多到一個檔案放不下時，改成資料夾，以 `default.nix` 為入口。
-- 同類檔案有兩個以上才建子目錄。
-- 選項放在依目錄命名的命名空間，例如 `nixos/base/services/` → `services'.*`。
-
-## 別名
-
-`base/core/aliases.nix` 定義兩個別名，指向主要使用者：
-
-- `user'.*` → `users.users.<使用者>`
-- `hm'.*` → `home-manager.users.<使用者>`
+`core/` 目錄與 `home/base/` 的模組一律生效，沒有開關，只放每臺機器都需要的東西。
+其他模組預設關閉，由主機在 `default.nix` 打開，伺服器因此只會帶入自己開啟的功能。

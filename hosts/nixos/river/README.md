@@ -23,16 +23,6 @@ MECHREVO 無界 14XA（WUJIE 14X Blizzard）筆電，Ryzen 7 8845HS。
 | 睡眠 | 只有 s2idle，沒有 S3 | 合蓋行為見 `power.nix` |
 | 鏡頭 | IR 鏡頭 | `04f2:b7dd` |
 
-## 設定檔
-
-| 檔案 | 內容 |
-|---|---|
-| `default.nix` | 功能開關、時區、`stateVersion` |
-| `hardware.nix` | 開機載入器、核心、initrd、韌體與週邊 |
-| `storage.nix` | 磁碟佈局（LUKS + FIDO2、Btrfs）、持久化、zram、磁碟維護 |
-| `power.nix` | 休眠與睡眠、蓋子與觸控板的恢復修補、電源管理服務 |
-| `keyboard.nix` | keyd 鍵位映射（Copilot 鍵、HHKB） |
-
 ## BIOS
 
 BIOS 更新程式只有 Windows 的 `.EXE`。
