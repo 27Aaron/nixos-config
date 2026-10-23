@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.gui'.zed;
+  cfg = config.gui.zed;
 in
 {
-  options.gui'.zed.enable = lib.mkEnableOption "the Zed editor";
+  options.gui.zed.enable = lib.mkEnableOption "the Zed editor";
 
   config = lib.mkIf cfg.enable {
     programs.zed-editor = {
@@ -109,7 +109,7 @@ in
 
     # .config/zed 存放合併後的 settings.json 與快捷鍵、片段;擴充功能、
     # 工作區資料庫與登入狀態在 .local/share/zed。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       ".config/zed"
       {
         directory = ".local/share/zed";

@@ -30,7 +30,7 @@ nixos/
 根目錄是 tmpfs，重開機即清空，只有登記過的路徑會留下：
 
 - 系統狀態用 `preservation'.os.*`。
-- 使用者狀態用 `preservation'.user.*`；Home Manager 模組改用 `persist'`，
+- 使用者狀態用 `preservation'.user.*`；Home Manager 模組改用 `persist`，
   由 `base/hardware/persistence.nix` 併入。
 - 不是每臺主機都用 tmpfs 根目錄，因此每個登記都要以
   `lib.mkIf config.hardware'.persistence.enable` 包起來，主機沒開持久化時不留下任何設定。

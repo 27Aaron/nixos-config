@@ -26,14 +26,14 @@ modules/
 │   └── server/           # server'.*: fail2ban, initrd-ssh
 └── home/
     ├── base/             # always on for every host, macOS included; no enable options
-    │   ├── core/         # what fits no interface: account settings, persist' options
+    │   ├── core/         # what fits no interface: account settings, persist options
     │   ├── cli/          # draws nothing of its own (shell/, git, ssh, packages)
     │   ├── tui/          # takes over the terminal (lazygit, monitors)
     │   └── gui/          # opens a window (empty placeholder)
     ├── nixos/            # switchable Home Manager modules
-    │   ├── cli/          # cli'.*: draws nothing of its own (development, toolchains)
-    │   ├── tui/          # tui'.*: takes over the terminal (agents/)
-    │   └── gui/          # gui'.*: opens a window (browsers/, editors/, kitty, theme, XDG, desktop apps)
+    │   ├── cli/          # cli.*: draws nothing of its own (development, toolchains)
+    │   ├── tui/          # tui.*: takes over the terminal (agents/)
+    │   └── gui/          # gui.*: opens a window (browsers/, editors/, kitty, theme, XDG, desktop apps)
     └── darwin/           # reserved: Home Manager modules only macOS needs
 tests/                    # eval tests run by `just check`: security invariants and inventories
 vars/default.nix          # shared non-secret user values
@@ -59,15 +59,15 @@ Host files are ordinary NixOS modules:
 - Place a module at the most general level where it works: `base/` for both system platforms, `nixos/base/` for any NixOS host including servers, `nixos/desktop/` only with a screen, `nixos/server/` only on servers. `modules/README.md` lists the full order.
 - Modules under a `core/` directory are always on and have no `enable` option; keep them limited to what every host needs. A core module may expose tunables under `core'.*` (for example `core'.logging.journalMaxUse`). Every other system module is off by default: it exposes options under a prime-namespaced attribute (`hardware'.*`, `services'.*`, `desktop'.*`, `server'.*`), with an `enable` option via `lib.mkEnableOption` gated by `lib.mkIf`. The namespace follows the directory; grouping subdirectories such as `desktop/input-method/` do not add a level.
 - Aliases: `modules/base/core/aliases.nix` defines `user'.*` (`users.users.<vars.username>`) and `hm'.*` (`home-manager.users.<vars.username>`); `modules/nixos/base/hardware/persistence.nix` defines `preservation'.os.*` and `preservation'.user.*`.
-- Home Manager modules follow the same rule. `home/base/` holds always-on modules without an `enable` option that every host needs and that work on servers, desktops and macOS alike, such as the shell, Git and everyday CLI tools. They are sorted into `cli/`, `tui/` and `gui/` by interface; `core/` keeps what fits none of them, such as account settings and the `persist'` options. Keep each of the four directories, with a `.gitkeep` while empty. Anything a host should be able to switch on or off, such as development environments, agents and GUI apps, goes to `home/nixos/` with an `enable` option under `cli'.*`, `tui'.*` or `gui'.*` (by interface), and a host turns it on through `hm'`, for example `hm'.gui'.zed.enable = true`.
+- Home Manager modules follow the same rule. `home/base/` holds always-on modules without an `enable` option that every host needs and that work on servers, desktops and macOS alike, such as the shell, Git and everyday CLI tools. They are sorted into `cli/`, `tui/` and `gui/` by interface; `core/` keeps what fits none of them, such as account settings and the `persist` options. Keep each of the four directories, with a `.gitkeep` while empty. Anything a host should be able to switch on or off, such as development environments, agents and GUI apps, goes to `home/nixos/` with an `enable` option under `cli.*`, `tui.*` or `gui.*` (by interface), and a host turns it on through `hm'`, for example `hm'.gui.zed.enable = true`.
 - `mkEnableOption` descriptions complete the sentence "Whether to enable …": lowercase, no final period, and the upstream spelling of names (`the greetd login manager`, `power-profiles-daemon`).
 - Keep one program or one concern per file. When a module outgrows one file, turn it into a directory with a `default.nix` entry.
 
 ## Persistence
 
-- With a tmpfs root, nothing outside the registered paths survives a reboot. Anything a program must keep must appear in `preservation'.os.*`, `preservation'.user.*`, or the `persist'` bridge.
-- Not every host uses a tmpfs root, so every persistence entry is gated on the host's switch: system modules wrap `preservation'.*` in `lib.mkIf config.hardware'.persistence.enable`, and Home Manager modules wrap `persist'.*` in `lib.mkIf config.persist'.enable`, which the persistence module turns on together with `hardware'.persistence`.
-- Home Manager modules report their runtime state through `persist'.directories` and `persist'.files`; the persistence module merges them into `preservation'.user`. System modules write `preservation'.user` directly.
+- With a tmpfs root, nothing outside the registered paths survives a reboot. Anything a program must keep must appear in `preservation'.os.*`, `preservation'.user.*`, or the `persist` bridge.
+- Not every host uses a tmpfs root, so every persistence entry is gated on the host's switch: system modules wrap `preservation'.*` in `lib.mkIf config.hardware'.persistence.enable`, and Home Manager modules wrap `persist.*` in `lib.mkIf config.persist.enable`, which the persistence module turns on together with `hardware'.persistence`.
+- Home Manager modules report their runtime state through `persist.directories` and `persist.files`; the persistence module merges them into `preservation'.user`. System modules write `preservation'.user` directly.
 - Register state in the module that creates it. `~/.cache` is never persisted as a whole; list only the caches worth keeping.
 - Give directories that hold credentials, sessions, keys or history `mode = "0700"`. Preservation's default is `0755`, and it is re-applied on every boot.
 - When a system module persists state for a service that an upstream module may also enable, gate it on the service's final state (`lib.mkIf (config.hardware'.persistence.enable && config.hardware.bluetooth.enable) [ ... ]`), not on the module's own switch.

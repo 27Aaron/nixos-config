@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.gui'.mangohud;
+  cfg = config.gui.mangohud;
 in
 {
-  options.gui'.mangohud.enable = lib.mkEnableOption "the MangoHud performance overlay";
+  options.gui.mangohud.enable = lib.mkEnableOption "the MangoHud performance overlay";
 
   # 不設 enableSessionWide:那會讓每個 Vulkan 程式都顯示疊加層;遊戲改以
   # `mangohud %command%` 個別開啟。

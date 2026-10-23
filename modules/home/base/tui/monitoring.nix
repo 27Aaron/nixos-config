@@ -12,5 +12,5 @@
   ];
 
   # btop 會在介面中直接改寫設定檔。
-  persist'.directories = lib.mkIf config.persist'.enable [ ".config/btop" ];
+  persist.directories = lib.mkIf config.persist.enable [ ".config/btop" ];
 }

@@ -6,12 +6,12 @@
   ...
 }:
 let
-  cfg = config.gui'.magpie;
+  cfg = config.gui.magpie;
 
   magpie = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.magpie;
 in
 {
-  options.gui'.magpie.enable = lib.mkEnableOption "magpie and its tray service";
+  options.gui.magpie.enable = lib.mkEnableOption "magpie and its tray service";
 
   config = lib.mkIf cfg.enable {
     home.packages = [ magpie ];
@@ -38,7 +38,7 @@ in
     # 金鑰與用量在 .config/magpie,WebKit 資料在 .local/share/magpie;
     # ~/.cache/magpie 含 agents/sessions 狀態,清理時保留 agents-state.json
     # 與 sessions.json 即可。
-    persist' = lib.mkIf config.persist'.enable {
+    persist = lib.mkIf config.persist.enable {
       directories = [
         {
           directory = ".config/magpie";

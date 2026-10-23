@@ -8,9 +8,9 @@ let
   cfg = config.hardware'.persistence;
   user = vars.username;
 
-  # Home Manager 透過 persist' 回報的狀態;未載入 HM 時為空。
+  # Home Manager 透過 persist 回報的狀態;未載入 HM 時為空。
   persist =
-    config.hm'.persist' or {
+    config.hm'.persist or {
       directories = [ ];
       files = [ ];
     };
@@ -59,8 +59,8 @@ in
 
     preservation'.user.files = persist.files;
 
-    # 讓 Home Manager 模組的 persist' 項目生效。
-    hm'.persist'.enable = true;
+    # 讓 Home Manager 模組的 persist 項目生效。
+    hm'.persist.enable = true;
 
     # 通用 NixOS 系統狀態。
     preservation'.os = {

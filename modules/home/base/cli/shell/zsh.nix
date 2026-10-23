@@ -18,7 +18,7 @@
     syntaxHighlighting.enable = true;
   };
 
-  persist'.directories = lib.mkIf config.persist'.enable [
+  persist.directories = lib.mkIf config.persist.enable [
     {
       directory = ".cache/zsh";
       mode = "0700";

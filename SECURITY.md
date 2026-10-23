@@ -70,7 +70,7 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 | systemd-boot editor off, immutable users | `modules/nixos/base/hardware/boot/`, `users.nix` | `boot-and-accounts` |
 | Kernel sysctl baseline, blocked modules, user namespaces kept, hibernation compatible | `modules/nixos/base/core/kernel-hardening.nix` | `kernel` |
 | Editor and agent trust prompts on | `modules/home/nixos/gui/editors/`, `tui/agents/` | `editor-and-agent-trust` |
-| Credential and history directories persisted as `0700` | each module's `persist'` entries | `private-state` |
+| Credential and history directories persisted as `0700` | each module's `persist` entries | `private-state` |
 | `execWheelOnly` off while btrbk relies on sudo | `modules/nixos/base/services/btrbk.nix` | `btrbk-sudo` |
 | Sandboxed apps are installed only in their nixpak form | `modules/home/nixos/gui/nagram.nix`, `lib/nixpak/` | `sandboxed-apps` |
 

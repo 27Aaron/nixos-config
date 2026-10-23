@@ -5,10 +5,10 @@
   ...
 }:
 let
-  cfg = config.cli'.toolchain;
+  cfg = config.cli.toolchain;
 in
 {
-  options.cli'.toolchain.enable = lib.mkEnableOption "language toolchains and language servers";
+  options.cli.toolchain.enable = lib.mkEnableOption "language toolchains and language servers";
 
   config = lib.mkIf cfg.enable {
     # 裝在使用者 PATH 上,供編輯器、終端機與腳本共用。這裡只放 nixpkgs 的
@@ -42,6 +42,6 @@ in
     ];
 
     # Go 的建置快取;保留可免去重開機後重新編譯。
-    persist'.directories = lib.mkIf config.persist'.enable [ ".cache/go-build" ];
+    persist.directories = lib.mkIf config.persist.enable [ ".cache/go-build" ];
   };
 }

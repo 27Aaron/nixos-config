@@ -5,10 +5,10 @@
   ...
 }:
 let
-  cfg = config.gui'.vscode;
+  cfg = config.gui.vscode;
 in
 {
-  options.gui'.vscode.enable = lib.mkEnableOption "Visual Studio Code";
+  options.gui.vscode.enable = lib.mkEnableOption "Visual Studio Code";
 
   config = lib.mkIf cfg.enable {
     programs.vscode = {
@@ -29,7 +29,7 @@ in
     };
 
     # 設定與登入狀態由程式自行寫入。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/Code";
         mode = "0700";

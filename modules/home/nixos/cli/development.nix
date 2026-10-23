@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.cli'.development;
+  cfg = config.cli.development;
 in
 {
-  options.cli'.development.enable = lib.mkEnableOption "project environments with direnv, mise and uv";
+  options.cli.development.enable = lib.mkEnableOption "project environments with direnv, mise and uv";
 
   config = lib.mkIf cfg.enable {
     # 用 direnv + nix-direnv 載入專案環境。
@@ -38,7 +38,7 @@ in
     '';
 
     # .envrc 允許清單、mise 工具鏈、uv 直譯器。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       ".local/share/direnv"
       ".local/share/mise"
       ".local/share/uv"

@@ -5,17 +5,17 @@
   ...
 }:
 let
-  cfg = config.gui'.firefox;
+  cfg = config.gui.firefox;
 in
 {
-  options.gui'.firefox.enable = lib.mkEnableOption "Firefox";
+  options.gui.firefox.enable = lib.mkEnableOption "Firefox";
 
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.firefox ];
 
     # profile 整個保留:storage/ 存放網站登入狀態,各資料庫彼此關聯,不宜拆開。
     # 憑證位於 profile 內的 cert9.db/key4.db,無需另外登記。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/mozilla";
         mode = "0700";

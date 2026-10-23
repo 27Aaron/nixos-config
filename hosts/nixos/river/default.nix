@@ -38,17 +38,17 @@
   };
 
   hm' = {
-    cli' = {
+    cli = {
       development.enable = true;
       toolchain.enable = true;
     };
 
-    tui' = {
+    tui = {
       claude-code.enable = true;
       dsh.enable = true;
     };
 
-    gui' = {
+    gui = {
       chrome.enable = true;
       firefox.enable = true;
       vscode.enable = true;

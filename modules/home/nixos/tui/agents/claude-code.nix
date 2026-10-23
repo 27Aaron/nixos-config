@@ -6,12 +6,12 @@
   ...
 }:
 let
-  cfg = config.tui'.claude-code;
+  cfg = config.tui.claude-code;
 
   claude-code = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
 in
 {
-  options.tui'.claude-code.enable = lib.mkEnableOption "Claude Code";
+  options.tui.claude-code.enable = lib.mkEnableOption "Claude Code";
 
   config = lib.mkIf cfg.enable {
     # 非自由軟體,需要 nixpkgs.config.allowUnfree。
@@ -24,7 +24,7 @@ in
     };
 
     # 登入憑證、設定與對話紀錄由程式自行寫入。
-    persist' = lib.mkIf config.persist'.enable {
+    persist = lib.mkIf config.persist.enable {
       directories = [
         {
           directory = ".claude";

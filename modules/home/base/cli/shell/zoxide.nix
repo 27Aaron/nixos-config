@@ -6,5 +6,5 @@
     enableZshIntegration = true;
   };
 
-  persist'.directories = lib.mkIf config.persist'.enable [ ".local/share/zoxide" ];
+  persist.directories = lib.mkIf config.persist.enable [ ".local/share/zoxide" ];
 }
