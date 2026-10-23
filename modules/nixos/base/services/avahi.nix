@@ -19,10 +19,13 @@ in
       openFirewall = true;
 
       # 讓區網其他機器不必知道 IP,就能以 <hostName>.local 找到這臺。
-      publish = {
-        enable = true;
-        domain = true;
-        userServices = true;
+      # 舊的 publish.userServices 會順帶打開 publish-addresses,新的 settings 預設為 false,
+      # 少了它 .local 名稱就解析不到。
+      settings.publish = {
+        disable-publishing = false;
+        disable-user-service-publishing = false;
+        publish-addresses = true;
+        publish-domain = true;
       };
     };
   };
