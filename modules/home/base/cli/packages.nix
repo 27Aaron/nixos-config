@@ -1,6 +1,5 @@
 { pkgs, ... }:
 {
-  # 只安裝、不需設定的命令列工具;需要設定的各自有模組。
   home.packages = with pkgs; [
     fastfetch
 
