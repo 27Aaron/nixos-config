@@ -30,9 +30,17 @@ BIOS 更新程式只有 Windows 的 `.EXE`。
 - **下載：**[N.1.14MRO50](https://driver.mechrevo.com/d.mechrevo.com/driver/MECHREVO2024/WJ14X8845HS/GXxHXxxN114MRO50_CAP.EXE)
 - **來源：**[w568w 的 WUJIE 14XA 逆向筆記](https://gist.github.com/w568w/b2fc5f9d1f4dff13efe751abec27b396?permalink_comment_id=6147538#gistcomment-6147538)
 
-## Secure Boot
+## Secure Boot 與磁碟解鎖
 
 以 lanzaboote 開機，簽章用的是自己產生的金鑰。設定步驟見 [SECURITY.md 的 Secure Boot](../../../SECURITY.md#secure-boot)。
 
 - 只登記自己的金鑰，不含 Microsoft 金鑰：TPM 事件記錄共 84 筆，其中沒有 `EV_EFI_BOOT_SERVICES_DRIVER`，表示開機時不會載入外部 Option ROM；內顯的 GOP 包在 BIOS 裡。
 - 之後若要透過 USB4 接外接顯卡，並需要它在開機選單或 BIOS 階段就有畫面，要改用 `sbctl enroll-keys --microsoft` 重新登記。進入 Linux 後不受影響。
+
+磁碟以 TPM2 解鎖，綁定 PCR 7，不設 PIN，所以開機時不必輸入任何東西（例外紀錄見 WORKAROUNDS.md 的 WA-023）。安全性改由以下幾點維持：
+
+- Secure Boot：換掉 kernel 或 initrd、關閉 Secure Boot，或從其他開機碟開機，都會讓 PCR 7 改變，TPM 就不會交出金鑰。
+- 不自動登入：開機後停在 tuigreet，必須輸入帳號密碼。
+- 睡眠前鎖定：Noctalia 的 `[lockscreen].lock_before_suspend` 預設開啟，從睡眠或休眠恢復後都是鎖定畫面。這個設定由 Noctalia 介面管理，不在 Nix 裡，關掉它就違反了 WA-023 的前提。
+
+LUKS slot 只有 `0 password` 與 `1 tpm2`。清除 CMOS 或重設 BIOS 可能清空 fTPM，更換 Secure Boot 金鑰也會改變 PCR 7；遇到這些情況，用 LUKS 密碼開機後重新登記 TPM2，指令見 SECURITY.md。
