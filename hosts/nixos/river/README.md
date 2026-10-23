@@ -29,3 +29,10 @@ BIOS 更新程式只有 Windows 的 `.EXE`。
 
 - **下載：**[N.1.14MRO50](https://driver.mechrevo.com/d.mechrevo.com/driver/MECHREVO2024/WJ14X8845HS/GXxHXxxN114MRO50_CAP.EXE)
 - **來源：**[w568w 的 WUJIE 14XA 逆向筆記](https://gist.github.com/w568w/b2fc5f9d1f4dff13efe751abec27b396?permalink_comment_id=6147538#gistcomment-6147538)
+
+## Secure Boot
+
+以 lanzaboote 開機，簽章用的是自己產生的金鑰。設定步驟見 [SECURITY.md 的 Secure Boot](../../../SECURITY.md#secure-boot)。
+
+- 只登記自己的金鑰，不含 Microsoft 金鑰：TPM 事件記錄共 84 筆，其中沒有 `EV_EFI_BOOT_SERVICES_DRIVER`，表示開機時不會載入外部 Option ROM；內顯的 GOP 包在 BIOS 裡。
+- 之後若要透過 USB4 接外接顯卡，並需要它在開機選單或 BIOS 階段就有畫面，要改用 `sbctl enroll-keys --microsoft` 重新登記。進入 Linux 後不受影響。

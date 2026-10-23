@@ -44,6 +44,7 @@ let
   privateFiles = [ ".claude.json" ];
   privateSystemDirs = [
     "/var/lib/bluetooth"
+    "/var/lib/sbctl"
     "/etc/NetworkManager/system-connections"
   ];
 
@@ -140,15 +141,16 @@ in
     };
 
   # systemd-boot 的編輯器能改核心參數(例如 init=/bin/sh),等同免密碼 root;
-  # 帳號只能由設定宣告。
+  # lanzaboote 安裝的 systemd-boot 也一樣。帳號只能由設定宣告。
   boot-and-accounts =
     { config, ... }:
     let
       loader = config.boot.loader.systemd-boot;
+      lanzaboote = config.boot.lanzaboote;
     in
     {
       expr = {
-        editor = loader.enable && loader.editor;
+        editor = (loader.enable && loader.editor) || (lanzaboote.enable && lanzaboote.settings.editor);
         inherit (config.users) mutableUsers;
       };
       expected = {

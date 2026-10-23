@@ -14,7 +14,8 @@ The eval tests in [`tests/`](tests/README.md) run on every `just check` and fail
 | Inventory of open firewall ports per host | services that open ports | `firewall` |
 | No password or hash in the configuration; passwords decrypted before users are created | `modules/nixos/base/core/users.nix` | `password-source` |
 | sops decrypts only with the user's SSH key, no key file | `modules/nixos/base/core/sops.nix`, `modules/darwin/core/sops.nix` | `sops-key` |
-| systemd-boot editor off, immutable users | `modules/nixos/base/hardware/boot/`, `users.nix` | `boot-and-accounts` |
+| systemd-boot editor off (also under lanzaboote), immutable users | `modules/nixos/base/hardware/boot/`, `users.nix` | `boot-and-accounts` |
+| Secure Boot with owner-generated keys through lanzaboote; keys persisted as `0700` (river) | `modules/nixos/base/hardware/boot/lanzaboote.nix` | `boot-and-accounts`, `private-state` |
 | Kernel sysctl baseline, blocked modules, user namespaces kept, hibernation compatible | `modules/nixos/base/core/kernel-hardening.nix` | `kernel` |
 | Editor and agent trust prompts on | `modules/home/nixos/gui/editors/`, `modules/home/*/tui/agents/` | `editor-and-agent-trust` |
 | Credential and history directories persisted as `0700` | each module's `persist` entries | `private-state` |
@@ -33,6 +34,8 @@ nix config show allowed-users                      # @wheel
 sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication) '   # no / no
 sudo nft list chain inet nixos-fw input-allow      # only the expected ports
 systemctl --failed
+bootctl status | grep 'Secure Boot'             # enabled (user), on Secure Boot hosts
+sudo sbctl verify                                  # all stubs signed, on Secure Boot hosts
 ```
 
 On macOS:
@@ -53,6 +56,7 @@ Every input below can change what runs on the machine; those that provide system
 | `home-manager` | user environment | default branch |
 | `disko` | NixOS file systems | default branch |
 | `preservation` | NixOS persistence | default branch |
+| `lanzaboote` | Secure Boot loader and signing tool | release tag |
 | `sops-nix` | secret decryption | default branch |
 | `llm-agents` | coding agents; trusted cache | default branch |
 | `nagram` | Nagram desktop | default branch |
@@ -79,6 +83,38 @@ Replace a host's key:
 1. Generate the new key under another name and print its recipient with `ssh-to-age < new.pub`.
 2. In nix-secrets, replace the host's recipient in `.sops.yaml` and run `sops updatekeys` on every file, using a key that can still decrypt them.
 3. Update the `secrets` input here, then move the new key to `~/.ssh/id_ed25519` and switch.
+
+## Secure Boot
+
+Hosts with `hardware'.lanzaboote` boot systemd-boot stubs signed with owner-generated keys in `/var/lib/sbctl`, persisted as `0700`. Set up a host in this order; until the keys are enrolled, every step can be undone by switching back to `hardware'.systemd-boot`.
+
+1. Create the keys, then copy them to the persistent volume. Do this before the first switch: preservation bind-mounts `/persistent/var/lib/sbctl` over `/var/lib/sbctl`, so an empty persistent copy would hide the new keys.
+
+   ```bash
+   sudo nix shell nixpkgs#sbctl -c sbctl create-keys
+   sudo cp -a /var/lib/sbctl /persistent/var/lib/
+   sudo chmod 700 /persistent/var/lib/sbctl
+   sudo ls /var/lib/sbctl/keys /persistent/var/lib/sbctl/keys   # PK, KEK and db in both
+   ```
+
+2. Enable `hardware'.lanzaboote` in place of `hardware'.systemd-boot`, then `just switch`. `sudo sbctl verify` must report every file as signed except the kernels and initrds under `/boot/EFI/nixos/`. Remove the entries plain systemd-boot left behind, which lanzaboote no longer updates and which would boot unsigned kernels; the glob needs a root shell because `/boot` is readable only by root:
+
+   ```bash
+   sudo sh -c 'rm -v /boot/loader/entries/nixos-*.conf'
+   sudo bootctl list | grep source   # only /boot/EFI/Linux/nixos-generation-*.efi
+   ```
+3. Reboot once with Secure Boot still off, and confirm that the host boots and `/var/lib/sbctl/keys` survived.
+4. In the firmware, set a firmware password and put Secure Boot into Setup Mode by clearing the platform key (an option such as *Reset To Setup Mode* or *Delete PK*). Do not erase all Secure Boot variables: that also drops the revocation list (dbx).
+5. Back in NixOS, `sudo sbctl status` must show `Setup Mode: ✗ Enabled` before you enroll the keys with `sudo sbctl enroll-keys`. Many firmwares leave Setup Mode only at the next boot, so reboot, turn Secure Boot on in the firmware if it is off, and check that `bootctl status` shows `Secure Boot: enabled (user)`.
+
+Add `--microsoft` to `enroll-keys` if the host must boot Microsoft-signed media, or if the firmware loads option ROMs, which are signed with Microsoft's key and would otherwise be refused. The TPM event log records each option ROM as an `EV_EFI_BOOT_SERVICES_DRIVER` event; the second command checks that the log was read at all.
+
+```bash
+sudo nix shell nixpkgs#tpm2-tools -c sh -c 'tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements' | grep -c EV_EFI_BOOT_SERVICES_DRIVER
+sudo nix shell nixpkgs#tpm2-tools -c sh -c 'tpm2_eventlog /sys/kernel/security/tpm0/binary_bios_measurements' | grep -c EventType
+```
+
+The NixOS installer is not signed with these keys; disable Secure Boot in the firmware to boot it for recovery. For a host that fails signature checks after an interrupted install, see [lanzaboote's troubleshooting guide](https://github.com/nix-community/lanzaboote/blob/v1.2.0/docs/explanation/troubleshooting.md).
 
 ## Updating
 
