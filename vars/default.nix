@@ -2,6 +2,7 @@
   username = "aaron";
   fullName = "Aaron";
   homeStateVersion = "26.11";
+  timeZone = "Asia/Taipei";
 
   sshAuthorizedKeys = [
     # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA6xNNhF6jaPKuch8vSHwHTGlbyn4i2zSHxrqGOiacxG Aaron@Deployment"

@@ -26,6 +26,11 @@ build target=host:
 switch target=host:
     @nh {{nh_platform}} switch path:. -H {{target}}
 
+# 在全新的 macOS 上首次安裝 nix-darwin;之後改用 just switch。
+[macos]
+install target=host:
+    @sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from path:. nix-darwin#darwin-rebuild -- switch --flake path:.#{{target}}
+
 # 部署遠端 NixOS 主機,於本機建置;以 root 連入,目標須開啟 services'.openssh.rootLogin。
 deploy target remote:
     @nixos-rebuild switch --flake .#{{target}} --target-host {{remote}}
