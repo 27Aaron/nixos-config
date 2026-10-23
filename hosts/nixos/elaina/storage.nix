@@ -6,6 +6,7 @@
     espSize = "1G";
     swapSize = "65537M";
     luks.enable = true;
+    luks.fido2.enable = true;
   };
 
   # 狀態持久化。

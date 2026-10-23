@@ -141,6 +141,10 @@ in
     # 操作,每次只插一把鑰匙;預設要求 PIN 與觸摸,單有鑰匙無法解鎖:
     #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks   # 列出槽位
     #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
+    # 不接鍵盤的主機改為只要觸摸、不要求 PIN(見 WORKAROUNDS.md 的 WA-022);
+    # PIN 的要求記在 LUKS token 裡,開機時自動判斷,設定不必改:
+    #   sudo systemd-cryptenroll --fido2-device=auto --fido2-with-client-pin=no /dev/disk/by-partlabel/disk-main-luks
+    # LUKS 密碼槽位保留作備援,金鑰遺失時仍可解鎖。
     boot.initrd = lib.mkIf cfg.luks.enable {
       systemd.enable = true;
       availableKernelModules = lib.optionals cfg.luks.fido2.enable [
