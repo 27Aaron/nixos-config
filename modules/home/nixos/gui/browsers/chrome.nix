@@ -5,17 +5,17 @@
   ...
 }:
 let
-  cfg = config.gui'.chrome;
+  cfg = config.gui.chrome;
 in
 {
-  options.gui'.chrome.enable = lib.mkEnableOption "Google Chrome";
+  options.gui.chrome.enable = lib.mkEnableOption "Google Chrome";
 
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.google-chrome ];
 
     # 整個 profile 保留:Chrome 把使用者資料與可重建元件混放,
     # 且會在目錄內以原子替換方式寫檔。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/google-chrome";
         mode = "0700";

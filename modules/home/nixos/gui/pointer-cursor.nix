@@ -5,10 +5,10 @@
   ...
 }:
 let
-  cfg = config.gui'.pointer-cursor;
+  cfg = config.gui.pointer-cursor;
 in
 {
-  options.gui'.pointer-cursor.enable = lib.mkEnableOption "the pointer cursor theme";
+  options.gui.pointer-cursor.enable = lib.mkEnableOption "the pointer cursor theme";
 
   config = lib.mkIf cfg.enable {
     # Bibata Modern Ice 為白色款,同套件另有 Classic(黑)與 Amber(黃)。
@@ -21,6 +21,6 @@ in
     };
 
     # home.pointerCursor 在 ~/.icons 建立的連結。
-    persist'.directories = lib.mkIf config.persist'.enable [ ".icons" ];
+    persist.directories = lib.mkIf config.persist.enable [ ".icons" ];
   };
 }

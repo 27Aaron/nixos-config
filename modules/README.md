@@ -53,6 +53,7 @@ modules/
 - 設定多到一個檔案放不下時，改成資料夾，以 `default.nix` 為入口。
 - 同類檔案有兩個以上才建子目錄。
 - 選項放在依目錄命名的命名空間，例如 `nixos/base/services/` → `services'.*`。
+  系統層命名空間一律加 `'`；Home Manager 的 `cli`、`tui`、`gui`、`persist` 不加，見 `home/README.md`。
 
 ## 別名
 

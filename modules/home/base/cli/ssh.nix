@@ -22,7 +22,7 @@ in
   );
 
   # 客戶端金鑰與 known_hosts。
-  persist'.directories = lib.mkIf config.persist'.enable [
+  persist.directories = lib.mkIf config.persist.enable [
     {
       directory = ".ssh";
       mode = "0700";

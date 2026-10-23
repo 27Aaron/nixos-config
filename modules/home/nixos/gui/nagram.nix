@@ -6,7 +6,7 @@
   ...
 }:
 let
-  cfg = config.gui'.nagram;
+  cfg = config.gui.nagram;
 
   mkNixPak = inputs.nixpak.lib.nixpak {
     inherit (pkgs) lib;
@@ -52,14 +52,14 @@ let
   };
 in
 {
-  options.gui'.nagram.enable = lib.mkEnableOption "the Nagram Telegram client";
+  options.gui.nagram.enable = lib.mkEnableOption "the Nagram Telegram client";
 
   config = lib.mkIf cfg.enable {
     # env 會把桌面捷徑與 D-Bus 服務檔裡的執行檔換成沙箱版本。
     home.packages = [ sandboxed.config.env ];
 
     # 工作階段與設定;tdata 等同帳號登入權限。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".local/share/NagramDesktop";
         mode = "0700";

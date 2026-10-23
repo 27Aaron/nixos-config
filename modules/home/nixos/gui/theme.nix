@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.gui'.theme;
+  cfg = config.gui.theme;
 
   # 另有 latte(淺色)、frappe 與 macchiato。
   flavor = "mocha";
@@ -22,7 +22,7 @@ let
   };
 in
 {
-  options.gui'.theme.enable = lib.mkEnableOption "the GTK and Qt theme";
+  options.gui.theme.enable = lib.mkEnableOption "the GTK and Qt theme";
 
   config = lib.mkIf cfg.enable {
     qt = {
@@ -71,7 +71,7 @@ in
 
     # GTK 應用與 Nautilus 執行時寫入 dconf 的狀態;未以 dconf.settings 宣告,
     # 無法由設定重建。
-    persist'.directories = lib.mkIf config.persist'.enable [
+    persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/dconf";
         mode = "0700";

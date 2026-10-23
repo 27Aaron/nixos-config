@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.gui'.kitty;
+  cfg = config.gui.kitty;
 in
 {
-  options.gui'.kitty.enable = lib.mkEnableOption "the kitty terminal";
+  options.gui.kitty.enable = lib.mkEnableOption "the kitty terminal";
 
   config = lib.mkIf cfg.enable {
     programs.kitty = {

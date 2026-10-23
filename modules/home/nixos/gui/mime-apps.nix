@@ -5,7 +5,7 @@
   ...
 }:
 let
-  cfg = config.gui'.mime-apps;
+  cfg = config.gui.mime-apps;
 
   browser = [
     "google-chrome.desktop"
@@ -17,7 +17,7 @@ let
   ];
 in
 {
-  options.gui'.mime-apps.enable = lib.mkEnableOption "default applications for MIME types";
+  options.gui.mime-apps.enable = lib.mkEnableOption "default applications for MIME types";
 
   config = lib.mkIf cfg.enable {
     # 只列已安裝的程式。
