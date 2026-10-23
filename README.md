@@ -42,7 +42,7 @@ A flake for NixOS and nix-darwin hosts.
 
 ## Security
 
-[SECURITY.md](SECURITY.md) describes the threat model, trust boundaries and how each control is checked; [WORKAROUNDS.md](WORKAROUNDS.md) lists temporary workarounds and accepted exceptions with their removal conditions.
+[SECURITY.md](SECURITY.md) lists the security controls and how each is checked, the trusted flake inputs, and the secret and update procedures; [WORKAROUNDS.md](WORKAROUNDS.md) lists temporary workarounds and accepted exceptions with their removal conditions.
 
 ## References
 
