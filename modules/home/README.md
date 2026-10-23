@@ -35,10 +35,6 @@ home/
 `base/` 與 `nixos/` 底下都依介面分類：不佔用終端機的放 `cli/`，佔用整個終端機的放 `tui/`，
 開啟視窗的放 `gui/`。選項命名空間跟著介面分類：`nixos/gui/theme.nix` 的選項是 `gui.theme`。
 
-`cli`、`tui`、`gui`、`persist` 不加 `'`：Home Manager 沒有同名的頂層選項，日後若撞名，
-求值會直接報重複宣告，不會悄悄合併。系統層的命名空間（`hardware'`、`desktop'`、`hm'` 等）
-才加 `'`，因為 `hardware`、`services` 會與 NixOS 衝突。以 `hm'` 為界，外面加、裡面不加。
-
 ## 開關
 
 `base/` 的模組一律生效，沒有 `enable`。`nixos/` 的模組都預設關閉，主機在
