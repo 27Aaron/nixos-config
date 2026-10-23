@@ -39,6 +39,8 @@
     pkgs.git-trim
   ];
 
+  home.shellAliases.gs = "git status";
+
   # GitHub CLI 的帳號憑證。
   persist'.directories = [
     {

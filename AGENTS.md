@@ -27,7 +27,7 @@ modules/
 └── home/
     ├── base/             # always on for every host, macOS included; no enable options
     │   ├── core/         # what fits no interface: account settings, persist' options
-    │   ├── cli/          # draws nothing of its own (shell, git, ssh, packages)
+    │   ├── cli/          # draws nothing of its own (shell/, git, ssh, packages)
     │   ├── tui/          # takes over the terminal (lazygit, monitors)
     │   └── gui/          # opens a window (empty placeholder)
     ├── nixos/            # switchable Home Manager modules

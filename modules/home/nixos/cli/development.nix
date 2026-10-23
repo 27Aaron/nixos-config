@@ -27,6 +27,16 @@ in
 
     programs.uv.enable = true;
 
+    programs.fish.interactiveShellInit = ''
+      uv generate-shell-completion fish | source
+      uvx --generate-shell-completion fish | source
+    '';
+
+    programs.zsh.initContent = ''
+      eval "$(uv generate-shell-completion zsh)"
+      eval "$(uvx --generate-shell-completion zsh)"
+    '';
+
     # .envrc 允許清單、mise 工具鏈、uv 直譯器。
     persist'.directories = [
       ".local/share/direnv"
