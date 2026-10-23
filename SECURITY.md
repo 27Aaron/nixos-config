@@ -4,24 +4,24 @@
 
 ## Controls and how they are checked
 
-[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制退化時檢查就會失敗。NixOS 主機執行 `shared.nix` 與 `nixos.nix`；nix-darwin 主機執行 `shared.nix` 與 `darwin.nix`。
+[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制退化時檢查就會失敗。NixOS 主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`nixos.nix`](tests/security/nixos.nix)；nix-darwin 主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`darwin.nix`](tests/security/darwin.nix)。
 
 | 控制 | 位置 | 測試 |
 |---|---|---|
-| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`（macOS 為 `@admin`），必須有簽章 | `modules/base/core/nix.nix`、`modules/nixos/base/core/nix.nix`、`modules/darwin/core/nix.nix` | `nix-trust`、`daemon-access` |
-| 受信任 substituter 與金鑰的清單 | `modules/base/core/nix.nix`、`modules/nixos/desktop/input-method/vinput.nix`（只在 `desktop'.vinput` 時） | `nix-caches` |
-| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | `modules/nixos/base/services/openssh.nix` | `ssh` |
+| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`（macOS 為 `@admin`），必須有簽章 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/base/core/nix.nix`](modules/nixos/base/core/nix.nix)、[`modules/darwin/core/nix.nix`](modules/darwin/core/nix.nix) | `nix-trust`、`daemon-access` |
+| 受信任 substituter 與金鑰的清單 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
+| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/nixos/base/services/openssh.nix`](modules/nixos/base/services/openssh.nix) | `ssh` |
 | 各主機防火牆對外連接埠的清單 | 開啟連接埠的服務 | `firewall` |
-| 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | `modules/nixos/base/core/users.nix` | `password-source` |
-| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | `modules/nixos/base/core/sops.nix`、`modules/darwin/core/sops.nix` | `sops-key` |
-| systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | `modules/nixos/base/hardware/boot/`、`users.nix` | `boot-and-accounts` |
-| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | `modules/nixos/base/hardware/boot/lanzaboote.nix` | `boot-and-accounts`、`private-state` |
-| TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | `modules/nixos/base/hardware/disko.nix` | 模組 assertion |
-| 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | `modules/nixos/base/core/kernel-hardening.nix` | `kernel` |
-| 編輯器與代理的信任提示保持開啟 | `modules/home/nixos/gui/editors/`、`modules/home/*/tui/agents/` | `editor-and-agent-trust` |
+| 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/nixos/base/core/users.nix`](modules/nixos/base/core/users.nix) | `password-source` |
+| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix)、[`modules/darwin/core/sops.nix`](modules/darwin/core/sops.nix) | `sops-key` |
+| systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/nixos/base/hardware/boot/`](modules/nixos/base/hardware/boot/)、[`users.nix`](modules/nixos/base/core/users.nix) | `boot-and-accounts` |
+| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/nixos/base/hardware/boot/lanzaboote.nix`](modules/nixos/base/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
+| TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 模組 assertion |
+| 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/nixos/base/core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) | `kernel` |
+| 編輯器與代理的信任提示保持開啟 | [`modules/home/nixos/gui/editors/`](modules/home/nixos/gui/editors/)、[`modules/home/nixos/tui/agents/`](modules/home/nixos/tui/agents/)、[`modules/home/shared/tui/agents/`](modules/home/shared/tui/agents/) | `editor-and-agent-trust` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `persist` 項目 | `private-state` |
-| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | `modules/nixos/base/services/btrbk.nix` | `btrbk-sudo` |
-| 沙箱化的程式只以 nixpak 版本安裝 | `modules/home/nixos/gui/nagram.nix`、`lib/nixpak/` | `sandboxed-apps` |
+| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/nixos/base/services/btrbk.nix`](modules/nixos/base/services/btrbk.nix) | `btrbk-sudo` |
+| 沙箱化的程式只以 nixpak 版本安裝 | [`modules/home/nixos/gui/nagram.nix`](modules/home/nixos/gui/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
 程式符合以下條件時就放進 nixpak 沙箱：來自第三方、會處理不受信任的內容，而且不需要使用者的檔案。
 
@@ -48,7 +48,7 @@ nix config show allowed-users                      # @admin
 
 ## Flake inputs
 
-下列每個輸入都能改變機器上執行的東西；提供系統模組的輸入會在啟用時以 root 執行。把更新當成一次供應鏈事件來審查，依照 `AGENTS.md` 的〈Flake lock bumps〉。
+下列每個輸入都能改變機器上執行的東西；提供系統模組的輸入會在啟用時以 root 執行。把更新當成一次供應鏈事件來審查，依照 [`AGENTS.md` 的〈Flake lock bumps〉](AGENTS.md#flake-lock-bumps)。
 
 | 輸入 | 提供 | 追蹤 |
 |---|---|---|
@@ -121,7 +121,7 @@ Secure Boot 開啟後，啟用 `hardware'.disko.luks.tpm2` 的主機就能以 TP
 sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
 ```
 
-沒有加上 `--tpm2-with-pin=yes` 時，磁碟在開機時不需任何秘密就會解鎖，因此主機不能自動登入，而且必須在睡眠與休眠前鎖定工作階段。這類主機要記錄在 `WORKAROUNDS.md`。
+沒有加上 `--tpm2-with-pin=yes` 時，磁碟在開機時不需任何秘密就會解鎖，因此主機不能自動登入，而且必須在睡眠與休眠前鎖定工作階段。這類主機要記錄在 [`WORKAROUNDS.md`](WORKAROUNDS.md)。
 
 initrd 依序嘗試 TPM2、FIDO2，最後是密碼。更換 Secure Boot 金鑰後 PCR 7 會改變：加上 `--wipe-slot=tpm2` 重新登記。保留密碼 slot 作為備援。
 
@@ -129,7 +129,7 @@ NixOS 安裝程式沒有以這些金鑰簽章；要用它救援時，在韌體�
 
 ## Updating
 
-1. 更新輸入（`just update` 或 `just update-input <name>`），並依 `AGENTS.md` 的說明審查變更。
+1. 更新輸入（`just update` 或 `just update-input <name>`），並依 [`AGENTS.md` 的〈Flake lock bumps〉](AGENTS.md#flake-lock-bumps)審查變更。
 2. `just check` 必須通過。`just build` 會印出與執行中系統的套件差異；要讀過。
 3. `just switch`。NixOS 上，核心或 initrd 有變動就重開機：`readlink -f /run/booted-system/kernel` 與 `readlink -f /nix/var/nix/profiles/system/kernel` 不同，代表需要重開機。
 4. 出問題就回滾：NixOS 用開機選單或 `nixos-rebuild switch --rollback`，macOS 用 `darwin-rebuild --rollback`。
@@ -139,7 +139,7 @@ NixOS 安裝程式沒有以這些金鑰簽章；要用它救援時，在韌體�
 ## If compromise is suspected
 
 1. 中斷網路連線。
-2. 從另一臺受信任的機器，輪替這臺主機持有的東西：帳號密碼、SSH 金鑰（從 `vars/` 與 GitHub 移除舊公鑰）、權杖，以及這臺主機能解密的 nix-secrets 機密。
+2. 從另一臺受信任的機器，輪替這臺主機持有的東西：帳號密碼、SSH 金鑰（從 [`vars/`](vars/) 與 GitHub 移除舊公鑰）、權杖，以及這臺主機能解密的 nix-secrets 機密。
 3. 從這個 flake 重新安裝，而不是清理執行中的系統，並且只複製回檢查過的資料。
 
 切換到較舊的世代無法復原入侵。
