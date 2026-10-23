@@ -8,7 +8,7 @@
     username = vars.username;
     homeDirectory = osConfig.users.users.${vars.username}.home;
 
-    stateVersion = "26.11";
+    stateVersion = vars.homeStateVersion;
     language.collate = "C.UTF-8";
   };
 

@@ -40,18 +40,12 @@
   hm' = {
     cli' = {
       development.enable = true;
-      git.enable = true;
-      packages.enable = true;
-      shell.enable = true;
-      ssh.enable = true;
       toolchain.enable = true;
     };
 
     tui' = {
       claude-code.enable = true;
       dsh.enable = true;
-      lazygit.enable = true;
-      monitoring.enable = true;
     };
 
     gui' = {
