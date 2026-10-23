@@ -28,6 +28,7 @@ A flake for NixOS hosts, laid out so that nix-darwin hosts can join later.
 | Host | Machine | Role |
 |---|---|---|
 | `river` | MECHREVO WUJIE 14XA, Ryzen 7 8845HS | laptop, niri desktop |
+| `luna` | MacBook Pro 16-inch (2023), Apple M2 Max | laptop, macOS; not built until nix-darwin is wired up |
 
 ## Layout
 

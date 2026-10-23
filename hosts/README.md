@@ -5,7 +5,7 @@
 ```text
 hosts/
 ├── nixos/<名稱>/    # NixOS 主機
-└── darwin/          # nix-darwin 主機,預留
+└── darwin/<名稱>/   # nix-darwin 主機,尚未接上 darwinConfigurations
 ```
 
 ## 主機目錄放什麼
@@ -22,4 +22,5 @@ hosts/
 2. 需要遠端部署的主機，開啟 `services'.openssh.rootLogin`，之後以 `just deploy <名稱> root@<位址>` 部署。
 3. 執行 `just build <名稱>` 確認能建置。
 
-第一臺 Mac 需要先在 flake 加入 `nix-darwin` 輸入，並在 `hosts/default.nix` 接上 `darwinConfigurations`。
+`darwin/luna` 已經有設定，但要先在 flake 加入 `nix-darwin` 輸入，並在 `hosts/default.nix` 接上
+`darwinConfigurations`，才會被評估與建置。
