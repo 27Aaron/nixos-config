@@ -44,6 +44,7 @@ modules/
   例如帳號、nix 設定、防火牆。需要讓主機微調的數值放在 `core'.*`，
   例如 `core'.logging.journalMaxUse`，但不提供 `enable`。
 - **其他模組一律預設關閉**，要在主機的 `default.nix` 寫 `enable = true` 才會生效。
+  Home Manager 的 `home/base/` 例外，整個目錄一律生效，見 `home/README.md`。
   伺服器因此只會帶入自己開啟的功能。
 
 ## 撰寫慣例
