@@ -21,7 +21,7 @@ Priorities, in order: patch quickly, expose little, grant least privilege, and b
 | Administration | `sudo` needs the account password, which comes from nix-secrets through sops. Nobody is a Nix trusted user; only `@wheel` reaches the daemon (`@admin` on macOS). GameMode's polkit rule lets the `gamemode` group, which includes the owner, run its CPU governor and GPU helpers as root without a password ([WA-021](WORKAROUNDS.md#security-exceptions)). | Code running as the user can wait for the password to be typed. |
 | Network | nftables firewall; only 233/tcp (sshd, keys only, no root login) is open. dae's tproxy listener lives in its own network namespace. | sshd is reachable on every network the laptop joins. |
 | Disk | LUKS2 unlocked by a FIDO2 key with PIN and touch, or the passphrase; `/` is a tmpfs; persistent state lives on Btrfs inside LUKS. | The kernel and initrd sit on the unencrypted ESP. |
-| Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation, with river's own SSH key; river holds no copy of the shared server key. | The key is readable by the user, not only root, and every secret shares the same recipients ([WA-016](WORKAROUNDS.md#security-exceptions)). |
+| Secrets | sops-nix decrypts secrets from the private nix-secrets repository at activation, with each host's own user SSH key; neither river nor luna holds a copy of the shared server key. | The key is readable by the user, not only root, and every secret shares the same recipients ([WA-016](WORKAROUNDS.md#security-exceptions)). |
 | Supply chain | Locked inputs; an inventory of trusted caches and keys enforced by the eval tests. See [inputs](#flake-inputs). | A lock file is not an audit; most inputs track a branch. |
 | Desktop apps | Nagram runs in a nixpak sandbox: it sees only its data directory and `~/Downloads/Telegram`, reaches other files through the file chooser portal, and talks to a filtered D-Bus. Trust prompts stay on in Zed, VS Code and Claude Code. | The other apps, including closed-source ones, can still read `~/.ssh`, browser profiles and tokens. |
 | Recovery | Eight boot generations; btrbk snapshots `@persistent` twice a day. | Snapshots live on the same disk as the data. `@games` (`/games`) holds re-downloadable game libraries and is never snapshotted. |
@@ -48,7 +48,7 @@ Every input below can change what runs on the machine. Those that provide NixOS 
 | `home-manager` | NixOS and nix-darwin module, user environment | root (activation service) and user | default branch |
 | `disko` | NixOS module (file systems) | root | default branch |
 | `preservation` | NixOS module (bind mounts in the initrd) | root | default branch |
-| `sops-nix` | NixOS module, secret decryption | root | default branch |
+| `sops-nix` | NixOS and nix-darwin module, secret decryption | root | default branch |
 | `llm-agents` | claude-code, dsh, claude-desktop; trusted cache `cache.numtide.com` | user | default branch |
 | `nagram` | Nagram desktop, from an upstream binary | user | default branch |
 | `fcitx5-vinput` | fcitx5 add-on and daemon, which see every keystroke; trusted cache | user | tag `v2.4.2` ([WA-001](WORKAROUNDS.md#pins)) |
@@ -91,7 +91,7 @@ systemctl --failed
 
 ## Secrets
 
-River decrypts with `~/.ssh/id_ed25519`, read from `/persistent/home/aaron/.ssh/` at activation. Every secret in nix-secrets is encrypted to three age keys: the MacBook's, the shared server key, and river's (the `ssh-to-age` form of that SSH key).
+River decrypts with `~/.ssh/id_ed25519`, read from `/persistent/home/aaron/.ssh/` at activation; luna (the MacBook) reads `/Users/aaron/.ssh/id_ed25519` directly. Every secret in nix-secrets is encrypted to three age keys: the MacBook's, the shared server key, and river's (the `ssh-to-age` form of that SSH key).
 
 Edit a secret on river without root:
 
