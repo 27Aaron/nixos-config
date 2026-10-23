@@ -22,7 +22,7 @@ in
     desktop'.greetd.sessionCommand = lib.mkIf config.desktop'.greetd.enable niriSession;
 
     # 設定直接在機器上編輯,不由 Nix 生成。
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".config/niri"
     ];
   };

@@ -29,7 +29,7 @@ in
     };
 
     # 設定與登入狀態由程式自行寫入。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".config/Code";
         mode = "0700";

@@ -35,7 +35,7 @@ in
     };
 
     # Mesa/RADV 的 shader 快取,由驅動自行管理;保留可免去重開機後重新編譯。
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".cache/mesa_shader_cache"
       ".cache/radv_builtin_shaders"
     ];

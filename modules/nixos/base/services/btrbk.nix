@@ -52,7 +52,7 @@ in
     ];
 
     # 服務使用者 btrbk 的家目錄,同時是它的 systemd StateDirectory。
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/var/lib/btrbk";
         user = "btrbk";

@@ -71,7 +71,7 @@ in
 
     # GTK 應用與 Nautilus 執行時寫入 dconf 的狀態;未以 dconf.settings 宣告,
     # 無法由設定重建。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".config/dconf";
         mode = "0700";

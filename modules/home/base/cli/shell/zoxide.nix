@@ -1,3 +1,4 @@
+{ config, lib, ... }:
 {
   programs.zoxide = {
     enable = true;
@@ -5,5 +6,5 @@
     enableZshIntegration = true;
   };
 
-  persist'.directories = [ ".local/share/zoxide" ];
+  persist'.directories = lib.mkIf config.persist'.enable [ ".local/share/zoxide" ];
 }

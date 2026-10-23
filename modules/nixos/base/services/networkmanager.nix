@@ -16,7 +16,7 @@ in
 
     user'.extraGroups = [ "networkmanager" ];
 
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/etc/NetworkManager/system-connections";
         mode = "0700";

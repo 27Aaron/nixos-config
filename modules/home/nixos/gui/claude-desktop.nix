@@ -18,7 +18,7 @@ in
     home.packages = [ claude-desktop ];
 
     # 設定與登入狀態。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".config/Claude";
         mode = "0700";

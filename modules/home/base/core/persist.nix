@@ -14,8 +14,10 @@ let
 in
 {
   # 各模組在此回報要跨重啟保留的家目錄路徑,由 NixOS 的 persistence 模組
-  # 併入 preservation。其他平臺不讀取,宣告了也無妨。
+  # 併入 preservation。enable 由該模組設定,其他平臺維持關閉。
   options.persist' = {
+    enable = lib.mkEnableOption "reporting home state to the NixOS persistence module";
+
     directories = lib.mkOption {
       type = lib.types.listOf (lib.types.either lib.types.str (entryType "directory"));
       default = [ ];

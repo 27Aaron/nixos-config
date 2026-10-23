@@ -1,4 +1,5 @@
 {
+  config,
   inputs,
   lib,
   vars,
@@ -26,5 +27,7 @@ in
   programs.dconf.enable = true;
 
   # Home Manager 自己的狀態。
-  preservation'.user.directories = [ ".local/state/home-manager" ];
+  preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
+    ".local/state/home-manager"
+  ];
 }

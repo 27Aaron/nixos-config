@@ -1,3 +1,4 @@
+{ config, lib, ... }:
 {
   programs.atuin = {
     enable = true;
@@ -18,7 +19,7 @@
   };
 
   # 指令歷史與同步金鑰。
-  persist'.directories = [
+  persist'.directories = lib.mkIf config.persist'.enable [
     {
       directory = ".atuin";
       mode = "0700";

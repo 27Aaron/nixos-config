@@ -21,6 +21,6 @@ in
     };
 
     # home.pointerCursor 在 ~/.icons 建立的連結。
-    persist'.directories = [ ".icons" ];
+    persist'.directories = lib.mkIf config.persist'.enable [ ".icons" ];
   };
 }

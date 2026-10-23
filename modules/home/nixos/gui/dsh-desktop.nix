@@ -17,7 +17,7 @@ in
     home.packages = [ dsh-desktop ];
 
     # Electron 設定、登入狀態與崩潰紀錄。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".config/@deepseek-ai/dsh-desktop";
         mode = "0700";

@@ -109,7 +109,7 @@ in
 
     # .config/zed 存放合併後的 settings.json 與快捷鍵、片段;擴充功能、
     # 工作區資料庫與登入狀態在 .local/share/zed。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       ".config/zed"
       {
         directory = ".local/share/zed";

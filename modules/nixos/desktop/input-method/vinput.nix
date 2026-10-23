@@ -56,7 +56,7 @@ in
       Install.WantedBy = [ "graphical-session.target" ];
     };
 
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = ".config/vinput";
         mode = "0700";

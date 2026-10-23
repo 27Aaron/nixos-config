@@ -17,7 +17,7 @@ in
     home.packages = [ dsh ];
 
     # 設定、憑證與工作階段都在 DSH_HOME,預設 ~/.dsh。
-    persist'.directories = [
+    persist'.directories = lib.mkIf config.persist'.enable [
       {
         directory = ".dsh";
         mode = "0700";

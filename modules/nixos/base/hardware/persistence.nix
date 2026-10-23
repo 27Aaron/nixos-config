@@ -59,6 +59,9 @@ in
 
     preservation'.user.files = persist.files;
 
+    # 讓 Home Manager 模組的 persist' 項目生效。
+    hm'.persist'.enable = true;
+
     # 通用 NixOS 系統狀態。
     preservation'.os = {
       directories = [

@@ -56,7 +56,11 @@ NixOS 主機由 `nixos/base/core/home-manager.nix` 自動收集 `base/` 與 `nix
 ## 持久化
 
 在 NixOS 上，家目錄同樣位於 tmpfs。模組以 `persist'.directories`、`persist'.files`
-回報要保留的路徑（相對於家目錄）。其他平臺不讀取這兩個選項，宣告了也沒有影響。
+回報要保留的路徑（相對於家目錄）。
+
+每個登記都要以 `lib.mkIf config.persist'.enable` 包起來。`persist'.enable` 由
+`modules/nixos/base/hardware/persistence.nix` 跟著 `hardware'.persistence.enable` 打開；
+不用 tmpfs 根目錄的主機和 macOS 維持關閉，不會留下任何持久化設定。
 
 `~/.cache` 不整體保留，只有真正需要的快取才逐項登記，而且登記在產生它的模組裡，
 例如 go-build 在 `nixos/cli/toolchain.nix`。系統層模組不經過 `persist'`，直接寫
@@ -65,7 +69,7 @@ NixOS 主機由 `nixos/base/core/home-manager.nix` 自動收集 `base/` 與 `nix
 含憑證、登入狀態或歷史紀錄的目錄一律加上 `mode = "0700"`：
 
 ```nix
-persist'.directories = [
+persist'.directories = lib.mkIf config.persist'.enable [
   {
     directory = ".config/gh";
     mode = "0700";

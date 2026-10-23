@@ -37,7 +37,7 @@ in
 
     # Steam 本體、登入憑證與 Proton prefix 都在 .local/share/Steam;.steam 是指向它的
     # 連結與 registry.vdf。
-    preservation'.user.directories = [
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = ".local/share/Steam";
         mode = "0700";

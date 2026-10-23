@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   home.packages = with pkgs; [
     btop
@@ -7,5 +12,5 @@
   ];
 
   # btop 會在介面中直接改寫設定檔。
-  persist'.directories = [ ".config/btop" ];
+  persist'.directories = lib.mkIf config.persist'.enable [ ".config/btop" ];
 }

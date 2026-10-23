@@ -51,7 +51,7 @@ in
     };
 
     # tuigreet 以 --remember 記住上次的使用者與工作階段。
-    preservation'.os.directories = [
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/var/cache/tuigreet";
         user = "greeter";

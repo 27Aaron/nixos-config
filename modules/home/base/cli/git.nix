@@ -1,4 +1,6 @@
 {
+  config,
+  lib,
   pkgs,
   vars,
   ...
@@ -42,7 +44,7 @@
   home.shellAliases.gs = "git status";
 
   # GitHub CLI 的帳號憑證。
-  persist'.directories = [
+  persist'.directories = lib.mkIf config.persist'.enable [
     {
       directory = ".config/gh";
       mode = "0700";
