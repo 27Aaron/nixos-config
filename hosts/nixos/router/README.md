@@ -1,6 +1,6 @@
 # router
 
-Proxmox 上的 NixOS 虛擬機。
+Proxmox 上的 NixOS 虛擬機，以 dae 擔任區網閘道。
 
 ## 硬體
 

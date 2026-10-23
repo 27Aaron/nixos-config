@@ -19,9 +19,9 @@ A flake for NixOS and nix-darwin hosts.
 - **Ephemeral root:** `/` is a tmpfs wiped on every boot; only state registered with [preservation](https://github.com/nix-community/preservation) survives.
 - **Storage:** LUKS2 with FIDO2 or TPM2 unlock, Btrfs subvolumes, btrbk snapshots of the persistent volume, and an encrypted swapfile for hibernation.
 - **Desktop:** niri with the Noctalia shell, greetd, PipeWire, and Fcitx5 with Rime.
-- **Gaming:** Steam with GE-Proton and DW-Proton, GameMode and MangoHud, with its game library on a Btrfs subvolume that snapshots skip.
+- **Gaming:** Steam with GE-Proton and DW-Proton, plus GameMode and MangoHud; the game library lives on a Btrfs subvolume that snapshots skip.
 - **Secrets:** sops-nix, with the encrypted files kept in a separate private repository.
-- **Modules:** collected automatically and off by default; a host only flips switches.
+- **Modules:** collected automatically; apart from the always-on core, each stays off until a host enables it, so a host file is mostly switches.
 
 ## Hosts
 
@@ -38,13 +38,13 @@ A flake for NixOS and nix-darwin hosts.
 |---|---|
 | [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` or `darwinConfigurations` entry |
 | [`modules/`](modules/README.md) | system and Home Manager modules, grouped by where they run |
-| `vars/` | shared non-secret values such as the user name and SSH public keys |
+| [`vars/`](vars/) | shared non-secret values such as the user name and SSH public keys |
 | [`tests/`](tests/README.md) | eval tests for security settings, run by `just check` |
-| `lib/` | the module collector |
+| [`lib/`](lib/) | the module collector and the shared nixpak sandbox module |
 
 ## Security
 
-[SECURITY.md](SECURITY.md) lists the security controls and how each is checked, the trusted flake inputs, and the secret and update procedures; [WORKAROUNDS.md](WORKAROUNDS.md) lists temporary workarounds and accepted exceptions with their removal conditions.
+[SECURITY.md](SECURITY.md) lists each security control and the test that checks it, the trusted flake inputs, and how secrets and updates are handled. [WORKAROUNDS.md](WORKAROUNDS.md) tracks temporary workarounds, pins, and accepted security exceptions, each with the condition for removing it.
 
 ## References
 

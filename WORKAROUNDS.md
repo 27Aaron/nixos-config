@@ -1,20 +1,20 @@
 # Workarounds
 
-暫時性的權宜做法、版本釘選與已接受的安全例外，每一項都附上可以移除的條件。沒有這份清單，上游修好之後本機的權宜做法會被遺留下來，也沒人記得它為什麼在那裡。
+這份清單列出暫時性的權宜做法、版本釘選與已接受的安全例外，每一項都附上移除條件。少了它，上游修好之後，本機的權宜做法還會留在原地，也沒人記得當初為什麼加。
 
 ## How to use
 
-- **新增**：引入權宜做法、釘選或例外的變更，在同一個提交裡於此新增一列，寫上具體的移除條件，並在程式碼旁的註解裡提到編號。
+- **新增**：在引入權宜做法、釘選或例外的同一個提交裡新增一列，寫上具體的移除條件，並在程式碼旁的註解裡提到編號。
 - **移除**：條件達成後，刪除程式碼與該列，並在提交訊息裡提到編號。
-- **檢查**：nixpkgs、核心或 BIOS 更新後，檢查條件依賴它們的各列。
+- **檢查**：nixpkgs、核心或 BIOS 更新後，重新檢查移除條件依賴它們的各列。
 
-`git grep WA-` 會找出每一列以及它對應的程式碼。
+`git grep WA-` 會列出每一列與它對應的程式碼。
 
 ## Pins
 
 | 編號 | 內容與位置 | 原因 | 移除條件 | 新增日期 |
 |---|---|---|---|---|
-| WA-001 | `fcitx5-vinput` 釘在標籤 `v2.4.2`，且不 follow `nixpkgs`：[`flake.nix`](flake.nix)，由 [`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix) 使用 | `fcitx5-vinput.cachix.org` 的二進位檔以上游自己的 lock 建置；follow `nixpkgs` 會在本機編譯 sherpa-onnx。代價是多一份只有在上游更新 lock 時才會拿到安全修正的 nixpkgs，以及一個受信任的二進位快取。 | 套件進入 nixpkgs，或本機建置變得可以接受；屆時改為 follow `nixpkgs`，並從 [`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix) 與 [`tests/security/shared.nix`](tests/security/shared.nix) 移除快取。在那之前，標籤要刻意升級。 | 2026-10-18 (#152) |
+| WA-001 | `fcitx5-vinput` 釘在標籤 `v2.4.2`，且不 follow `nixpkgs`：[`flake.nix`](flake.nix)，由 [`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix) 使用 | `fcitx5-vinput.cachix.org` 的二進位檔以上游自己的 lock 建置；follow `nixpkgs` 會在本機編譯 sherpa-onnx。代價是多一份只有在上游更新 lock 時才會拿到安全修正的 nixpkgs，以及一個受信任的二進位快取。 | 套件進入 nixpkgs，或本機建置變得可以接受；屆時改為 follow `nixpkgs`，並從 [`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix) 與 [`tests/security/shared.nix`](tests/security/shared.nix) 移除快取。在那之前，標籤只在刻意決定時升級。 | 2026-10-18 (#152) |
 
 ## Workarounds
 
@@ -42,4 +42,4 @@
 | WA-016 | sops 以使用者自己的 SSH 金鑰解密，而不是只有 root 能讀的金鑰，而且所有機密共用同一組收件人：[`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix)、[`modules/darwin/core/sops.nix`](modules/darwin/core/sops.nix)、nix-secrets 的 `.sops.yaml` | 為了簡單而選擇。 | 整理 nix-secrets 時重新檢討。 | 2026-10-22 |
 | WA-021 | 擁有者在 `gamemode` 群組裡：[`modules/nixos/desktop/game/gamemode.nix`](modules/nixos/desktop/game/gamemode.nix) | GameMode 的調整輔助程式需要它。 | 不再使用 GameMode，或它不再需要整個群組的授權。 | 2026-10-22 |
 | WA-022 | elaina 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/nixos/elaina/storage.nix`](hosts/nixos/elaina/storage.nix)，登記指令在 [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 這臺主機沒有鍵盤。它不執行桌面工作階段，而 Secure Boot 會讓遭竄改的開機鏈拿不到金鑰。 | 主機接上鍵盤時重新檢討。 | 2026-10-23 |
-| WA-023 | river 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/nixos/river/storage.nix`](hosts/nixos/river/storage.nix)，登記指令在 [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 為了方便而選擇。Secure Boot 會讓遭竄改的開機鏈拿不到金鑰，greetd 會要求帳號密碼，Noctalia 也會在睡眠與休眠前鎖定工作階段（`[lockscreen].lock_before_suspend`，預設為 `true`，在它的 UI 裡設定而非在 Nix 裡）。 | river 再次改回自動登入，或不再於睡眠前鎖定時重新檢討。 | 2026-10-23 |
+| WA-023 | river 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/nixos/river/storage.nix`](hosts/nixos/river/storage.nix)，登記指令在 [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 為了方便而選擇。風險由三點抵銷：Secure Boot 讓遭竄改的開機鏈拿不到金鑰；greetd 要求帳號密碼；Noctalia 在睡眠與休眠前鎖定工作階段（`[lockscreen].lock_before_suspend`，預設為 `true`，在它的 UI 裡設定，不在 Nix 裡）。 | river 改回自動登入，或不再於睡眠前鎖定時重新檢討。 | 2026-10-23 |
