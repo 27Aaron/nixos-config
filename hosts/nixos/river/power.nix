@@ -5,6 +5,10 @@
   boot = {
     resumeDevice = "/dev/mapper/crypted";
     kernelParams = [ "resume_offset=533760" ];
+    # 預設只把記憶體回收到 RAM 的 2/5;之後凍結裝置時(多半是 amdgpu 把 VRAM
+    # 搬回系統記憶體)還會再多用 2-3 GiB,超過快照能用的一半 RAM 就以 ENOMEM
+    # 失敗。設為 0 讓核心盡量回收到磁碟 swap,代價是恢復後程式要從 swap 讀回。
+    kernel.sysfs.power.image_size = 0;
   };
 
   # 韌體只有 s2idle,沒有 S3。合蓋先睡眠,一小時後再休眠。
