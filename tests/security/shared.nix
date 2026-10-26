@@ -30,7 +30,7 @@ let
 in
 {
   # 受信任的使用者能停用簽章檢查、匯入任意 store 路徑,等同免密碼 root。
-  # 誰能連上 daemon 依平臺而異,見各平臺的 daemon-access。
+  # 誰能連上 daemon 見 nixos.nix 的 daemon-access。
   nix-trust =
     { config, ... }:
     {

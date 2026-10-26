@@ -7,11 +7,6 @@
       # url = "github:NixOS/nixpkgs/nixos-unstable-small";
     };
 
-    nix-darwin = {
-      url = "github:nix-darwin/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -78,16 +73,16 @@
       ...
     }:
     let
-      systems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-      ];
+      systems = [ "x86_64-linux" ];
+      # 主機設定只在 Linux 求值;formatter 與 devShell 也要在編輯這份設定的 Mac 上可用。
+      devSystems = systems ++ [ "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+      forDevSystems = nixpkgs.lib.genAttrs devSystems;
     in
     {
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
+      formatter = forDevSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rs);
 
-      devShells = forAllSystems (
+      devShells = forDevSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
@@ -102,7 +97,7 @@
         }
       );
 
-      inherit (import ./hosts { inherit inputs; }) nixosConfigurations darwinConfigurations;
+      inherit (import ./hosts { inherit inputs; }) nixosConfigurations;
 
       checks = forAllSystems (
         system:
@@ -114,7 +109,6 @@
             inherit (nixpkgs) lib;
             pkgs = nixpkgs.legacyPackages.${system};
             nixosConfigurations = onSystem self.nixosConfigurations;
-            darwinConfigurations = onSystem self.darwinConfigurations;
           };
         }
       );
