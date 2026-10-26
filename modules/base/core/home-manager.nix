@@ -8,7 +8,7 @@ let
   inherit (import ../../../lib { inherit lib; }) listModules;
 in
 {
-  # Home Manager 本體由 nixos/、darwin/ 各自引入對應平臺的模組。
+  # Home Manager 本體由 nixos/ 引入。
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -19,8 +19,7 @@ in
       inherit inputs vars;
     };
 
-    # base 一律生效,shared 是兩個平臺都能開關的功能;平臺專屬的使用者模組由
-    # nixos/、darwin/ 各自補上。
+    # base 一律生效,shared 是可以開關的功能;NixOS 專屬的使用者模組由 nixos/ 補上。
     users.${vars.username}.imports = listModules ../../home/base ++ listModules ../../home/shared;
   };
 }
