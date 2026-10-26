@@ -1,6 +1,6 @@
 # Agent Instructions
 
-這個儲存庫是 NixOS 與 nix-darwin 主機的 Nix flake。NixOS 主機以 tmpfs 當根目錄：每次開機都會清空，只有登記到 [preservation](https://github.com/nix-community/preservation) 模組的狀態會留下，存放在以 LUKS 加密的 Btrfs 磁碟區上。設定要保持宣告式、可組合，並且在部署前就能驗證。
+這個儲存庫是 NixOS 主機的 Nix flake。根目錄是 tmpfs：每次開機都會清空，只有登記到 [preservation](https://github.com/nix-community/preservation) 模組的狀態會留下，存放在以 LUKS 加密的 Btrfs 磁碟區上。設定要保持宣告式、可組合，並且在部署前就能驗證。
 
 ## Repository layout
 
@@ -10,10 +10,9 @@
 | [`lib/`](lib/) | 模組收集器與共用的 nixpak 沙箱模組 |
 | [`hosts/`](hosts/) | 每臺主機一個目錄，自動探索 |
 | [`modules/`](modules/) | 所有可重用的模組，依能在哪裡執行分層 |
-| [`modules/base/`](modules/base/) | NixOS 與 nix-darwin 共用的系統模組 |
+| [`modules/base/`](modules/base/) | 各臺 NixOS 共用的系統模組 |
 | [`modules/nixos/`](modules/nixos/) | NixOS 系統模組：[`base/`](modules/nixos/base/)、[`desktop/`](modules/nixos/desktop/)、[`server/`](modules/nixos/server/) |
-| [`modules/darwin/`](modules/darwin/) | nix-darwin 系統模組 |
-| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/)、[`nixos/`](modules/home/nixos/)、[`darwin/`](modules/home/darwin/) 可開關 |
+| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/)、[`nixos/`](modules/home/nixos/) 可開關 |
 | [`tests/`](tests/) | `just check` 執行的 eval 測試 |
 | [`vars/`](vars/) | 共用的非機密值 |
 | [`SECURITY.md`](SECURITY.md) | 安全控制與對應測試、flake 輸入、機密與更新流程 |
@@ -23,12 +22,12 @@
 
 ## Host discovery
 
-每個 `hosts/nixos/<name>/default.nix` 會成為 `nixosConfigurations.<name>`，每個 `hosts/darwin/<name>/default.nix` 會成為 `darwinConfigurations.<name>`；目錄名稱以 `hostName` 傳給模組。`default.nix` 只放主機的功能開關、時區與 `stateVersion`，綁定這臺機器硬體的設定依主題拆成主機目錄下的其他檔案。第二臺機器也用得到的東西，就做成 [`modules/`](modules/) 底下的模組。
+每個 `hosts/nixos/<name>/default.nix` 會成為 `nixosConfigurations.<name>`；目錄名稱以 `hostName` 傳給模組。`default.nix` 只放主機的功能開關、時區與 `stateVersion`，綁定這臺機器硬體的設定依主題拆成主機目錄下的其他檔案。第二臺機器也用得到的東西，就做成 [`modules/`](modules/) 底下的模組。
 
 ## Module conventions
 
 - 模組由 [`lib/default.nix`](lib/default.nix) 的 `listModules` 自動收集；含 `default.nix` 的子目錄只透過該檔載入。
-- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。Home Manager 模組要每臺主機都需要、而且在 macOS 上也能運作，才放進 [`home/base/`](modules/home/base/)；可開關的模組兩個平臺都能用就放 [`home/shared/`](modules/home/shared/)，否則放 [`home/nixos/`](modules/home/nixos/) 或 [`home/darwin/`](modules/home/darwin/)。
+- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。Home Manager 模組要每臺主機都需要，才放進 [`home/base/`](modules/home/base/)；可開關、伺服器與桌面都能用的放 [`home/shared/`](modules/home/shared/)，否則放 [`home/nixos/`](modules/home/nixos/)。
 - `core/` 底下與 [`home/base/`](modules/home/base/) 裡的模組一律生效，沒有 `enable` 選項。其他模組預設關閉，選項命名空間與 `enable` 開關比照相鄰的模組。
 - 一個檔案只放一個程式或一件事。一個檔案放不下時，改成以 `default.nix` 為入口的目錄。
 
@@ -47,7 +46,7 @@
 - 憑證與機密放在私人的 `nix-secrets` 儲存庫，透過 sops-nix 送進系統。`inputs.secrets` 會被複製到所有人可讀的 `/nix/store`，所以求值時只能讀其中的加密檔案，或本來就不敏感的檔案（例如 SSH 主機別名）。[`vars/`](vars/) 只放非機密值。
 - 帳號密碼來自 nix-secrets 的 `users/password.yaml`，以 `neededForUsers` 在建立使用者之前解密；設定裡絕不放密碼或雜湊。每臺主機都靠 sops 做這件事，所以它是 core 模組。
 - 主機以使用者的 `~/.ssh/id_ed25519` 解密（`sops.age.sshKeyPaths`；NixOS 主機直接讀 `/persistent` 上的那份），絕不另外放 age 金鑰檔。更換金鑰前先讀 [`SECURITY.md` 的〈Secrets〉](SECURITY.md#secrets)。
-- 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查、匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）；macOS 上 `wheel` 只有 root，所以改用 `@admin`。
+- 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查、匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）。
 - root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行開啟，只用於遠端部署目標；其他主機只接受使用者的金鑰，再以 `sudo` 提權。root 仍保留授權金鑰，因為 initrd 的 SSH 解鎖要用。
 - `security.sudo.execWheelOnly` 維持關閉：上游的 btrbk 模組以自己的使用者執行，並透過 sudo 規則呼叫 `btrfs`。
 - [`core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) 的核心基準使用 `lib.mkDefault`，主機以一般定義覆寫，絕不用 `mkForce`。有三項刻意不收緊：user namespace 保持開啟（Nix 建置沙箱需要）、`security.protectKernelImage` 保持關閉（它會停用休眠）、`kernel.kptr_restrict` 維持 1（dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`）。主機需要 `core'.kernel.blockedModules` 裡的某個模組時（例如 IPsec VPN），就在那裡把它移除。
@@ -76,7 +75,7 @@ just build    # 建置一臺主機；預設為本機主機名稱，也可以明�
 
 影響範圍小的變更，可以只求值受影響的選項，例如 `nix eval .#nixosConfigurations.<name>.config.<option>`。變更主機探索、共用模組或 flake 輸入時，要建置每一臺受影響的主機。
 
-[`tests/`](tests/) 的 eval 測試會在每臺主機上檢查上述安全規則，並維護對外連接埠、受信任二進位快取與私密持久化路徑的清單。變更刻意改動其中一項時（服務開了連接埠、新增快取、新增主機），在同一個變更裡更新 [`tests/security/`](tests/security/)（[`shared.nix`](tests/security/shared.nix)、[`nixos.nix`](tests/security/nixos.nix) 或 [`darwin.nix`](tests/security/darwin.nix)）的預期值並說明理由。絕不只為了讓測試通過而放寬測試；見 [`tests/README.md`](tests/README.md)。
+[`tests/`](tests/) 的 eval 測試會在每臺主機上檢查上述安全規則，並維護對外連接埠、受信任二進位快取與私密持久化路徑的清單。變更刻意改動其中一項時（服務開了連接埠、新增快取、新增主機），在同一個變更裡更新 [`tests/security/`](tests/security/)（[`shared.nix`](tests/security/shared.nix) 或 [`nixos.nix`](tests/security/nixos.nix)）的預期值並說明理由。絕不只為了讓測試通過而放寬測試；見 [`tests/README.md`](tests/README.md)。
 
 不應改變系統的重構或純註解變更，要在改動前後各記錄一次 toplevel derivation 並比對：
 
@@ -91,7 +90,6 @@ nix run nixpkgs#nix-diff -- <old.drv> <new.drv>
 
 ```bash
 just switch [target]                # 在本機套用主機設定
-just install [target]               # 新 Mac 上第一次啟用 nix-darwin；之後用 just switch
 just deploy <target> root@<host>    # 遠端部署；目標需要 services'.openssh.rootLogin
 ```
 
@@ -110,7 +108,7 @@ type(scope): description
 - 標題連同 `type(scope): ` 不超過 50 個字元。GitHub 會截斷超過 72 個字元的標題，squash merge 還會再附加 ` (#123)`，50 個字元才有餘裕。標題只寫一個變更的結果，省略冠詞與贅字，清單與細節移到內文。
 - 內文在 72 個字元處換行。
 - pull request 標題會成為 squash merge 的提交標題，因此遵守相同規則。
-- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`desktop`、`server`、`darwin`、`home`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
+- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`desktop`、`server`、`home`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
 - 描述變更的結果，而不是列出編輯過的檔案。
 
 ```text

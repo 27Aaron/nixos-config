@@ -4,8 +4,7 @@
 
 ```text
 hosts/
-├── nixos/<名稱>/    # NixOS 主機
-└── darwin/<名稱>/   # nix-darwin 主機
+└── nixos/<名稱>/    # NixOS 主機
 ```
 
 ## 主機目錄放什麼
@@ -18,7 +17,7 @@ hosts/
 
 ## 新增主機
 
-1. 建立 `hosts/nixos/<名稱>/default.nix`；Mac 則建立 `hosts/darwin/<名稱>/default.nix`。
-2. NixOS 主機要在 `tests/security/nixos.nix` 的 `openPorts` 登記它的對外連接埠，見 `tests/README.md`。
+1. 建立 `hosts/nixos/<名稱>/default.nix`。
+2. 在 `tests/security/nixos.nix` 的 `openPorts` 登記它的對外連接埠，見 `tests/README.md`。
 3. 要遠端部署的主機，開啟 `services'.openssh.rootLogin`，之後以 `just deploy <名稱> root@<位址>` 部署。
-4. 執行 `just build <名稱>` 確認能建置。全新的 Mac 第一次以 `just install <名稱>` 啟用 nix-darwin。
+4. 執行 `just build <名稱>` 確認能建置。

@@ -39,7 +39,7 @@
 | 編號 | 內容與位置 | 原因 | 移除條件 | 新增日期 |
 |---|---|---|---|---|
 | WA-013 | `kernel.kptr_restrict` 維持 1 而不是 2：[`modules/nixos/base/core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) | dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`，設為 2 時連 root 看到的都是零。 | `sudo sysctl kernel.kptr_restrict=2 && sudo systemctl restart dae` 後 dae 仍正常運作；屆時調高並更新測試。 | 2026-10-22 (#191) |
-| WA-016 | sops 以使用者自己的 SSH 金鑰解密，而不是只有 root 能讀的金鑰，而且所有機密共用同一組收件人：[`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix)、[`modules/darwin/core/sops.nix`](modules/darwin/core/sops.nix)、nix-secrets 的 `.sops.yaml` | 為了簡單而選擇。 | 整理 nix-secrets 時重新檢討。 | 2026-10-22 |
+| WA-016 | sops 以使用者自己的 SSH 金鑰解密，而不是只有 root 能讀的金鑰，而且所有機密共用同一組收件人：[`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix)、nix-secrets 的 `.sops.yaml` | 為了簡單而選擇。 | 整理 nix-secrets 時重新檢討。 | 2026-10-22 |
 | WA-021 | 擁有者在 `gamemode` 群組裡：[`modules/nixos/desktop/game/gamemode.nix`](modules/nixos/desktop/game/gamemode.nix) | GameMode 的調整輔助程式需要它。 | 不再使用 GameMode，或它不再需要整個群組的授權。 | 2026-10-22 |
 | WA-022 | elaina 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/nixos/elaina/storage.nix`](hosts/nixos/elaina/storage.nix)，登記指令在 [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 這臺主機沒有鍵盤。它不執行桌面工作階段，而 Secure Boot 會讓遭竄改的開機鏈拿不到金鑰。 | 主機接上鍵盤時重新檢討。 | 2026-10-23 |
 | WA-023 | river 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/nixos/river/storage.nix`](hosts/nixos/river/storage.nix)，登記指令在 [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 為了方便而選擇。風險由三點抵銷：Secure Boot 讓遭竄改的開機鏈拿不到金鑰；greetd 要求帳號密碼；Noctalia 在睡眠與休眠前鎖定工作階段（`[lockscreen].lock_before_suspend`，預設為 `true`，在它的 UI 裡設定，不在 Nix 裡）。 | river 改回自動登入，或不再於睡眠前鎖定時重新檢討。 | 2026-10-23 |

@@ -4,16 +4,16 @@
 
 ## Controls and how they are checked
 
-[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制一旦退化，檢查就會失敗。NixOS 主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`nixos.nix`](tests/security/nixos.nix)；nix-darwin 主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`darwin.nix`](tests/security/darwin.nix)。
+[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制一旦退化，檢查就會失敗。每臺主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`nixos.nix`](tests/security/nixos.nix)。
 
 | 控制 | 位置 | 測試 |
 |---|---|---|
-| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`（macOS 為 `@admin`），必須有簽章 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/base/core/nix.nix`](modules/nixos/base/core/nix.nix)、[`modules/darwin/core/nix.nix`](modules/darwin/core/nix.nix) | `nix-trust`、`daemon-access` |
+| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`，必須有簽章 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/base/core/nix.nix`](modules/nixos/base/core/nix.nix) | `nix-trust`、`daemon-access` |
 | 受信任 substituter 與金鑰的清單 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
 | sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/nixos/base/services/openssh.nix`](modules/nixos/base/services/openssh.nix) | `ssh` |
 | 各主機防火牆對外連接埠的清單 | 開啟連接埠的服務 | `firewall` |
 | 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/nixos/base/core/users.nix`](modules/nixos/base/core/users.nix) | `password-source` |
-| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix)、[`modules/darwin/core/sops.nix`](modules/darwin/core/sops.nix) | `sops-key` |
+| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix) | `sops-key` |
 | systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/nixos/base/hardware/boot/`](modules/nixos/base/hardware/boot/)、[`users.nix`](modules/nixos/base/core/users.nix) | `boot-and-accounts` |
 | 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/nixos/base/hardware/boot/lanzaboote.nix`](modules/nixos/base/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
 | TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 模組 assertion |
@@ -27,7 +27,7 @@
 
 ### Runtime checks
 
-動到安全設定的 switch 或重開機之後，執行這些檢查。NixOS 上：
+動到安全設定的 switch 或重開機之後，執行這些檢查：
 
 ```bash
 nix config show trusted-users                      # root
@@ -39,13 +39,6 @@ bootctl status | grep 'Secure Boot'                # Secure Boot 主機：enable
 sudo sbctl verify                                  # Secure Boot 主機：每個 stub 都已簽章
 ```
 
-macOS 上：
-
-```bash
-nix config show trusted-users                      # root
-nix config show allowed-users                      # @admin
-```
-
 ## Flake inputs
 
 下列每個輸入都能改變機器上執行的東西，提供系統模組的輸入還會在啟用時以 root 執行。更新時把它當成一次供應鏈事件審查，流程見 [`AGENTS.md` 的〈Flake lock bumps〉](AGENTS.md#flake-lock-bumps)。
@@ -53,7 +46,6 @@ nix config show allowed-users                      # @admin
 | 輸入 | 提供 | 追蹤 |
 |---|---|---|
 | `nixpkgs` | 所有東西 | `nixos-unstable` |
-| `nix-darwin` | nix-darwin 系統 | 預設分支 |
 | `home-manager` | 使用者環境 | 預設分支 |
 | `disko` | NixOS 檔案系統 | 預設分支 |
 | `preservation` | NixOS 持久化 | 預設分支 |
@@ -64,8 +56,6 @@ nix config show allowed-users                      # @admin
 | `fcitx5-vinput` | fcitx5 附加元件；受信任快取 | 標籤（[WA-001](WORKAROUNDS.md#pins)） |
 | `nixpak` | 程式沙箱包裝 | 預設分支 |
 | `nur-packages`、`fonts`、`secrets` | 擁有者自己的儲存庫 | 預設分支 |
-
-macOS 上的 Homebrew 套件不受 flake 鎖定，另外更新。
 
 ## Secrets
 
@@ -135,7 +125,7 @@ NixOS 安裝程式沒有用這些金鑰簽章，要用它救援時，先在韌�
 1. 更新輸入（`just update` 或 `just update-input <name>`），並依 [`AGENTS.md` 的〈Flake lock bumps〉](AGENTS.md#flake-lock-bumps)審查變更。
 2. `just check` 必須通過。`just build` 會印出與執行中系統的套件差異，讀過再繼續。
 3. `just switch`。NixOS 上核心或 initrd 有變動時要重開機：`readlink -f /run/booted-system/kernel` 與 `readlink -f /nix/var/nix/profiles/system/kernel` 不同，就是需要重開機。
-4. 出問題就回滾：NixOS 用開機選單或 `nixos-rebuild switch --rollback`，macOS 用 `darwin-rebuild --rollback`。
+4. 出問題就回滾：用開機選單或 `nixos-rebuild switch --rollback`。
 
 至少每週檢查一次更新；有遭到實際利用的漏洞影響使用中的套件時，立即檢查。來源：[NixOS 安全公告](https://github.com/NixOS/nixpkgs/security/advisories)、[CISA 已知遭利用漏洞目錄](https://www.cisa.gov/known-exploited-vulnerabilities-catalog)。
 
