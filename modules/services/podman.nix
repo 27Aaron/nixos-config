@@ -41,8 +41,14 @@ in
       };
     };
 
-    # k8s-file 預設不限大小;journald 有統一的上限。
-    virtualisation.containers.containersConf.settings.containers.log_driver = "journald";
+    virtualisation.containers = {
+      # k8s-file 預設不限大小;journald 有統一的上限。
+      containersConf.settings.containers.log_driver = "journald";
+
+      # 不完整的映像名稱只到 Docker Hub 找。上游預設沒有搜尋清單,nginx 這類
+      # 名稱會直接解析失敗;只列一個來源,也不會有同名映像該選哪個的問題。
+      registries.settings.unqualified-search-registries = [ "docker.io" ];
+    };
 
     # 系統層的計時器只更新 rootful 容器。
     systemd.timers.podman-auto-update = autoUpdateTimer;
