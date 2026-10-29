@@ -9,25 +9,26 @@
 | [`flake.nix`](flake.nix) | 輸入與輸出 |
 | [`lib/`](lib/) | 模組收集器與共用的 nixpak 沙箱模組 |
 | [`hosts/`](hosts/) | 每臺主機一個目錄，自動探索 |
-| [`modules/`](modules/) | 所有可重用的模組，依能在哪裡執行分層 |
-| [`modules/base/`](modules/base/) | 各臺 NixOS 共用的系統模組 |
-| [`modules/nixos/`](modules/nixos/) | NixOS 系統模組：[`base/`](modules/nixos/base/)、[`desktop/`](modules/nixos/desktop/)、[`server/`](modules/nixos/server/) |
-| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/)、[`nixos/`](modules/home/nixos/) 可開關 |
+| [`modules/`](modules/) | 所有可重用的模組，依用途分目錄 |
+| [`modules/core/`](modules/core/) | 每臺主機一律生效的系統模組 |
+| [`modules/hardware/`](modules/hardware/)、[`modules/services/`](modules/services/) | 伺服器也可能用到的系統模組，可開關 |
+| [`modules/desktop/`](modules/desktop/)、[`modules/server/`](modules/server/) | 只有桌面或只有伺服器才用的系統模組，可開關 |
+| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/) 可開關 |
 | [`tests/`](tests/) | `just check` 執行的 eval 測試 |
 | [`vars/`](vars/) | 共用的非機密值 |
 | [`SECURITY.md`](SECURITY.md) | 安全控制與對應測試、flake 輸入、機密與更新流程 |
 | [`WORKAROUNDS.md`](WORKAROUNDS.md) | 暫時性的權宜做法、版本釘選與安全例外 |
 
-`hosts/`、`modules/`、`tests/` 與它們的主要子目錄各有一份 `README.md`，說明什麼東西該放在那裡。新增檔案前先讀；變更讓它過時的話，一併更新。
+`hosts/`、每臺主機的目錄、`modules/`、`modules/home/` 與 `tests/` 各有一份 `README.md`，說明什麼東西該放在那裡。新增檔案前先讀；變更讓它過時的話，一併更新。
 
 ## Host discovery
 
-每個 `hosts/nixos/<name>/default.nix` 會成為 `nixosConfigurations.<name>`；目錄名稱以 `hostName` 傳給模組。`default.nix` 只放主機的功能開關、時區與 `stateVersion`，綁定這臺機器硬體的設定依主題拆成主機目錄下的其他檔案。第二臺機器也用得到的東西，就做成 [`modules/`](modules/) 底下的模組。
+每個 `hosts/<name>/default.nix` 會成為 `nixosConfigurations.<name>`；目錄名稱以 `hostName` 傳給模組。`default.nix` 只放主機的功能開關、時區與 `stateVersion`，綁定這臺機器硬體的設定依主題拆成主機目錄下的其他檔案。第二臺機器也用得到的東西，就做成 [`modules/`](modules/) 底下的模組。
 
 ## Module conventions
 
 - 模組由 [`lib/default.nix`](lib/default.nix) 的 `listModules` 自動收集；含 `default.nix` 的子目錄只透過該檔載入。
-- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。Home Manager 模組要每臺主機都需要，才放進 [`home/base/`](modules/home/base/)；可開關、伺服器與桌面都能用的放 [`home/shared/`](modules/home/shared/)，否則放 [`home/nixos/`](modules/home/nixos/)。
+- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。Home Manager 模組要每臺主機都需要，才放進 [`home/base/`](modules/home/base/)；可開關的放 [`home/shared/`](modules/home/shared/)。
 - `core/` 底下與 [`home/base/`](modules/home/base/) 裡的模組一律生效，沒有 `enable` 選項。其他模組預設關閉，選項命名空間與 `enable` 開關比照相鄰的模組。
 - 一個檔案只放一個程式或一件事。一個檔案放不下時，改成以 `default.nix` 為入口的目錄。
 
@@ -49,8 +50,8 @@
 - 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查、匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）。
 - root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行開啟，只用於遠端部署目標；其他主機只接受使用者的金鑰，再以 `sudo` 提權。root 仍保留授權金鑰，因為 initrd 的 SSH 解鎖要用。
 - `security.sudo.execWheelOnly` 維持關閉：上游的 btrbk 模組以自己的使用者執行，並透過 sudo 規則呼叫 `btrfs`。
-- [`core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) 的核心基準使用 `lib.mkDefault`，主機以一般定義覆寫，絕不用 `mkForce`。有三項刻意不收緊：user namespace 保持開啟（Nix 建置沙箱需要）、`security.protectKernelImage` 保持關閉（它會停用休眠）、`kernel.kptr_restrict` 維持 1（dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`）。主機需要 `core'.kernel.blockedModules` 裡的某個模組時（例如 IPsec VPN），就在那裡把它移除。
-- 沙箱化的桌面程式使用 [`lib/nixpak/`](lib/nixpak/) 的 nixpak 模組，並列進 [`tests/security/shared.nix`](tests/security/shared.nix) 的 `sandboxedApps`。只綁定程式需要的路徑。絕不綁定整個 `$XDG_RUNTIME_DIR`：裡面有能啟動程式的 niri 控制 socket，以及 SSH 與 GPG agent。也絕不綁定未經過濾的 session bus：透過它，systemd 的使用者管理器能在沙箱外執行指令。以 FHS 打包的程式可以在 nixpak 裡執行，內層 FHS 環境看得到的東西受外層沙箱限制。
+- [`core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) 的核心基準使用 `lib.mkDefault`，主機以一般定義覆寫，絕不用 `mkForce`。有三項刻意不收緊：user namespace 保持開啟（Nix 建置沙箱需要）、`security.protectKernelImage` 保持關閉（它會停用休眠）、`kernel.kptr_restrict` 維持 1（dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`）。主機需要 `core'.kernel.blockedModules` 裡的某個模組時（例如 IPsec VPN），就在那裡把它移除。
+- 沙箱化的桌面程式使用 [`lib/nixpak/`](lib/nixpak/) 的 nixpak 模組，並列進 [`tests/security.nix`](tests/security.nix) 的 `sandboxedApps`。只綁定程式需要的路徑。絕不綁定整個 `$XDG_RUNTIME_DIR`：裡面有能啟動程式的 niri 控制 socket，以及 SSH 與 GPG agent。也絕不綁定未經過濾的 session bus：透過它，systemd 的使用者管理器能在沙箱外執行指令。以 FHS 打包的程式可以在 nixpak 裡執行，內層 FHS 環境看得到的東西受外層沙箱限制。
 - 不 follow `nixpkgs` 的輸入帶有自己的 nixpkgs，只有在上游更新 lock 時才會拿到安全修正。目前只有 `fcitx5-vinput`，為了它的二進位快取（[WA-001](WORKAROUNDS.md#pins)）。
 
 ## Workarounds
@@ -75,7 +76,7 @@ just build    # 建置一臺主機；預設為本機主機名稱，也可以明�
 
 影響範圍小的變更，可以只求值受影響的選項，例如 `nix eval .#nixosConfigurations.<name>.config.<option>`。變更主機探索、共用模組或 flake 輸入時，要建置每一臺受影響的主機。
 
-[`tests/`](tests/) 的 eval 測試會在每臺主機上檢查上述安全規則，並維護對外連接埠、受信任二進位快取與私密持久化路徑的清單。變更刻意改動其中一項時（服務開了連接埠、新增快取、新增主機），在同一個變更裡更新 [`tests/security/`](tests/security/)（[`shared.nix`](tests/security/shared.nix) 或 [`nixos.nix`](tests/security/nixos.nix)）的預期值並說明理由。絕不只為了讓測試通過而放寬測試；見 [`tests/README.md`](tests/README.md)。
+[`tests/`](tests/) 的 eval 測試會在每臺主機上檢查上述安全規則，並維護對外連接埠、受信任二進位快取與私密持久化路徑的清單。變更刻意改動其中一項時（服務開了連接埠、新增快取、新增主機），在同一個變更裡更新 [`tests/security.nix`](tests/security.nix) 的預期值並說明理由。絕不只為了讓測試通過而放寬測試；見 [`tests/README.md`](tests/README.md)。
 
 不應改變系統的重構或純註解變更，要在改動前後各記錄一次 toplevel derivation 並比對：
 

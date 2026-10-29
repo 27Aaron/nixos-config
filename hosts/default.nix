@@ -6,6 +6,13 @@ let
 
   vars = import ../vars;
 
+  # modules/ 底下除了 home/ 都是系統模組;home/ 由 core/home-manager.nix 載入。
+  systemModules = lib.pipe (builtins.readDir ../modules) [
+    (lib.filterAttrs (name: type: type == "directory" && name != "home"))
+    lib.attrNames
+    (lib.concatMap (name: listModules ../modules/${name}))
+  ];
+
   hostsIn =
     dir:
     lib.filterAttrs (
@@ -19,10 +26,10 @@ let
         hostName = name;
         inherit inputs vars;
       };
-      modules = listModules ../modules/base ++ listModules ../modules/nixos ++ [ ./nixos/${name} ];
+      modules = systemModules ++ [ ./${name} ];
     };
 in
 {
-  # hosts/nixos/<名稱>/ 成為 nixosConfigurations.<名稱>。
-  nixosConfigurations = lib.mapAttrs mkNixos (hostsIn ./nixos);
+  # hosts/<名稱>/ 成為 nixosConfigurations.<名稱>。
+  nixosConfigurations = lib.mapAttrs mkNixos (hostsIn ./.);
 }

@@ -4,8 +4,7 @@
   nixosConfigurations,
 }:
 let
-  cases =
-    import ./security/shared.nix { inherit lib; } // import ./security/nixos.nix { inherit lib; };
+  cases = import ./security.nix { inherit lib; };
 
   # 每個案例套用到每一臺主機;runTests 只執行名稱以 test 開頭的項目。
   tests = lib.concatMapAttrs (

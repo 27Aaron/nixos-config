@@ -4,24 +4,24 @@
 
 ## Controls and how they are checked
 
-[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制一旦退化，檢查就會失敗。每臺主機執行 [`shared.nix`](tests/security/shared.nix) 與 [`nixos.nix`](tests/security/nixos.nix)。
+[`tests/`](tests/README.md) 的 eval 測試在每次 `just check` 時執行，控制一旦退化，檢查就會失敗。每臺主機都執行 [`security.nix`](tests/security.nix) 的每個案例。
 
 | 控制 | 位置 | 測試 |
 |---|---|---|
-| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`，必須有簽章 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/base/core/nix.nix`](modules/nixos/base/core/nix.nix) | `nix-trust`、`daemon-access` |
-| 受信任 substituter 與金鑰的清單 | [`modules/base/core/nix.nix`](modules/base/core/nix.nix)、[`modules/nixos/desktop/input-method/vinput.nix`](modules/nixos/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
-| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/nixos/base/services/openssh.nix`](modules/nixos/base/services/openssh.nix) | `ssh` |
+| 沒有 Nix 受信任使用者，daemon 只限 `@wheel`，必須有簽章 | [`modules/core/nix.nix`](modules/core/nix.nix) | `nix-trust`、`daemon-access` |
+| 受信任 substituter 與金鑰的清單 | [`modules/core/nix.nix`](modules/core/nix.nix)、[`modules/desktop/input-method/vinput.nix`](modules/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
+| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/services/openssh.nix`](modules/services/openssh.nix) | `ssh` |
 | 各主機防火牆對外連接埠的清單 | 開啟連接埠的服務 | `firewall` |
-| 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/nixos/base/core/users.nix`](modules/nixos/base/core/users.nix) | `password-source` |
-| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/nixos/base/core/sops.nix`](modules/nixos/base/core/sops.nix) | `sops-key` |
-| systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/nixos/base/hardware/boot/`](modules/nixos/base/hardware/boot/)、[`users.nix`](modules/nixos/base/core/users.nix) | `boot-and-accounts` |
-| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/nixos/base/hardware/boot/lanzaboote.nix`](modules/nixos/base/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
-| TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/nixos/base/hardware/disko.nix`](modules/nixos/base/hardware/disko.nix) | 模組 assertion |
-| 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/nixos/base/core/kernel-hardening.nix`](modules/nixos/base/core/kernel-hardening.nix) | `kernel` |
-| 編輯器與代理的信任提示保持開啟 | [`modules/home/nixos/gui/editors/`](modules/home/nixos/gui/editors/)、[`modules/home/nixos/tui/agents/`](modules/home/nixos/tui/agents/)、[`modules/home/shared/tui/agents/`](modules/home/shared/tui/agents/) | `editor-and-agent-trust` |
+| 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/core/users.nix`](modules/core/users.nix) | `password-source` |
+| sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/core/sops.nix`](modules/core/sops.nix) | `sops-key` |
+| systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/hardware/boot/`](modules/hardware/boot/)、[`users.nix`](modules/core/users.nix) | `boot-and-accounts` |
+| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/hardware/boot/lanzaboote.nix`](modules/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
+| TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 模組 assertion |
+| 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
+| 編輯器與代理的信任提示保持開啟 | [`modules/home/shared/gui/editors/`](modules/home/shared/gui/editors/)、[`modules/home/shared/tui/agents/`](modules/home/shared/tui/agents/) | `editor-and-agent-trust` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `persist` 項目 | `private-state` |
-| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/nixos/base/services/btrbk.nix`](modules/nixos/base/services/btrbk.nix) | `btrbk-sudo` |
-| 沙箱化的程式只以 nixpak 版本安裝 | [`modules/home/nixos/gui/nagram.nix`](modules/home/nixos/gui/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
+| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/btrbk.nix`](modules/services/btrbk.nix) | `btrbk-sudo` |
+| 沙箱化的程式只以 nixpak 版本安裝 | [`modules/home/shared/gui/nagram.nix`](modules/home/shared/gui/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
 程式同時符合以下三點時就放進 nixpak 沙箱：來自第三方、會處理不受信任的內容、不需要使用者的檔案。
 
