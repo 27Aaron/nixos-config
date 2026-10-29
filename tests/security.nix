@@ -3,13 +3,17 @@ let
   vars = import ../vars;
 
   # 各主機對外開放的連接埠。服務新開了埠,要在這裡登記才能通過測試。
-  # 每臺都開 sshd 與 avahi 的 mDNS。rules 是 extraInputRules 的每一行。
+  # 每臺都開 sshd 與 avahi 的 mDNS。interfaces 是只對特定介面開的埠,rules 是
+  # extraInputRules 的每一行。
   openPorts = {
     river = {
       tcp = [ 233 ];
       udp = [ 5353 ];
-      # 只對 rootful 容器的橋接網路開放,讓 aardvark-dns 能回應。
-      rules = [ ''iifname "podman*" udp dport 53 accept'' ];
+      # podman 模組只對 rootful 容器的橋接網路開放,讓 aardvark-dns 能回應。
+      interfaces."podman*" = {
+        tcp = [ 53 ];
+        udp = [ 53 ];
+      };
     };
     router = {
       tcp = [ 233 ];
@@ -171,7 +175,7 @@ in
     let
       fw = config.networking.firewall;
       inherit (config.networking) hostName;
-      # podman 模組即使沒開任何埠,也會宣告 podman0 這個鍵。
+      # 宣告了卻沒開任何埠的介面不算。
       openOn = lib.filterAttrs (_: i: lib.any (l: l != [ ]) (lib.attrValues i)) fw.interfaces;
       ports = openPorts.${hostName} or (throw "tests/security.nix: 請在 openPorts 登記 ${hostName} 開放的連接埠");
     in
@@ -183,7 +187,11 @@ in
           allowedUDPPortRanges
           trustedInterfaces
           ;
-        interfaces = openOn;
+        interfaces = lib.mapAttrs (_: i: {
+          tcp = sorted i.allowedTCPPorts;
+          udp = sorted i.allowedUDPPorts;
+          ranges = i.allowedTCPPortRanges ++ i.allowedUDPPortRanges;
+        }) openOn;
         rules = lib.filter (l: l != "") (map lib.trim (lib.splitString "\n" fw.extraInputRules));
         tcp = sorted fw.allowedTCPPorts;
         udp = sorted fw.allowedUDPPorts;
@@ -192,7 +200,11 @@ in
         enable = true;
         allowedTCPPortRanges = [ ];
         allowedUDPPortRanges = [ ];
-        interfaces = { };
+        interfaces = lib.mapAttrs (_: i: {
+          tcp = sorted (i.tcp or [ ]);
+          udp = sorted (i.udp or [ ]);
+          ranges = [ ];
+        }) (ports.interfaces or { });
         # lo 由 NixOS 的防火牆模組預設信任。
         trustedInterfaces = [ "lo" ];
         tcp = sorted ports.tcp;
