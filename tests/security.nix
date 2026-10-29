@@ -38,6 +38,7 @@ let
     ".config/mozilla"
     ".config/google-chrome"
     ".config/Code"
+    ".config/1Password"
     ".local/share/zed"
     ".local/share/keyrings"
     ".local/share/NagramDesktop"
