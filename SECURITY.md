@@ -10,7 +10,7 @@
 |---|---|---|
 | 沒有 Nix 受信任使用者，daemon 只限 `@wheel`，必須有簽章 | [`modules/core/nix.nix`](modules/core/nix.nix) | `nix-trust`、`daemon-access` |
 | 受信任 substituter 與金鑰的清單 | [`modules/core/nix.nix`](modules/core/nix.nix)、[`modules/desktop/input-method/vinput.nix`](modules/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
-| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/services/openssh.nix`](modules/services/openssh.nix) | `ssh` |
+| sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/services/network/openssh.nix`](modules/services/network/openssh.nix) | `ssh` |
 | 各主機防火牆對外連接埠的清單 | 開啟連接埠的服務 | `firewall` |
 | 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/core/users.nix`](modules/core/users.nix) | `password-source` |
 | sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/core/sops.nix`](modules/core/sops.nix) | `sops-key` |
@@ -20,7 +20,7 @@
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
-| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/btrbk.nix`](modules/services/btrbk.nix) | `btrbk-sudo` |
+| btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/storage/btrbk.nix`](modules/services/storage/btrbk.nix) | `btrbk-sudo` |
 | 沙箱化的程式只以 nixpak 版本安裝 | [`modules/desktop/nagram.nix`](modules/desktop/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
 程式同時符合以下三點時就放進 nixpak 沙箱：來自第三方、會處理不受信任的內容、不需要使用者的檔案。

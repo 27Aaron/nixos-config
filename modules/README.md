@@ -4,12 +4,21 @@
 
 ```text
 modules/
-├── core/        # 每臺主機一律生效,包括 shell 與日常命令列工具
-├── hardware/    # 硬體、開機、磁碟與持久化
-├── services/    # 背景服務,伺服器也可能用到
-├── dev/         # 開發環境、工具鏈與 AI agent,伺服器與桌面都能用
-├── desktop/     # 只有接螢幕的主機,包括圖形介面程式
-└── server/      # 只有伺服器
+├── core/            # 每臺主機一律生效
+│   ├── cli/         # 日常命令列工具:git、ssh、gnupg、監控
+│   └── shell/       # fish、zsh 與提示列、歷史、補全
+├── hardware/        # 硬體、開機(boot/)、磁碟與持久化
+├── services/        # 背景服務,伺服器也可能用到
+│   ├── network/     # SSH、代理、mDNS、網路管理
+│   └── storage/     # 快照、scrub、磁碟健康
+├── dev/             # 開發環境、工具鏈與 AI agent(agents/),伺服器與桌面都能用
+├── desktop/         # 只有接螢幕的主機
+│   ├── session/     # 登入畫面、視窗管理器、桌面外殼
+│   ├── appearance/  # 字型、主題、游標
+│   ├── files/       # 檔案總管、回收桶、使用者目錄、預設程式
+│   ├── ai/          # AI 桌面程式
+│   └── browsers/、editors/、game/、input-method/、power/
+└── server/          # 只有伺服器
 ```
 
 每個目錄都由 `hosts/default.nix` 以 `lib/default.nix` 的 `listModules` 自動收集，不必手動匯入；子目錄若含 `default.nix`，只載入該檔。
@@ -47,4 +56,4 @@ config = lib.mkIf cfg.enable {
 
 ## 持久化
 
-根目錄是 tmpfs，只有登記過的路徑會留下。系統狀態登記在 `preservation'.os`，使用者狀態登記在 `preservation'.user`，兩者都以 `config.hardware'.persistence.enable` 為條件。`~/.cache` 不整體保留，只登記真正需要的快取。含金鑰、憑證、登入狀態或歷史紀錄的目錄加上 `mode = "0700"`。
+根目錄是 tmpfs，只有登記過的路徑會留下。系統狀態登記在 `preservation'.os`，使用者狀態登記在 `preservation'.user`，兩者都以 `config.hardware'.persistence.enable` 為條件。路徑登記在使用它的程式的模組裡；`hardware/persistence.nix` 只放 NixOS 與 systemd 本身的狀態，例如 `/var/lib/nixos`、`/var/log` 與 machine-id。`~/.cache` 不整體保留，只登記真正需要的快取。含金鑰、憑證、登入狀態或歷史紀錄的目錄加上 `mode = "0700"`。

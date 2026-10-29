@@ -30,9 +30,6 @@
     manual.manpages.enable = false;
   };
 
-  # Home Manager 寫入 dconf 需要系統側支援。
-  programs.dconf.enable = true;
-
   preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
     ".local/state/home-manager"
   ];

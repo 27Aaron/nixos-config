@@ -38,17 +38,6 @@ in
       ];
     };
 
-    preservation'.user.directories = [
-      # 不整體保留 ~/.cache:內容幾乎都可重建且成長很快,需要的快取由各模組
-      # 自行登記。
-
-      # GNOME 鑰匙圈見 desktop/seahorse.nix。
-      {
-        directory = ".gnupg";
-        mode = "0700";
-      }
-    ];
-
     preservation'.os = {
       directories = [
         {

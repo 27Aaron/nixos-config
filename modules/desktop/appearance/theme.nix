@@ -67,14 +67,5 @@ in
 
       gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
     };
-
-    # GTK 應用與 Nautilus 執行時寫入 dconf 的狀態;未以 dconf.settings 宣告,
-    # 無法由設定重建。
-    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
-      {
-        directory = ".config/dconf";
-        mode = "0700";
-      }
-    ];
   };
 }
