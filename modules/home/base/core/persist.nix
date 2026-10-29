@@ -1,6 +1,5 @@
 { lib, ... }:
 let
-  # 狀態項目可寫成家目錄相對路徑,或帶屬性的集合。
   entryType =
     kind:
     lib.types.submodule {
@@ -13,8 +12,7 @@ let
     };
 in
 {
-  # 各模組在此回報要跨重啟保留的家目錄路徑,由 NixOS 的 persistence 模組
-  # 併入 preservation。enable 由該模組設定,其他平臺維持關閉。
+  # 由系統的 persistence 模組開啟並併入 preservation。
   options.persist = {
     enable = lib.mkEnableOption "reporting home state to the NixOS persistence module";
 

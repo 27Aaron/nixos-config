@@ -48,7 +48,6 @@ in
 
     zramSwap = {
       enable = true;
-      # 讓 zram 優先於任何磁碟 swap。
       priority = 100;
       memoryPercent = cfg.memoryPercent;
       memoryMax = cfg.memoryMax;

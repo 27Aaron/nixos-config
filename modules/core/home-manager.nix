@@ -21,14 +21,12 @@ in
       inherit inputs vars;
     };
 
-    # base 一律生效,shared 是主機可以開關的功能。
     users.${vars.username}.imports = listModules ../home/base ++ listModules ../home/shared;
   };
 
   # Home Manager 寫入 dconf 需要系統側支援。
   programs.dconf.enable = true;
 
-  # Home Manager 自己的狀態。
   preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
     ".local/state/home-manager"
   ];

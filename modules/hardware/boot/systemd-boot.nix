@@ -20,7 +20,6 @@ in
         configurationLimit = lib.mkDefault 8;
       };
 
-      # bootctl 安裝時需寫入 EFI 變數以註冊開機項目。
       efi.canTouchEfiVariables = true;
     };
   };

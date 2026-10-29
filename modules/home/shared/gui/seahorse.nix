@@ -13,7 +13,6 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.seahorse ];
 
-    # GNOME 鑰匙圈資料;seahorse 是其管理介面。
     persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".local/share/keyrings";

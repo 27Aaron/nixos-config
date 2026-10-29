@@ -16,7 +16,6 @@ in
   config = lib.mkIf cfg.enable {
     home.packages = [ dsh-desktop ];
 
-    # Electron 設定、登入狀態與崩潰紀錄。
     persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/@deepseek-ai/dsh-desktop";

@@ -18,7 +18,6 @@ in
         extensions = with pkgs.vscode-extensions; [
           jnoortheen.nix-ide
 
-          # 讓編輯器跟著專案的 .envrc 走。
           arrterian.nix-env-selector
           mkhl.direnv
 
@@ -28,7 +27,6 @@ in
       };
     };
 
-    # 設定與登入狀態由程式自行寫入。
     persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/Code";

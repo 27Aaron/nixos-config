@@ -35,13 +35,10 @@ in
         base_keymap = "Zed";
         hour_format = "hour24";
 
-        # 新目錄先以受限模式開啟,不套用專案的 .zed/settings.json,也不啟動
-        # 語言伺服器與 MCP 伺服器;全部信任的話,開啟惡意倉庫即可執行任意指令。
-        # 自己的專案在首次開啟時信任一次即可。須明確寫 false:合併不會移除
-        # settings.json 裡既有的鍵。
+        # 全部信任的話,開啟惡意倉庫就會套用它的設定並啟動語言與 MCP 伺服器。
+        # 須明確寫 false:合併不會移除 settings.json 裡既有的鍵。
         session.trust_all_worktrees = false;
 
-        # 跟隨系統深淺色。
         theme = {
           mode = "system";
           dark = "Catppuccin Mocha";
@@ -56,7 +53,6 @@ in
         ui_font_family = "LXGW WenKai TC";
         agent_ui_font_family = "LXGW WenKai TC";
 
-        # 與 kitty 相同的等寬字型。
         buffer_font_family = "Maple Mono NF";
         buffer_font_size = 14;
         cursor_blink = false;
@@ -76,7 +72,6 @@ in
           blinking = "off";
         };
 
-        # 透過 shell 的 direnv hook 載入 .envrc。
         load_direnv = "shell_hook";
 
         # 語言伺服器優先使用 PATH 上的版本;Zed 自行下載的二進位在 NixOS 上
@@ -107,8 +102,6 @@ in
       };
     };
 
-    # .config/zed 存放合併後的 settings.json 與快捷鍵、片段;擴充功能、
-    # 工作區資料庫與登入狀態在 .local/share/zed。
     persist.directories = lib.mkIf config.persist.enable [
       ".config/zed"
       {

@@ -13,9 +13,7 @@ let
     inherit pkgs;
   };
 
-  # 上游二進位內建的 libxkbcommon 只找 /usr/share/X11/xkb,找不到時會在
-  # Wayland 回呼中段錯誤;把 xkeyboard-config 放進它的 FHS 環境即可。
-  # 移除條件見 WORKAROUNDS.md 的 WA-007。
+  # 上游內附的 libxkbcommon 只找 /usr/share/X11/xkb;見 WA-007。
   nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop.override {
     buildFHSEnv =
       args:

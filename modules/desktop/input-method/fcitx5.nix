@@ -30,7 +30,6 @@ in
         addons = with pkgs; [
           fcitx5-gtk
           (fcitx5-rime.override {
-            # 方案與詞庫由 rime-ice 提供。
             rimeDataPkgs = [ rime-ice ];
           })
         ];
@@ -55,7 +54,6 @@ in
             };
           };
 
-          # UseDarkTheme:依 xdg-desktop-portal 回報的深淺色切換主題。
           addons.classicui.globalSection = {
             Theme = "mellow-wechat";
             DarkTheme = "mellow-wechat-dark";
@@ -73,7 +71,6 @@ in
       "fcitx5/themes/mellow-wechat-dark".source = "${mellow-themes}/mellow-wechat-dark";
     };
 
-    # 以 rime-ice 取代 fcitx5-rime 的預設方案。
     hm'.xdg.dataFile."fcitx5/rime/default.custom.yaml".text = ''
       patch:
         __include: rime_ice_suggestion:/

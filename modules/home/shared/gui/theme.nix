@@ -7,7 +7,6 @@
 let
   cfg = config.gui.theme;
 
-  # 另有 latte(淺色)、frappe 與 macchiato。
   flavor = "mocha";
   accent = "mauve";
 

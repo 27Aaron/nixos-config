@@ -45,7 +45,6 @@ in
       ];
     };
 
-    # 基本使用者狀態,各模組與 Home Manager 回報的項目附加在後。
     preservation'.user.directories = [
       # 不整體保留 ~/.cache:內容幾乎都可重建且成長很快,需要的快取由各模組
       # 自行登記。
@@ -60,10 +59,8 @@ in
 
     preservation'.user.files = persist.files;
 
-    # 讓 Home Manager 模組的 persist 項目生效。
     hm'.persist.enable = true;
 
-    # 通用 NixOS 系統狀態。
     preservation'.os = {
       directories = [
         {
@@ -101,8 +98,7 @@ in
       ];
     };
 
-    # 持久化的 /var/lib/lastlog 與 lastlog2 的 tmpfiles 規則衝突,以空檔覆蓋。
-    # 移除條件見 WORKAROUNDS.md 的 WA-010。
+    # lastlog2 的 tmpfiles 規則與持久化的 /var/lib/lastlog 衝突;見 WA-010。
     environment.etc."tmpfiles.d/lastlog2-tmpfiles.conf".text = ''
       # Managed by Preservation.
     '';

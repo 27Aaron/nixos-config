@@ -16,7 +16,6 @@ in
     neededForUsers = true;
   };
 
-  # 帳號完全由設定宣告,不接受執行時以 passwd 等指令修改。
   users.mutableUsers = false;
 
   users.users = {

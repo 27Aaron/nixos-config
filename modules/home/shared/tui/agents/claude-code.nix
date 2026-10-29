@@ -14,7 +14,6 @@ in
   options.tui.claude-code.enable = lib.mkEnableOption "Claude Code";
 
   config = lib.mkIf cfg.enable {
-    # 非自由軟體,需要 nixpkgs.config.allowUnfree。
     home.packages = [ claude-code ];
 
     # auto 模式逐一審查動作:例行操作直接放行,有風險的會被擋下。不用
@@ -23,7 +22,6 @@ in
       cc = "claude --permission-mode auto";
     };
 
-    # 登入憑證、設定與對話紀錄由程式自行寫入。
     persist = lib.mkIf config.persist.enable {
       directories = [
         {

@@ -18,7 +18,6 @@
     };
   };
 
-  # 指令歷史與同步金鑰。
   persist.directories = lib.mkIf config.persist.enable [
     {
       directory = ".atuin";

@@ -6,15 +6,13 @@
   ...
 }:
 {
-  # 硬體清單與 PCI ID 見同目錄的 README.md。
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # 開機:載入器、核心與 initrd。systemd initrd 由 disko 與 persistence
-  # 模組啟用。
+  # systemd initrd 由 disko 與 persistence 模組啟用。
   hardware'.lanzaboote.enable = true;
 
   boot = {
@@ -22,8 +20,7 @@
     kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [ "kvm-amd" ];
 
-    # 開機畫面不顯示 ACPI 這類錯誤,記錄仍在 journal 裡。
-    # 移除條件見 WORKAROUNDS.md 的 WA-004。
+    # 隱藏韌體的 ACPI 錯誤,journal 仍有紀錄;見 WA-004。
     consoleLogLevel = 3;
 
     initrd.availableKernelModules = [
@@ -35,7 +32,6 @@
     ];
   };
 
-  # 韌體與週邊驅動。
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
   hardware'.amdgpu.enable = true;
   hardware'.bluetooth.enable = true;

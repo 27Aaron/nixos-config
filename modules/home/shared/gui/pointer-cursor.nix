@@ -11,7 +11,6 @@ in
   options.gui.pointer-cursor.enable = lib.mkEnableOption "the pointer cursor theme";
 
   config = lib.mkIf cfg.enable {
-    # Bibata Modern Ice 為白色款,同套件另有 Classic(黑)與 Amber(黃)。
     home.pointerCursor = {
       enable = true;
       package = pkgs.bibata-cursors;

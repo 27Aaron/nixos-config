@@ -25,7 +25,6 @@ in
       enable = true;
 
       defaultApplications = {
-        # Chrome 優先。
         "text/html" = browser;
         "text/xml" = browser;
         "application/xml" = browser;
@@ -48,7 +47,6 @@ in
         "application/json" = editor;
         "x-scheme-handler/vscode" = [ "code-url-handler.desktop" ];
 
-        # Nagram 連結。
         "x-scheme-handler/tg" = [ "xyz.nextalone.nagram.desktop.desktop" ];
 
         # 目錄用 Nautilus,由 desktop'.file-manager 安裝。
@@ -56,7 +54,6 @@ in
       };
     };
 
-    # 提供 xdg-open。
     home.packages = [ pkgs.xdg-utils ];
   };
 }

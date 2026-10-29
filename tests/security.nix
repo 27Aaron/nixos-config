@@ -48,7 +48,6 @@ let
     "/etc/NetworkManager/system-connections"
   ];
 
-  # 每臺主機的核心參數基準與禁止載入的模組。
   kernelSysctl = {
     "kernel.dmesg_restrict" = 1;
     "kernel.kptr_restrict" = 1;
