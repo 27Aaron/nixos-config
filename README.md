@@ -36,7 +36,7 @@ A flake for NixOS hosts.
 | Path | Contents |
 |---|---|
 | [`hosts/`](hosts/README.md) | one directory per machine; each becomes a `nixosConfigurations` entry |
-| [`modules/`](modules/README.md) | system and Home Manager modules, grouped by where they run |
+| [`modules/`](modules/README.md) | system and Home Manager modules, grouped by purpose |
 | [`vars/`](vars/) | shared non-secret values such as the user name and SSH public keys |
 | [`tests/`](tests/README.md) | eval tests for security settings, run by `just check` |
 | [`lib/`](lib/) | the module collector and the shared nixpak sandbox module |

@@ -1,6 +1,5 @@
 {
-  # 登入 shell 由 modules/base/core/fish.nix 設定,狀態目錄由
-  # modules/nixos/base/core/fish.nix 持久化。
+  # 登入 shell 與狀態目錄的持久化由 modules/core/fish.nix 設定。
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
