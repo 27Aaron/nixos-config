@@ -15,6 +15,7 @@ MECHREVO 無界 14XA（WUJIE 14X Blizzard）筆電，Ryzen 7 8845HS。
 | 藍牙 | MT7922 的藍牙部分 | `13d3:3585` |
 | 乙太網路 | Motorcomm YT6801，需要 Linux 7.0 以上 | `1f0a:6801` |
 | 觸控板 | UNIW0001:00 093A:0255，走 I2C 而非 PS/2 | 休眠恢復後要重新綁定，見 `power.nix`（WA-003） |
+| 鍵盤背光 | 由 EC 控制，沒有 `kbd_backlight` 裝置；狀態在 EC 位址 `0x78c`，經 `\_SB.INOU.ECRR`／`ECRW` 讀寫，亮為 `0x01`，寫入 `0x13` 熄滅 | 開機與恢復時關閉，見 `keyboard-backlight.nix`（WA-024） |
 | 音訊 | Radeon HD Audio、Ryzen HD Audio | `1002:1640`、`1022:15e3` |
 | USB4 | 單條 USB-C 線即可輸出影像 | `1022:1669` |
 | 儲存 | Micron 2550 NVMe SSD，1 TB（CT1000P3PSSD8） | |
