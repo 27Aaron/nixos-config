@@ -1,12 +1,10 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
 let
   kmod = "${pkgs.kmod}/bin";
-  inherit (config.boot) kernelPackages;
 
   sleepTargets = [
     "suspend.target"
@@ -14,15 +12,6 @@ let
     "hybrid-sleep.target"
     "suspend-then-hibernate.target"
   ];
-
-  # 套件自己複製 .ko,跳過 modules_install 的 kmodigest,缺少模組彙整要的
-  # .ko.cer;見 WA-025。
-  acpiCall = kernelPackages.acpi_call.overrideAttrs (old: {
-    installPhase = old.installPhase + ''
-      ${lib.getExe pkgs.buildPackages.kmodigest} \
-        $out/lib/modules/${kernelPackages.kernel.modDirVersion}/misc/acpi_call.ko
-    '';
-  });
 
   # EC 位址與位元取自上游 uniwill-acpi.c:0x78c 的 bit 1 是 KBD_POWER_OFF、
   # bit 4 是 KBD_APPLY、bit 7:5 是亮度,其餘位元保留原值。見 WA-024。
@@ -49,7 +38,7 @@ let
 in
 {
   # 只在呼叫期間載入:acpi_call 讓 root 能執行任意 ACPI 方法。
-  boot.extraModulePackages = [ acpiCall ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 
   # EC 每次上電都把燈打開,休眠恢復也是重新上電。睡眠類 target 要等系統醒來
   # 才算到達,排在它們之後就會在恢復時執行。

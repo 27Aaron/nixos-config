@@ -88,11 +88,6 @@ in
       '';
     };
 
-    # 上游只替 podman0 開 aardvark-dns;firewall.interfaces 不支援萬用字元。
-    networking.firewall.extraInputRules = ''
-      iifname "podman*" udp dport 53 accept
-    '';
-
     preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/var/lib/containers";

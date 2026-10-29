@@ -149,7 +149,7 @@ in
 
     boot.tmp.cleanOnBoot = true;
 
-    # crypttabExtraOpts 只有 systemd initrd 會讀取;FIDO2 解鎖需要 USB HID 驅動。
+    # FIDO2 解鎖需要 USB HID 驅動。
     #
     # 登記對分割區操作,不是 /dev/mapper/crypted。開機依序嘗試 TPM2、FIDO2,
     # 最後才問密碼;密碼槽位要保留作備援。
@@ -162,13 +162,10 @@ in
     # --wipe-slot=tpm2 重新登記。不加 --tpm2-with-pin=yes 時開機不需任何秘密,
     # 主機就不能自動登入,睡眠前也必須鎖定:
     #   sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
-    boot.initrd = lib.mkIf cfg.luks.enable {
-      systemd.enable = true;
-      availableKernelModules = lib.optionals cfg.luks.fido2.enable [
-        "usbhid"
-        "hid_generic"
-      ];
-    };
+    boot.initrd.availableKernelModules = lib.optionals (cfg.luks.enable && cfg.luks.fido2.enable) [
+      "usbhid"
+      "hid_generic"
+    ];
 
     disko.devices = {
       nodev."/" = {

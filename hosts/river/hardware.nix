@@ -12,7 +12,6 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # systemd initrd 由 disko 與 persistence 模組啟用。
   hardware'.lanzaboote.enable = true;
 
   boot = {

@@ -24,9 +24,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # preservation 以 initrd 的 tmpfiles 掛載,需要 systemd initrd。
-    boot.initrd.systemd.enable = true;
-
     # initrd 就要掛上持久分割區,才能及早提供 machine-id。
     fileSystems."/persistent".neededForBoot = true;
 
