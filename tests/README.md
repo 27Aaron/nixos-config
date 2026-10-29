@@ -31,7 +31,7 @@ nix-trust =
 
 `security.nix` 開頭的清單記錄的是安全決定。改動清單就等於做了一次決定，要在同一個變更裡說明理由：
 
-- `openPorts`：各主機對外開放的連接埠。服務新開了連接埠，或新增主機，都要在這裡登記。
+- `openPorts`：各主機對外開放的連接埠，以及 `networking.firewall.extraInputRules` 的每一行。服務新開了連接埠或加了規則，或新增主機，都要在這裡登記。
 - `caches`：信任的二進位快取與簽章金鑰。每一個都能把任意 store 路徑送進系統。
 - `privateDirs`、`privateFiles`、`privateSystemDirs`：一旦持久化，就必須只有擁有者能讀的路徑。
 - `kernelSysctl`、`blockedModules`：每臺主機的核心參數基準與禁止載入的模組。

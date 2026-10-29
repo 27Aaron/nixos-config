@@ -11,7 +11,7 @@
 | 沒有 Nix 受信任使用者，daemon 只限 `@wheel`，必須有簽章 | [`modules/core/nix.nix`](modules/core/nix.nix) | `nix-trust`、`daemon-access` |
 | 受信任 substituter 與金鑰的清單 | [`modules/core/nix.nix`](modules/core/nix.nix)、[`modules/desktop/input-method/vinput.nix`](modules/desktop/input-method/vinput.nix)（只在 `desktop'.vinput` 時） | `nix-caches` |
 | sshd：只接受金鑰，除非 `services'.openssh.rootLogin` 否則不允許 root 登入，不允許 X11 轉送 | [`modules/services/network/openssh.nix`](modules/services/network/openssh.nix) | `ssh` |
-| 各主機防火牆對外連接埠的清單 | 開啟連接埠的服務 | `firewall` |
+| 各主機防火牆對外連接埠與 `extraInputRules` 的清單 | 開啟連接埠的服務 | `firewall` |
 | 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/core/users.nix`](modules/core/users.nix) | `password-source` |
 | sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/core/sops.nix`](modules/core/sops.nix) | `sops-key` |
 | systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/hardware/boot/`](modules/hardware/boot/)、[`users.nix`](modules/core/users.nix) | `boot-and-accounts` |
@@ -20,6 +20,8 @@
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
+| 登入帳號不在 `podman`、`docker` 群組，不開放 `/run/docker.sock` | [`modules/services/podman.nix`](modules/services/podman.nix) | `container-socket` |
+| rootful 容器發布的埠不接受外部連線；rootless 的埠受一般防火牆規則管制 | [`modules/services/podman.nix`](modules/services/podman.nix) | 執行期檢查 |
 | btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/storage/btrbk.nix`](modules/services/storage/btrbk.nix) | `btrbk-sudo` |
 | 沙箱化的程式只以 nixpak 版本安裝 | [`modules/desktop/nagram.nix`](modules/desktop/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
@@ -34,6 +36,7 @@ nix config show trusted-users                      # root
 nix config show allowed-users                      # @wheel
 sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication) '   # no / no
 sudo nft list chain inet nixos-fw input-allow      # 只有預期的連接埠
+sudo nft list chain inet podman-published forward  # 啟用 podman 的主機：有 ct status dnat 的 drop 規則
 systemctl --failed                                 # 沒有失敗的單元
 bootctl status | grep 'Secure Boot'                # Secure Boot 主機：enabled (user)
 sudo sbctl verify                                  # Secure Boot 主機：每個 stub 都已簽章

@@ -3,11 +3,13 @@ let
   vars = import ../vars;
 
   # 各主機對外開放的連接埠。服務新開了埠,要在這裡登記才能通過測試。
-  # 每臺都開 sshd 與 avahi 的 mDNS。
+  # 每臺都開 sshd 與 avahi 的 mDNS。rules 是 extraInputRules 的每一行。
   openPorts = {
     river = {
       tcp = [ 233 ];
       udp = [ 5353 ];
+      # 只對 rootful 容器的橋接網路開放,讓 aardvark-dns 能回應。
+      rules = [ ''iifname "podman*" udp dport 53 accept'' ];
     };
     router = {
       tcp = [ 233 ];
@@ -36,6 +38,7 @@ let
     ".local/share/keyrings"
     ".local/share/NagramDesktop"
     ".local/share/atuin"
+    ".local/share/containers"
     ".local/share/fish"
     ".local/share/Steam"
     ".steam"
@@ -44,6 +47,7 @@ let
   privateFiles = [ ".claude.json" ];
   privateSystemDirs = [
     "/var/lib/bluetooth"
+    "/var/lib/containers"
     "/var/lib/sbctl"
     "/etc/NetworkManager/system-connections"
   ];
@@ -167,6 +171,8 @@ in
     let
       fw = config.networking.firewall;
       inherit (config.networking) hostName;
+      # podman 模組即使沒開任何埠,也會宣告 podman0 這個鍵。
+      openOn = lib.filterAttrs (_: i: lib.any (l: l != [ ]) (lib.attrValues i)) fw.interfaces;
       ports = openPorts.${hostName} or (throw "tests/security.nix: 請在 openPorts 登記 ${hostName} 開放的連接埠");
     in
     {
@@ -175,9 +181,10 @@ in
           enable
           allowedTCPPortRanges
           allowedUDPPortRanges
-          interfaces
           trustedInterfaces
           ;
+        interfaces = openOn;
+        rules = lib.filter (l: l != "") (map lib.trim (lib.splitString "\n" fw.extraInputRules));
         tcp = sorted fw.allowedTCPPorts;
         udp = sorted fw.allowedUDPPorts;
       };
@@ -190,6 +197,7 @@ in
         trustedInterfaces = [ "lo" ];
         tcp = sorted ports.tcp;
         udp = sorted ports.udp;
+        rules = ports.rules or [ ];
       };
     };
 
@@ -267,6 +275,30 @@ in
     {
       expr = config.services.btrbk.instances != { } && config.security.sudo.execWheelOnly;
       expected = false;
+    };
+
+  # podman 群組能經由 rootful socket 取得 root;docker 群組同理。登入帳號
+  # 只用 rootless 容器,不加入這兩個群組,也不開 /run/docker.sock。
+  container-socket =
+    { config, ... }:
+    let
+      inGroup =
+        group:
+        lib.elem group config.users.users.${vars.username}.extraGroups
+        || lib.elem vars.username (config.users.groups.${group}.members or [ ]);
+    in
+    {
+      expr = {
+        groups = lib.filter inGroup [
+          "podman"
+          "docker"
+        ];
+        dockerSocket = config.virtualisation.podman.dockerSocket.enable;
+      };
+      expected = {
+        groups = [ ];
+        dockerSocket = false;
+      };
     };
 
   # 模組只靠 blacklist 擋不住明確的 modprobe,要同時有 install 規則。
