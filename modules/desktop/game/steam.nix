@@ -17,7 +17,6 @@ in
     programs.steam = {
       enable = true;
 
-      # 替個別 Proton 遊戲補裝 Windows 執行庫(winetricks)。
       protontricks.enable = true;
 
       # Steam 是 X11 程式,在 Wayland 下送出的鍵鼠事件到不了其他視窗;extest 把它們轉成

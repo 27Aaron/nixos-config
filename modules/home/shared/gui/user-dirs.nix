@@ -13,7 +13,6 @@ in
     xdg = {
       enable = true;
 
-      # Public 與 Templates 用不到,設成 null 就不建立。
       userDirs = {
         enable = true;
         createDirectories = true;

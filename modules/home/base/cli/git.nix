@@ -43,7 +43,6 @@
 
   home.shellAliases.gs = "git status";
 
-  # GitHub CLI 的帳號憑證。
   persist.directories = lib.mkIf config.persist.enable [
     {
       directory = ".config/gh";

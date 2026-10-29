@@ -57,7 +57,6 @@ in
         OnCalendar = "daily";
         # 分散執行時間,避免同時喚醒磁碟。
         RandomizedDelaySec = "15min";
-        # 錯過的清理在開機後補跑。
         Persistent = true;
       };
     };

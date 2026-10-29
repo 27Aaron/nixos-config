@@ -10,9 +10,7 @@ let
   sshConfig = inputs.secrets + "/openssh/config";
 in
 {
-  # OpenSSH 10 要求 ~/.ssh/config 屬於使用者本人,home.file 的 store 連結
-  # 屬於 root,因此改在啟用時複製成一般檔案。
-  # 移除條件見 WORKAROUNDS.md 的 WA-006。
+  # OpenSSH 10 要求 ~/.ssh/config 屬於本人,store 連結屬於 root;見 WA-006。
   home.activation.installSshConfig = lib.mkIf (builtins.pathExists sshConfig) (
     lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       install -d -m 700 "$HOME/.ssh"
@@ -21,7 +19,6 @@ in
     ''
   );
 
-  # 客戶端金鑰與 known_hosts。
   persist.directories = lib.mkIf config.persist.enable [
     {
       directory = ".ssh";

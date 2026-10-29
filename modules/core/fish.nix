@@ -13,10 +13,8 @@
     '';
   };
 
-  # 主要使用者的登入 shell。
   user'.shell = pkgs.fish;
 
-  # fish 的設定與歷史。
   preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
     ".config/fish"
     {

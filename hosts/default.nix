@@ -30,6 +30,5 @@ let
     };
 in
 {
-  # hosts/<名稱>/ 成為 nixosConfigurations.<名稱>。
   nixosConfigurations = lib.mapAttrs mkNixos (hostsIn ./.);
 }

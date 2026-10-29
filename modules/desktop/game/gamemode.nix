@@ -18,8 +18,7 @@ in
       settings.general.renice = 10;
     };
 
-    # GameMode 的 polkit 規則只讓 gamemode 群組免密碼以 root 執行 CPU 調速器等輔助程式,
-    # 不在群組裡大多數調整都不會生效。見 WORKAROUNDS.md 的 WA-021。
+    # GameMode 的 polkit 規則只讓這個群組執行調整輔助程式;見 WA-021。
     user'.extraGroups = [ "gamemode" ];
   };
 }

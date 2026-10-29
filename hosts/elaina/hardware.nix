@@ -12,8 +12,7 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # 開機:載入器、核心與 initrd。systemd initrd 由 disko 與 persistence
-  # 模組啟用。
+  # systemd initrd 由 disko 與 persistence 模組啟用。
   hardware'.lanzaboote.enable = true;
 
   boot = {
@@ -30,6 +29,5 @@
     ];
   };
 
-  # 韌體與週邊驅動。
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

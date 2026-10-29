@@ -19,7 +19,6 @@ in
       wireplumber.enable = true;
     };
 
-    # 讓音訊伺服器透過 RTKit 取得即時排程。
     security.rtkit.enable = lib.mkIf cfg.enable true;
 
     # 依服務的最終狀態而非本模組開關,上游模組也可能啟用它。

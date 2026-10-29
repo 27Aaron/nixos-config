@@ -21,7 +21,6 @@ in
       enable = true;
       ports = [ 233 ];
 
-      # 只產生 Ed25519 主機金鑰,不產生 RSA。
       hostKeys = lib.mkDefault [
         {
           path = "/etc/ssh/ssh_host_ed25519_key";
@@ -34,7 +33,6 @@ in
         # 登入,提權仍需 sudo 密碼。
         PermitRootLogin = lib.mkDefault (if cfg.rootLogin then "prohibit-password" else "no");
         PasswordAuthentication = lib.mkDefault false;
-        # 一併關閉,確保只能以公鑰登入。
         KbdInteractiveAuthentication = lib.mkDefault false;
         PermitEmptyPasswords = lib.mkDefault false;
         # 純 Wayland 主機用不到 X11 轉發。
@@ -42,7 +40,6 @@ in
       };
     };
 
-    # 安裝所有 terminfo,各種終端機連入時都能正確顯示。
     environment.enableAllTerminfo = lib.mkDefault true;
 
     # 只持久化主機金鑰;保留整個 /etc/ssh 會遮住 NixOS 生成的 sshd_config

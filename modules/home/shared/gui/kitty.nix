@@ -13,7 +13,6 @@ in
     programs.kitty = {
       enable = true;
 
-      # 另有 Frappe、Macchiato 與淺色的 Latte。
       themeFile = "Catppuccin-Mocha";
 
       # 字型由 desktop'.fonts 安裝,這裡只指定家族名。
@@ -23,11 +22,9 @@ in
       };
 
       settings = {
-        # 只隱藏標題列,視窗邊框與陰影保留。
         hide_window_decorations = "titlebar-only";
         window_padding_width = "15";
 
-        # 背景模糊需要合成器支援。
         background_opacity = "0.85";
         background_blur = "30";
 

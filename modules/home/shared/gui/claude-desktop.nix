@@ -14,10 +14,8 @@ in
   options.gui.claude-desktop.enable = lib.mkEnableOption "Claude Desktop";
 
   config = lib.mkIf cfg.enable {
-    # 非自由軟體,需要 nixpkgs.config.allowUnfree。
     home.packages = [ claude-desktop ];
 
-    # 設定與登入狀態。
     persist.directories = lib.mkIf config.persist.enable [
       {
         directory = ".config/Claude";

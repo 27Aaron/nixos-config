@@ -162,8 +162,7 @@ in
       # 片段要等 sops 解密後才存在,組裝必須排在它後面。
       after = [ "sops-install-secrets.service" ];
       serviceConfig = {
-        # 上游模組只複製入口設定,include 的 config.d 會遺失,因此改為自行組裝。
-        # 移除條件見 WORKAROUNDS.md 的 WA-009。
+        # 上游模組只複製入口設定,遺漏 include 的 config.d;見 WA-009。
         LoadCredential = lib.mkForce [ ];
         ExecStartPre = lib.mkForce [
           ""

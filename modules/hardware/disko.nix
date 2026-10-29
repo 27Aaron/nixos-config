@@ -147,26 +147,21 @@ in
       }
     ];
 
-    # 只在開機時清空 /tmp,不改變其位置;與上方的 @tmp 搭配。
     boot.tmp.cleanOnBoot = true;
 
-    # 下方的 crypttabExtraOpts 只有 systemd initrd 會讀取。
+    # crypttabExtraOpts 只有 systemd initrd 會讀取;FIDO2 解鎖需要 USB HID 驅動。
     #
-    # FIDO2 解鎖需要 USB HID 驅動。登記需手動,對分割區而非 /dev/mapper/crypted
-    # 操作,每次只插一把鑰匙;預設要求 PIN 與觸摸,單有鑰匙無法解鎖:
-    #   sudo systemd-cryptenroll /dev/disk/by-partlabel/disk-main-luks   # 列出槽位
+    # 登記對分割區操作,不是 /dev/mapper/crypted。開機依序嘗試 TPM2、FIDO2,
+    # 最後才問密碼;密碼槽位要保留作備援。
+    #
+    # FIDO2 一次只插一把,預設要 PIN 與觸摸;沒有鍵盤的主機加上
+    # --fido2-with-client-pin=no(見 WA-022):
     #   sudo systemd-cryptenroll --fido2-device=auto /dev/disk/by-partlabel/disk-main-luks
-    # 不接鍵盤的主機改為只要觸摸、不要求 PIN(見 WORKAROUNDS.md 的 WA-022);
-    # PIN 的要求記在 LUKS token 裡,開機時自動判斷,設定不必改:
-    #   sudo systemd-cryptenroll --fido2-device=auto --fido2-with-client-pin=no /dev/disk/by-partlabel/disk-main-luks
     #
-    # TPM2 只綁 PCR 7(Secure Boot 狀態與驗證開機程式的憑證),系統更新不必重新登記:
+    # TPM2 只綁 PCR 7,系統更新不必重新登記;換 Secure Boot 金鑰後加上
+    # --wipe-slot=tpm2 重新登記。不加 --tpm2-with-pin=yes 時開機不需任何秘密,
+    # 主機就不能自動登入,睡眠前也必須鎖定:
     #   sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-partlabel/disk-main-luks
-    # 不加 --tpm2-with-pin=yes 時開機不需任何秘密即可解鎖,主機就不能自動登入,
-    # 睡眠前也必須鎖定工作階段。
-    # 更換 Secure Boot 金鑰後 PCR 7 會變,需加上 --wipe-slot=tpm2 重新登記。
-    # systemd-cryptsetup 依序嘗試 TPM2、FIDO2,最後才詢問密碼。
-    # LUKS 密碼槽位保留作備援,金鑰遺失時仍可解鎖。
     boot.initrd = lib.mkIf cfg.luks.enable {
       systemd.enable = true;
       availableKernelModules = lib.optionals cfg.luks.fido2.enable [

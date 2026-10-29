@@ -49,7 +49,6 @@
       mode = "0700";
     }
 
-    # nix 的使用者狀態與 profile 連結。
     ".local/share/nix"
     ".local/state/nix/profiles"
 
