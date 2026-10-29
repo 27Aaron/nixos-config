@@ -36,6 +36,7 @@
     magpie.enable = true;
     mangohud.enable = true;
     seahorse.enable = true;
+    "1password".enable = true;
     theme.enable = true;
     pointer-cursor.enable = true;
     mime-apps.enable = true;
