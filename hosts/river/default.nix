@@ -2,6 +2,7 @@
   imports = [
     ./hardware.nix
     ./keyboard.nix
+    ./keyboard-backlight.nix
     ./power.nix
     ./storage.nix
   ];
