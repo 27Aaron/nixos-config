@@ -23,6 +23,29 @@
       enable = true;
       lite = true;
     };
+
+    chrome.enable = true;
+    firefox.enable = true;
+    vscode.enable = true;
+    zed.enable = true;
+    kitty.enable = true;
+    claude-desktop.enable = true;
+    dsh-desktop.enable = true;
+    nagram.enable = true;
+    magpie.enable = true;
+    mangohud.enable = true;
+    seahorse.enable = true;
+    theme.enable = true;
+    pointer-cursor.enable = true;
+    mime-apps.enable = true;
+    user-dirs.enable = true;
+  };
+
+  dev' = {
+    project-env.enable = true;
+    toolchain.enable = true;
+    claude-code.enable = true;
+    dsh.enable = true;
   };
 
   services' = {
@@ -32,36 +55,6 @@
     dae.enable = true;
     logrotate.enable = true;
     vnstat.enable = true;
-  };
-
-  hm' = {
-    cli = {
-      development.enable = true;
-      toolchain.enable = true;
-    };
-
-    tui = {
-      claude-code.enable = true;
-      dsh.enable = true;
-    };
-
-    gui = {
-      chrome.enable = true;
-      firefox.enable = true;
-      vscode.enable = true;
-      zed.enable = true;
-      kitty.enable = true;
-      claude-desktop.enable = true;
-      dsh-desktop.enable = true;
-      nagram.enable = true;
-      magpie.enable = true;
-      mangohud.enable = true;
-      seahorse.enable = true;
-      theme.enable = true;
-      pointer-cursor.enable = true;
-      mime-apps.enable = true;
-      user-dirs.enable = true;
-    };
   };
 
   time.timeZone = "Asia/Tokyo";

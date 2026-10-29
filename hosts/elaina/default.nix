@@ -17,11 +17,9 @@
 
   server'.fail2ban.enable = true;
 
-  hm' = {
-    cli = {
-      development.enable = true;
-      toolchain.enable = true;
-    };
+  dev' = {
+    project-env.enable = true;
+    toolchain.enable = true;
   };
 
   system.stateVersion = "23.05";

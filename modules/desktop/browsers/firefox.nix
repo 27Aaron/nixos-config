@@ -1,0 +1,31 @@
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.desktop'.firefox;
+in
+{
+  options.desktop'.firefox.enable = lib.mkEnableOption "Firefox";
+
+  config = lib.mkIf cfg.enable {
+    hm'.home.packages = [ pkgs.firefox ];
+
+    # profile 整個保留:storage/ 存放網站登入狀態,各資料庫彼此關聯,不宜拆開。
+    # 憑證位於 profile 內的 cert9.db/key4.db,無需另外登記。
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
+      {
+        directory = ".config/mozilla";
+        mode = "0700";
+      }
+
+      # 快取放在持久卷以免佔用 tmpfs(可達 1G 以上)。
+      {
+        directory = ".cache/mozilla";
+        mode = "0700";
+      }
+    ];
+  };
+}

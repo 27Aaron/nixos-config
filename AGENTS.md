@@ -10,16 +10,16 @@
 | [`lib/`](lib/) | 模組收集器與共用的 nixpak 沙箱模組 |
 | [`hosts/`](hosts/) | 每臺主機一個目錄，自動探索 |
 | [`modules/`](modules/) | 所有可重用的模組，依用途分目錄 |
-| [`modules/core/`](modules/core/) | 每臺主機一律生效的系統模組 |
+| [`modules/core/`](modules/core/) | 每臺主機一律生效的模組，包括 shell、Git 等日常命令列工具 |
 | [`modules/hardware/`](modules/hardware/)、[`modules/services/`](modules/services/) | 伺服器也可能用到的系統模組，可開關 |
-| [`modules/desktop/`](modules/desktop/)、[`modules/server/`](modules/server/) | 只有桌面或只有伺服器才用的系統模組，可開關 |
-| [`modules/home/`](modules/home/) | Home Manager 模組：[`base/`](modules/home/base/) 一律生效；[`shared/`](modules/home/shared/) 可開關 |
+| [`modules/dev/`](modules/dev/) | 開發環境、工具鏈與 AI agent，伺服器與桌面都能用，可開關 |
+| [`modules/desktop/`](modules/desktop/)、[`modules/server/`](modules/server/) | 只有桌面或只有伺服器才用的模組，可開關 |
 | [`tests/`](tests/) | `just check` 執行的 eval 測試 |
 | [`vars/`](vars/) | 共用的非機密值 |
 | [`SECURITY.md`](SECURITY.md) | 安全控制與對應測試、flake 輸入、機密與更新流程 |
 | [`WORKAROUNDS.md`](WORKAROUNDS.md) | 暫時性的權宜做法、版本釘選與安全例外 |
 
-`hosts/`、每臺主機的目錄、`modules/`、`modules/home/` 與 `tests/` 各有一份 `README.md`，說明什麼東西該放在那裡。新增檔案前先讀；變更讓它過時的話，一併更新。
+`hosts/`、每臺主機的目錄、`modules/` 與 `tests/` 各有一份 `README.md`，說明什麼東西該放在那裡。新增檔案前先讀；變更讓它過時的話，一併更新。
 
 ## Host discovery
 
@@ -28,13 +28,14 @@
 ## Module conventions
 
 - 模組由 [`lib/default.nix`](lib/default.nix) 的 `listModules` 自動收集；含 `default.nix` 的子目錄只透過該檔載入。
-- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。Home Manager 模組要每臺主機都需要，才放進 [`home/base/`](modules/home/base/)；可開關的放 [`home/shared/`](modules/home/shared/)。
-- `core/` 底下與 [`home/base/`](modules/home/base/) 裡的模組一律生效，沒有 `enable` 選項。其他模組預設關閉，選項命名空間與 `enable` 開關比照相鄰的模組。
+- 模組放在它能運作的最通用層級，順序見 [`modules/README.md`](modules/README.md)。
+- 所有模組都是 NixOS 模組。使用者層的設定透過 `hm'`（`home-manager.users.<使用者>` 的別名）寫在同一個檔案裡，與該程式的系統設定和持久化放在一起，不另外分出 Home Manager 模組。
+- `core/` 底下的模組一律生效，沒有 `enable` 選項。其他模組預設關閉，選項命名空間與 `enable` 開關比照相鄰的模組。
 - 一個檔案只放一個程式或一件事。一個檔案放不下時，改成以 `default.nix` 為入口的目錄。
 
 ## Persistence
 
-- 根目錄是 tmpfs，沒登記的路徑重開機後就不見了。系統模組把狀態登記在 `preservation'.os` 或 `preservation'.user`；Home Manager 模組用 `persist`，由持久化模組合併進 `preservation'.user`。
+- 根目錄是 tmpfs，沒登記的路徑重開機後就不見了。模組把系統狀態登記在 `preservation'.os`、家目錄狀態登記在 `preservation'.user`，並以 `lib.mkIf config.hardware'.persistence.enable` 包起來。
 - 狀態在產生它的模組裡登記。`~/.cache` 從不整個持久化，只列出值得保留的快取。
 - 存放憑證、工作階段、金鑰或歷史紀錄的目錄要設 `mode = "0700"`。preservation 的預設是 `0755`，而且每次開機都會重新套用。
 - 某個服務也可能由上游模組啟用時，要依它的最終狀態（例如 `config.hardware.bluetooth.enable`）決定是否持久化，而不是依這個模組的開關。
@@ -109,7 +110,7 @@ type(scope): description
 - 標題連同 `type(scope): ` 不超過 50 個字元。GitHub 會截斷超過 72 個字元的標題，squash merge 還會再附加 ` (#123)`，50 個字元才有餘裕。標題只寫一個變更的結果，省略冠詞與贅字，清單與細節移到內文。
 - 內文在 72 個字元處換行。
 - pull request 標題會成為 squash merge 的提交標題，因此遵守相同規則。
-- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`desktop`、`server`、`home`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
+- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`dev`、`desktop`、`server`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
 - 描述變更的結果，而不是列出編輯過的檔案。
 
 ```text

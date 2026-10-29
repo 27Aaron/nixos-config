@@ -8,13 +8,6 @@
 let
   cfg = config.hardware'.persistence;
   user = vars.username;
-
-  # Home Manager 透過 persist 回報的狀態;未載入 HM 時為空。
-  persist =
-    config.hm'.persist or {
-      directories = [ ];
-      files = [ ];
-    };
 in
 {
   imports = [
@@ -49,17 +42,12 @@ in
       # 不整體保留 ~/.cache:內容幾乎都可重建且成長很快,需要的快取由各模組
       # 自行登記。
 
-      # GPG 金鑰環;GNOME 鑰匙圈見 modules/home/shared/gui/seahorse.nix。
+      # GNOME 鑰匙圈見 desktop/seahorse.nix。
       {
         directory = ".gnupg";
         mode = "0700";
       }
-    ]
-    ++ persist.directories;
-
-    preservation'.user.files = persist.files;
-
-    hm'.persist.enable = true;
+    ];
 
     preservation'.os = {
       directories = [

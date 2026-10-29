@@ -5,9 +5,6 @@
   vars,
   ...
 }:
-let
-  inherit (import ../../lib { inherit lib; }) listModules;
-in
 {
   imports = [ inputs.home-manager.nixosModules.home-manager ];
 
@@ -15,13 +12,22 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "hm-bak";
+  };
 
-    # 系統的 specialArgs 不會自動傳入 Home Manager 模組,需顯式轉交。
-    extraSpecialArgs = {
-      inherit inputs vars;
+  hm' = {
+    home = {
+      username = vars.username;
+      homeDirectory = config.users.users.${vars.username}.home;
+
+      stateVersion = vars.homeStateVersion;
+      language.collate = "C.UTF-8";
     };
 
-    users.${vars.username}.imports = listModules ../home/base ++ listModules ../home/shared;
+    programs.home-manager.enable = true;
+
+    # 兩者都關閉才能跳過 option manual 的建置。
+    programs.man.enable = false;
+    manual.manpages.enable = false;
   };
 
   # Home Manager 寫入 dconf 需要系統側支援。

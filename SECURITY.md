@@ -18,10 +18,10 @@
 | 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/hardware/boot/lanzaboote.nix`](modules/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
 | TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 模組 assertion |
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
-| 編輯器與代理的信任提示保持開啟 | [`modules/home/shared/gui/editors/`](modules/home/shared/gui/editors/)、[`modules/home/shared/tui/agents/`](modules/home/shared/tui/agents/) | `editor-and-agent-trust` |
-| 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `persist` 項目 | `private-state` |
+| 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
+| 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
 | btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/btrbk.nix`](modules/services/btrbk.nix) | `btrbk-sudo` |
-| 沙箱化的程式只以 nixpak 版本安裝 | [`modules/home/shared/gui/nagram.nix`](modules/home/shared/gui/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
+| 沙箱化的程式只以 nixpak 版本安裝 | [`modules/desktop/nagram.nix`](modules/desktop/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
 程式同時符合以下三點時就放進 nixpak 沙箱：來自第三方、會處理不受信任的內容、不需要使用者的檔案。
 
