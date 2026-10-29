@@ -8,6 +8,13 @@ let
   kmod = "${pkgs.kmod}/bin";
   inherit (config.boot) kernelPackages;
 
+  sleepTargets = [
+    "suspend.target"
+    "hibernate.target"
+    "hybrid-sleep.target"
+    "suspend-then-hibernate.target"
+  ];
+
   # 套件自己複製 .ko,跳過 modules_install 的 kmodigest,缺少模組彙整要的
   # .ko.cer;見 WA-025。
   acpiCall = kernelPackages.acpi_call.overrideAttrs (old: {
@@ -44,6 +51,15 @@ in
   # 只在呼叫期間載入:acpi_call 讓 root 能執行任意 ACPI 方法。
   boot.extraModulePackages = [ acpiCall ];
 
-  # EC 每次上電都把燈打開;休眠恢復也是重新上電。
-  powerManagement.powerUpCommands = "${backlightOff}";
+  # EC 每次上電都把燈打開,休眠恢復也是重新上電。睡眠類 target 要等系統醒來
+  # 才算到達,排在它們之後就會在恢復時執行。
+  systemd.services.keyboard-backlight-off = {
+    description = "Turn off the keyboard backlight";
+    wantedBy = [ "multi-user.target" ] ++ sleepTargets;
+    after = sleepTargets;
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = backlightOff;
+    };
+  };
 }
