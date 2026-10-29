@@ -3,11 +3,13 @@ let
   vars = import ../vars;
 
   # 各主機對外開放的連接埠。服務新開了埠,要在這裡登記才能通過測試。
-  # 每臺都開 sshd 與 avahi 的 mDNS。
+  # 每臺都開 sshd 與 avahi 的 mDNS。rules 是 extraInputRules 的每一行。
   openPorts = {
     river = {
       tcp = [ 233 ];
       udp = [ 5353 ];
+      # 只對 rootful 容器的橋接網路開放,讓 aardvark-dns 能回應。
+      rules = [ ''iifname "podman*" udp dport 53 accept'' ];
     };
     router = {
       tcp = [ 233 ];
@@ -182,6 +184,7 @@ in
           trustedInterfaces
           ;
         interfaces = openOn;
+        rules = lib.filter (l: l != "") (map lib.trim (lib.splitString "\n" fw.extraInputRules));
         tcp = sorted fw.allowedTCPPorts;
         udp = sorted fw.allowedUDPPorts;
       };
@@ -194,6 +197,7 @@ in
         trustedInterfaces = [ "lo" ];
         tcp = sorted ports.tcp;
         udp = sorted ports.udp;
+        rules = ports.rules or [ ];
       };
     };
 

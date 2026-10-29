@@ -6,14 +6,12 @@
 let
   cfg = config.services'.podman;
 
-  # 只清掉一週內沒用到的映像與容器。
   pruneFlags = [
     "--all"
     "--filter=until=168h"
   ];
 
-  # 上游計時器是每天一次。NixOS 把這裡的設定寫成 drop-in,而 drop-in 的
-  # OnCalendar 會疊加在上游之上,要先以空字串清掉。
+  # drop-in 的 OnCalendar 會疊加在上游的 daily 之上,要先以空字串清掉。
   autoUpdateTimer = {
     wantedBy = [ "timers.target" ];
     timerConfig.OnCalendar = [
@@ -31,11 +29,11 @@ in
     virtualisation.podman = {
       enable = true;
 
-      # 只提供 docker 指令別名,不開 /run/docker.sock。rootful socket 屬於
-      # podman 群組,能透過它取得 root,因此不把登入帳號加進去。
+      # 只做 docker 指令別名,不開 /run/docker.sock:連得上 rootful socket 就等於
+      # root,所以登入帳號也不加入 podman 群組。
       dockerCompat = true;
 
-      # 以 root 執行,只清 rootful 的儲存;rootless 的由下方的使用者服務清理。
+      # 以 root 執行,只清 rootful 的儲存。
       autoPrune = {
         enable = true;
         dates = "weekly";
@@ -43,18 +41,17 @@ in
       };
     };
 
-    # k8s-file 預設不限大小,會在容器儲存裡一直長大;journald 有統一的上限。
+    # k8s-file 預設不限大小;journald 有統一的上限。
     virtualisation.containers.containersConf.settings.containers.log_driver = "journald";
 
-    # 只更新帶 io.containers.autoupdate 標籤、由 systemd 管理的容器。系統層
-    # 的計時器只管 rootful 容器,rootless 的要另外啟用使用者層的同名計時器。
+    # 系統層的計時器只更新 rootful 容器。
     systemd.timers.podman-auto-update = autoUpdateTimer;
     systemd.user.timers.podman-auto-update = autoUpdateTimer;
 
     systemd.user.services.podman-prune = {
       description = "Prune rootless Podman resources";
-      # rootless podman 需要 /run/wrappers/bin 的 setuid newuidmap,而 NixOS
-      # 產生的服務會以自己的 PATH 蓋掉使用者管理器的預設值。
+      # newuidmap 是 /run/wrappers/bin 的 setuid 程式;NixOS 產生的服務會以自己
+      # 的 PATH 蓋掉使用者管理器的預設值。
       path = [ "/run/wrappers" ];
       serviceConfig = {
         Type = "oneshot";
@@ -75,11 +72,32 @@ in
       RandomizedDelaySec = 1800;
     };
 
+    # rootful 容器發布的埠經 DNAT 走 forward 鏈,不經過 input,主機防火牆擋不到,
+    # NixOS 的 filterForward 也會直接放行 DNAT。只擋從外部進來的;主機自己與其他
+    # 容器仍連得到。rootless 的埠由 pasta 綁在主機上,照常受 input 鏈管制。
+    networking.nftables.tables.podman-published = {
+      family = "inet";
+      content = ''
+        chain forward {
+          type filter hook forward priority filter; policy accept;
+          ct status dnat oifname "podman*" iifname != "podman*" drop
+        }
+      '';
+    };
+
+    # rootful 自訂網路(podman1 起)的 aardvark-dns 聽在閘道上,查詢會進 input
+    # 鏈;上游只替 podman0 開。firewall.interfaces 不加引號,無法用萬用字元。
+    networking.firewall.extraInputRules = ''
+      iifname "podman*" udp dport 53 accept
+    '';
+
     preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/var/lib/containers";
         mode = "0700";
       }
+      # rootful 的自訂網路設定;預設網路沒有自訂設定,NixOS 不會管理這個目錄。
+      "/etc/containers/networks"
     ];
 
     preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
