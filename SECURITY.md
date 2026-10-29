@@ -20,6 +20,7 @@
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
+| 登入帳號不在 `podman`、`docker` 群組，不開放 `/run/docker.sock` | [`modules/services/podman.nix`](modules/services/podman.nix) | `container-socket` |
 | btrbk 依賴 sudo 期間 `execWheelOnly` 保持關閉 | [`modules/services/storage/btrbk.nix`](modules/services/storage/btrbk.nix) | `btrbk-sudo` |
 | 沙箱化的程式只以 nixpak 版本安裝 | [`modules/desktop/nagram.nix`](modules/desktop/nagram.nix)、[`lib/nixpak/`](lib/nixpak/) | `sandboxed-apps` |
 
