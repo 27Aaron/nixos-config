@@ -6,13 +6,6 @@ let
 
   vars = import ../vars;
 
-  # modules/ 底下除了 home/ 都是系統模組;home/ 由 core/home-manager.nix 載入。
-  systemModules = lib.pipe (builtins.readDir ../modules) [
-    (lib.filterAttrs (name: type: type == "directory" && name != "home"))
-    lib.attrNames
-    (lib.concatMap (name: listModules ../modules/${name}))
-  ];
-
   hostsIn =
     dir:
     lib.filterAttrs (
@@ -26,7 +19,7 @@ let
         hostName = name;
         inherit inputs vars;
       };
-      modules = systemModules ++ [ ./${name} ];
+      modules = listModules ../modules ++ [ ./${name} ];
     };
 in
 {
