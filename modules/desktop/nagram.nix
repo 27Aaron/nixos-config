@@ -13,17 +13,7 @@ let
     inherit pkgs;
   };
 
-  # 上游內附的 libxkbcommon 只找 /usr/share/X11/xkb;見 WA-007。
-  nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop.override {
-    buildFHSEnv =
-      args:
-      pkgs.buildFHSEnv (
-        args
-        // {
-          targetPkgs = p: args.targetPkgs p ++ [ p.xkeyboard-config ];
-        }
-      );
-  };
+  nagram = inputs.nagram.packages.${pkgs.stdenv.hostPlatform.system}.nagram-desktop;
 
   # FHS 環境本身會掛入整個家目錄與 /run,不是沙箱;包在 nixpak 裡之後,
   # 內層只看得到外層放行的路徑。其他檔案經檔案選擇器的 portal 取用。
