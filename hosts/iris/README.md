@@ -8,7 +8,7 @@ Proxmox 上的 NixOS 虛擬機，擔任區網的 DNS 伺服器：AdGuard Home �
 |---|---|
 | 平臺 | Proxmox VE 虛擬機（QEMU/KVM，與 hydra 同一部主機） |
 | 磁碟 | `/dev/sda`（SATA，ESP 256M，LUKS 經 clevis 解鎖） |
-| 網路 | `eth0` 靜態 `10.10.10.9/24`（閘道 `10.10.10.1`），IPv6 由上游 DHCPv6 派發（比照 janus） |
+| 網路 | `eth0` 靜態 `10.10.10.9/24`（閘道 `10.10.10.1`），IPv6 由上游 DHCPv6 派發 |
 
 ## 部署
 

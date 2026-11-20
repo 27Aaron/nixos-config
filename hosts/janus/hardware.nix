@@ -1,38 +1,21 @@
 {
-  lib,
-  modulesPath,
-  pkgs,
-  ...
-}:
-{
-  imports = [
-    (modulesPath + "/profiles/qemu-guest.nix")
-  ];
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
-  boot = {
-    kernelPackages = pkgs.linuxPackages_latest;
-
-    # net.ifnames=0 讓網卡固定叫 eth0;audit 紀錄在這臺 VM 上只是雜訊。
-    kernelParams = [
-      "audit=0"
-      "net.ifnames=0"
-    ];
+  hardware'.kvm-guest = {
+    enable = true;
+    diskDevice = "/dev/sda";
+    # 1 GB 記憶體的機器,zram 上限跟著壓低,預設的 2049 MiB 對這臺沒意義。
+    zramMemoryMax = 513 * 1024 * 1024;
   };
 
   hardware' = {
+    # 這臺的磁碟不加密,也沒有 clevis/Tang 可用;沿用安裝時的
+    # systemd-boot 與 ESP,不另外產生 BIOS 開機分割區。
+    grub.enable = false;
     systemd-boot.enable = true;
-    disable-balloon.enable = true;
-
     disko = {
-      enable = true;
-      device = "/dev/sda";
-      tmpfsSize = "512M";
+      bios.enable = false;
+      luks.enable = false;
     };
-    persistence.enable = true;
   };
 
-  # Proxmox 透過 guest agent 正常關機並回報 IP。
-  services.qemuGuest.enable = true;
+  server'.initrd-ssh.enable = false;
 }
