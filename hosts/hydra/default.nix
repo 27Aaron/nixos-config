@@ -23,7 +23,10 @@
 
     openssh.enable = true;
 
-    dae.enable = true;
+    mihomo = {
+      enable = true;
+      allowLan = true;
+    };
     tailscale.enable = true;
 
     node-exporter.enable = true;
