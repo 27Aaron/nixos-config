@@ -23,7 +23,6 @@ let
       tcp = [ 233 ];
       udp = [ 5353 ];
     };
-    # DNS:AdGuard Home 對區網監聽 53(UDP/TCP)與網頁 UI 80。
     iris = {
       tcp = [
         53

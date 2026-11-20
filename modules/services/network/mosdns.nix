@@ -58,7 +58,6 @@ let
   #   geosite:proxy -> 遠端 DoH(阿里,加密且不依賴代理)
   #   其餘          -> 先問中國上游;答案沒有 CN IP(被污染/國外主機)
   #                    就改走遠端 DoH。
-  # 遠端改走阿里 DoH 後不再經過代理,閘道上沒有 dae 也能完整運作。
   mosdnsConfig = lib.generators.toYAML { } {
     log.level = "info";
     plugins = [
@@ -129,7 +128,7 @@ let
 
       {
         tag = "china_seq";
-        # prefer_ipv4:雙棧域名壓掉 AAAA,讓客戶端走 v4 連線;純 v6 域名 (沒有 A 記錄)仍正常解析。
+        # prefer_ipv4:雙棧域名壓掉 AAAA;純 v6 域名(沒有 A 記錄)不受影響。
         type = "sequence";
         args = [
           { exec = "prefer_ipv4"; }
@@ -138,7 +137,7 @@ let
       }
       {
         tag = "remote_seq";
-        # 國外域名多為雙棧,壓掉 AAAA 讓客戶端走 v4,行為與其餘路徑一致。
+        # 與 china_seq 的 prefer_ipv4 同理。
         type = "sequence";
         args = [
           { exec = "prefer_ipv4"; }
@@ -244,7 +243,6 @@ in
         ExecStart = "${lib.getExe pkgs.mosdns} start -c ${pkgs.writeText "mosdns-config.yaml" mosdnsConfig}";
         Restart = "on-failure";
         RestartSec = "5s";
-        # hardening
         CapabilityBoundingSet = [ "" ];
         NoNewPrivileges = true;
         PrivateTmp = true;

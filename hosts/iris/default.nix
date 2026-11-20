@@ -7,12 +7,16 @@
   services' = {
     avahi.enable = true;
 
-    adguardhome.enable = true;
-    adguardhome.webPort = 80;
+    adguardhome = {
+      enable = true;
+      webPort = 80;
+    };
     mosdns.enable = true;
 
-    openssh.enable = true;
-    openssh.rootLogin = true;
+    openssh = {
+      enable = true;
+      rootLogin = true;
+    };
 
     vnstat.enable = true;
   };

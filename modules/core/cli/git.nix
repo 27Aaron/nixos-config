@@ -24,7 +24,6 @@
       };
     };
 
-    # pager 由 enableGitIntegration 設成 delta。
     delta = {
       enable = true;
       enableGitIntegration = true;
