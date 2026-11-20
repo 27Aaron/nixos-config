@@ -15,7 +15,7 @@ let
         udp = [ 53 ];
       };
     };
-    router = {
+    janus = {
       tcp = [ 233 ];
       udp = [ 5353 ];
     };

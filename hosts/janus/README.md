@@ -1,4 +1,4 @@
-# router
+# janus
 
 Proxmox 上的 NixOS 虛擬機，以 dae 擔任區網閘道。
 
@@ -16,5 +16,5 @@ Proxmox 上的 NixOS 虛擬機，以 dae 擔任區網閘道。
 在其他主機上建置，以 root 連入部署：
 
 ```bash
-just deploy router root@<位址>
+just deploy janus root@<位址>
 ```
