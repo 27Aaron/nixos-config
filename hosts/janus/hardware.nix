@@ -6,16 +6,5 @@
     zramMemoryMax = 513 * 1024 * 1024;
   };
 
-  hardware' = {
-    # 這臺的磁碟不加密,也沒有 clevis/Tang 可用;沿用安裝時的
-    # systemd-boot 與 ESP,不另外產生 BIOS 開機分割區。
-    grub.enable = false;
-    systemd-boot.enable = true;
-    disko = {
-      bios.enable = false;
-      luks.enable = false;
-    };
-  };
-
-  server'.initrd-ssh.enable = false;
+  hardware'.clevis.enable = true;
 }

@@ -55,9 +55,8 @@ in
       };
     };
 
-    hardware'.grub.enable = lib.mkDefault true;
-    # 沒有 LUKS 的機器用不到 initrd 裡的 SSH。
-    server'.initrd-ssh.enable = lib.mkDefault true;
+    hardware'.grub.enable = true;
+    server'.initrd-ssh.enable = true;
 
     services'.zram = {
       enable = true;
@@ -71,10 +70,8 @@ in
         enable = true;
         device = cfg.diskDevice;
         tmpfsSize = lib.mkDefault "512M";
-        # 用 mkDefault 讓不加密磁碟或以 UEFI/systemd-boot 安裝的機器關閉,
-        # 例如 janus 以 systemd-boot 裝在既有 ESP 上,沒有 BIOS 開機分割區。
-        bios.enable = lib.mkDefault true;
-        luks.enable = lib.mkDefault true;
+        bios.enable = true;
+        luks.enable = true;
       };
       persistence.enable = true;
     };
