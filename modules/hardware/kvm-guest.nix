@@ -9,7 +9,8 @@ let
   cfg = config.hardware'.kvm-guest;
 in
 {
-  # 各 KVM 客體機共用的硬體基線;hosts/*/hardware.nix 只寫差異,例如盤符與是否經 clevis 解鎖。
+  # 各 KVM 客體機共用的硬體基線;hosts/*/hardware.nix 只寫差異,例如盤符。
+  # 家裡的 VM 磁碟不加密,LUKS 相關設定由此處開始都不啟用。
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
   options.hardware'.kvm-guest = {
@@ -56,7 +57,6 @@ in
     };
 
     hardware'.grub.enable = true;
-    server'.initrd-ssh.enable = true;
 
     services'.zram = {
       enable = true;
@@ -71,7 +71,6 @@ in
         device = cfg.diskDevice;
         tmpfsSize = lib.mkDefault "512M";
         bios.enable = true;
-        luks.enable = true;
       };
       persistence.enable = true;
     };

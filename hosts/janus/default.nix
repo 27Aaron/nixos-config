@@ -27,7 +27,5 @@
     vnstat.enable = true;
   };
 
-  server'.fail2ban.enable = true;
-
   system.stateVersion = "26.05";
 }

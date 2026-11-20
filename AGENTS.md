@@ -49,7 +49,7 @@
 - 帳號密碼來自 nix-secrets 的 `users/password.yaml`，以 `neededForUsers` 在建立使用者之前解密；設定裡絕不放密碼或雜湊。每臺主機都靠 sops 做這件事，所以它是 core 模組。
 - 主機以使用者的 `~/.ssh/id_ed25519` 解密（`sops.age.sshKeyPaths`；NixOS 主機直接讀 `/persistent` 上的那份），絕不另外放 age 金鑰檔。更換金鑰前先讀 [`SECURITY.md` 的〈Secrets〉](SECURITY.md#secrets)。
 - 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查、匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）。
-- root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行開啟，只用於遠端部署目標；其他主機只接受使用者的金鑰，再以 `sudo` 提權。root 仍保留授權金鑰，因為 initrd 的 SSH 解鎖要用。
+- root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行開啟，只用於遠端部署目標；其他主機只接受使用者的金鑰，再以 `sudo` 提權。root 仍保留授權金鑰，供日後需要 root 直連的部署或救援情境使用。
 - `security.sudo.execWheelOnly` 維持關閉：上游的 btrbk 模組以自己的使用者執行，並透過 sudo 規則呼叫 `btrfs`。
 - [`core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) 的核心基準使用 `lib.mkDefault`，主機以一般定義覆寫，絕不用 `mkForce`。有三項刻意不收緊：user namespace 保持開啟（Nix 建置沙箱需要）、`security.protectKernelImage` 保持關閉（它會停用休眠）、`kernel.kptr_restrict` 維持 1（dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`）。主機需要 `core'.kernel.blockedModules` 裡的某個模組時（例如 IPsec VPN），就在那裡把它移除。
 - 沙箱化的桌面程式使用 [`lib/nixpak/`](lib/nixpak/) 的 nixpak 模組，並列進 [`tests/security.nix`](tests/security.nix) 的 `sandboxedApps`。只綁定程式需要的路徑。絕不綁定整個 `$XDG_RUNTIME_DIR`：裡面有能啟動程式的 niri 控制 socket，以及 SSH 與 GPG agent。也絕不綁定未經過濾的 session bus：透過它，systemd 的使用者管理器能在沙箱外執行指令。以 FHS 打包的程式可以在 nixpak 裡執行，內層 FHS 環境看得到的東西受外層沙箱限制。

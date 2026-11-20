@@ -28,7 +28,7 @@ A flake for NixOS hosts.
 | Host | Machine | Role |
 |---|---|---|
 | `river` | MECHREVO WUJIE 14XA, Ryzen 7 8845HS | laptop, niri desktop |
-| `router` | Proxmox VM, 4 vCPU, 1 GB | headless server, LAN gateway with dae |
+| `janus` | Proxmox VM, 4 vCPU, 1 GB | headless server, LAN gateway with dae |
 | `elaina` | Beelink SER6 Pro VEST, Ryzen 7 7735HS | headless home server |
 | `hydra` | Proxmox VM, home lab | headless AI gateway with magpie and dae |
 

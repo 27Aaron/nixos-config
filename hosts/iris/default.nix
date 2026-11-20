@@ -5,9 +5,11 @@
   ];
 
   services' = {
-    mosdns.enable = true;
+    avahi.enable = true;
+
     adguardhome.enable = true;
     adguardhome.webPort = 80;
+    mosdns.enable = true;
 
     openssh.enable = true;
     openssh.rootLogin = true;

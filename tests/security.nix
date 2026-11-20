@@ -15,7 +15,7 @@ let
         udp = [ 53 ];
       };
     };
-    router = {
+    janus = {
       tcp = [ 233 ];
       udp = [ 5353 ];
     };
@@ -30,14 +30,20 @@ let
         233
         80
       ];
-      udp = [ 53 ];
+      udp = [
+        53
+        5353
+      ];
     };
     hydra = {
       tcp = [
         80
         233
       ];
-      udp = [ 41641 ];
+      udp = [
+        41641
+        5353
+      ];
       # node_exporter 只對 tailnet 開放,由 services'.node-exporter 負責。
       interfaces.tailscale0 = {
         tcp = [ 9100 ];
