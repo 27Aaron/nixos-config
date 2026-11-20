@@ -41,8 +41,10 @@ let
     "::ffff:0:0:0/96"
   ];
 
-  mrsProvider = name: url: {
-    inherit name url;
+  # behavior 是必填欄位,缺少會在啟動時直接失敗;geosite 的 .mrs 是
+  # domain 集合,geoip 的 .mrs 是 ipcidr 集合,兩種二進位格式不能混用。
+  mrsProvider = name: behavior: url: {
+    inherit name behavior url;
     type = "http";
     format = "mrs";
     interval = 86400;
@@ -109,7 +111,6 @@ let
     tcp-concurrent = true;
     keep-alive-idle = 30;
     keep-alive-interval = 15;
-    global-client-fingerprint = "chrome";
     external-controller =
       if cfg.allowLan then
         "0.0.0.0:${toString cfg.controllerPort}"
@@ -235,25 +236,57 @@ let
     ];
 
     rule-providers = {
-      ads = mrsProvider "ads" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.mrs";
+      ads =
+        mrsProvider "ads" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.mrs";
 
-      AI = mrsProvider "AI" "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs";
-      Anthropic = mrsProvider "anthropic" "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.mrs";
-      Anthropic_ip = mrsProvider "anthropic_ip" "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.ipcidr.mrs";
-      AppleAI = mrsProvider "appleai" "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/AppleAI/AppleAI.mrs";
+      AI =
+        mrsProvider "AI" "domain"
+          "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs";
+      Anthropic =
+        mrsProvider "anthropic" "domain"
+          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.mrs";
+      Anthropic_ip =
+        mrsProvider "anthropic_ip" "ipcidr"
+          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.ipcidr.mrs";
+      AppleAI =
+        mrsProvider "appleai" "domain"
+          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/AppleAI/AppleAI.mrs";
 
-      ApplePush = mrsProvider "applepush" "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.mrs";
-      ApplePush_ip = mrsProvider "applepush_ip" "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.ipcidr.mrs";
+      ApplePush =
+        mrsProvider "applepush" "domain"
+          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.mrs";
+      ApplePush_ip =
+        mrsProvider "applepush_ip" "ipcidr"
+          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.ipcidr.mrs";
 
-      private = mrsProvider "private" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs";
-      private_ip = mrsProvider "private_ip" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs";
-      proxy = mrsProvider "proxy" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.mrs";
-      google = mrsProvider "google" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs";
-      google_ip = mrsProvider "google_ip" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs";
-      telegram = mrsProvider "telegram" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs";
-      telegram_ip = mrsProvider "telegram_ip" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs";
-      twitter = mrsProvider "twitter" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/twitter.mrs";
-      twitter_ip = mrsProvider "twitter_ip" "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/twitter.mrs";
+      private =
+        mrsProvider "private" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs";
+      private_ip =
+        mrsProvider "private_ip" "ipcidr"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs";
+      proxy =
+        mrsProvider "proxy" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-!cn.mrs";
+      google =
+        mrsProvider "google" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs";
+      google_ip =
+        mrsProvider "google_ip" "ipcidr"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs";
+      telegram =
+        mrsProvider "telegram" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs";
+      telegram_ip =
+        mrsProvider "telegram_ip" "ipcidr"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs";
+      twitter =
+        mrsProvider "twitter" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/twitter.mrs";
+      twitter_ip =
+        mrsProvider "twitter_ip" "ipcidr"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/twitter.mrs";
     };
 
     rules = [
