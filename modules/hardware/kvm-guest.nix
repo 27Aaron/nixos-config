@@ -68,7 +68,6 @@ in
     };
 
     hardware' = {
-      disable-balloon.enable = true;
       disko = {
         enable = true;
         device = cfg.diskDevice;
@@ -77,6 +76,13 @@ in
       };
       persistence.enable = true;
     };
+
+    # 宿主機透過 balloon 回收記憶體時,會讓記憶體本來就少的 VM 不夠用。
+    # 只靠 blacklist 擋不住明確的 modprobe,要同時有 install 規則。
+    boot.blacklistedKernelModules = [ "virtio_balloon" ];
+    boot.extraModprobeConfig = ''
+      install virtio_balloon ${pkgs.coreutils}/bin/true
+    '';
 
     # Proxmox 透過 guest agent 正常關機並回報 IP。
     services.qemuGuest.enable = true;

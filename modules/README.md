@@ -9,7 +9,8 @@ modules/
 │   └── shell/       # fish、zsh 與提示列、歷史、補全
 ├── hardware/        # 硬體、開機(boot/)、磁碟與持久化
 ├── services/        # 背景服務,伺服器也可能用到
-│   ├── network/     # SSH、代理、mDNS、網路管理
+│   ├── network/     # SSH、代理、DNS、mDNS、網路管理
+│   ├── monitoring/  # 主機與流量指標
 │   └── storage/     # 快照、scrub、磁碟健康
 ├── dev/             # 開發環境、工具鏈與 AI agent(agents/),伺服器與桌面都能用
 ├── desktop/         # 只有接螢幕的主機
