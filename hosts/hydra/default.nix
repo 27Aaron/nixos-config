@@ -19,6 +19,8 @@
   };
 
   services' = {
+    avahi.enable = true;
+
     openssh.enable = true;
 
     dae.enable = true;

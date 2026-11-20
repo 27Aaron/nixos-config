@@ -8,10 +8,8 @@
   services' = {
     avahi.enable = true;
     networkmanager.enable = true;
-    openssh = {
-      enable = true;
-      rootLogin = true;
-    };
+    openssh.enable = true;
+    openssh.rootLogin = true;
     vnstat.enable = true;
   };
 
