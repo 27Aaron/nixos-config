@@ -9,8 +9,6 @@ let
   cfg = config.hardware'.kvm-guest;
 in
 {
-  # 各 KVM 客體機共用的硬體基線;hosts/*/hardware.nix 只寫差異,例如盤符。
-  # 家裡的 VM 磁碟不加密,LUKS 相關設定由此處開始都不啟用。
   imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
   options.hardware'.kvm-guest = {
@@ -32,7 +30,6 @@ in
   config = lib.mkIf cfg.enable {
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-    # 無螢幕的 VM 用 systemd-networkd,靜態位址寫在各主機的 network.nix。
     networking = {
       useDHCP = false;
       useNetworkd = true;
@@ -62,6 +59,12 @@ in
       enable = true;
       memoryPercent = 500;
       memoryMax = cfg.zramMemoryMax;
+    };
+
+    # /run 是 tmpfs,易失日誌直接吃客體機記憶體;持久日誌的模組預設 2G 對小磁碟的 VM 也偏多。
+    core'.logging = {
+      journalMaxUse = lib.mkDefault "256M";
+      journalRuntimeMaxUse = lib.mkDefault "16M";
     };
 
     hardware' = {
