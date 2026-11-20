@@ -242,23 +242,23 @@ let
 
       AI =
         mrsProvider "AI" "domain"
-          "https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/meta/geo/geosite/category-ai-!cn.mrs";
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.mrs";
       Anthropic =
         mrsProvider "anthropic" "domain"
-          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.mrs";
+          "https://fastly.jsdelivr.net/gh/27Aaron/ProxyRules@custom/Rules/Anthropic/Anthropic.mrs";
       Anthropic_ip =
         mrsProvider "anthropic_ip" "ipcidr"
-          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/Anthropic/Anthropic.ipcidr.mrs";
+          "https://fastly.jsdelivr.net/gh/27Aaron/ProxyRules@custom/Rules/Anthropic/Anthropic.ipcidr.mrs";
       AppleAI =
         mrsProvider "appleai" "domain"
-          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/AppleAI/AppleAI.mrs";
+          "https://fastly.jsdelivr.net/gh/27Aaron/ProxyRules@custom/Rules/AppleAI/AppleAI.mrs";
 
       ApplePush =
         mrsProvider "applepush" "domain"
-          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.mrs";
+          "https://fastly.jsdelivr.net/gh/27Aaron/ProxyRules@custom/Rules/ApplePush/ApplePush.mrs";
       ApplePush_ip =
         mrsProvider "applepush_ip" "ipcidr"
-          "https://raw.githubusercontent.com/27Aaron/ProxyRules/custom/Rules/ApplePush/ApplePush.ipcidr.mrs";
+          "https://fastly.jsdelivr.net/gh/27Aaron/ProxyRules@custom/Rules/ApplePush/ApplePush.ipcidr.mrs";
 
       private =
         mrsProvider "private" "domain"
