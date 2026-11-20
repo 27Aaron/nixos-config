@@ -22,7 +22,10 @@
   services' = {
     avahi.enable = true;
 
-    openssh.enable = true;
+    openssh = {
+      enable = true;
+      rootLogin = true;
+    };
 
     mihomo = {
       enable = true;
