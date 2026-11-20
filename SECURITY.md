@@ -19,6 +19,8 @@
 | TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 模組 assertion |
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
+| 監控端點只對 tailnet 開放，不對其他網路開放 | [`modules/services/network/node-exporter.nix`](modules/services/network/node-exporter.nix) | `firewall` |
+| magpie 的環境金鑰由 sops 以 `0400` 解密，網頁介面開的埠列入防火牆清單 | [`modules/services/magpie.nix`](modules/services/magpie.nix) | `firewall`、`private-state` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
 | 登入帳號不在 `podman`、`docker` 群組，不開放 `/run/docker.sock` | [`modules/services/podman.nix`](modules/services/podman.nix) | `container-socket` |
 | rootful 容器發布的埠不接受外部連線；rootless 的埠受一般防火牆規則管制 | [`modules/services/podman.nix`](modules/services/podman.nix) | 執行期檢查 |

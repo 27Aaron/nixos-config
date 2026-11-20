@@ -24,11 +24,6 @@ let
       mountOptions = btrfsOptions;
     };
 
-    "@snapshots" = {
-      mountpoint = "/snapshots";
-      mountOptions = btrfsOptions;
-    };
-
     # /tmp 放在磁碟而非根 tmpfs,解壓大檔時才不會撐滿根目錄;開機時由
     # cleanOnBoot 清空。nofail 讓尚未建立此 subvolume 的機器仍可開機:
     #   sudo btrfs subvolume create /btr_pool/@tmp
@@ -39,6 +34,15 @@ let
         "nodev"
         "nofail"
       ];
+    };
+  }
+  # btrbk 的快照目錄。只有啟用 snapshots 的主機才建立,其餘主機不多一個
+  # 掛載點;既有磁碟要先建立 subvolume:
+  #   sudo btrfs subvolume create /btr_pool/@snapshots
+  // lib.optionalAttrs cfg.snapshots.enable {
+    "@snapshots" = {
+      mountpoint = "/snapshots";
+      mountOptions = btrfsOptions;
     };
   }
   # 遊戲庫可以重新下載,獨立成 subvolume 才不會被 btrbk 隨 @persistent 快照,
@@ -110,6 +114,8 @@ in
       default = null;
       description = "Btrfs swapfile size; null disables it.";
     };
+
+    snapshots.enable = lib.mkEnableOption "a Btrfs subvolume at /snapshots for btrbk";
 
     games.enable = lib.mkEnableOption "a Btrfs subvolume at /games for game libraries, kept out of snapshots";
 

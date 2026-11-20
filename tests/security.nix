@@ -23,6 +23,17 @@ let
       tcp = [ 233 ];
       udp = [ 5353 ];
     };
+    hydra = {
+      tcp = [
+        80
+        233
+      ];
+      udp = [ 41641 ];
+      # node_exporter 只對 tailnet 開放,由 services'.node-exporter 負責。
+      interfaces.tailscale0 = {
+        tcp = [ 9100 ];
+      };
+    };
   };
 
   # 存放金鑰、登入狀態或歷史紀錄的路徑;有持久化就必須只限本人讀取。
@@ -35,6 +46,8 @@ let
     ".config/Claude"
     ".config/@deepseek-ai/dsh-desktop"
     ".config/magpie"
+    ".cache/magpie"
+    ".local/state/magpie"
     ".config/mozilla"
     ".config/google-chrome"
     ".config/Code"
@@ -54,6 +67,7 @@ let
     "/var/lib/bluetooth"
     "/var/lib/containers"
     "/var/lib/sbctl"
+    "/var/lib/tailscale"
     "/etc/NetworkManager/system-connections"
   ];
 
