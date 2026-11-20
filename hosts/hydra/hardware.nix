@@ -1,6 +1,3 @@
 {
-  hardware'.kvm-guest = {
-    enable = true;
-    diskDevice = "/dev/sda";
-  };
+  hardware'.kvm-guest.enable = true;
 }

@@ -14,12 +14,6 @@ in
   options.hardware'.kvm-guest = {
     enable = lib.mkEnableOption "the shared KVM guest baseline";
 
-    diskDevice = lib.mkOption {
-      type = lib.types.str;
-      default = "/dev/vda";
-      description = "Disk for the disko layout. virtio disks show up as /dev/vda, SATA as /dev/sda.";
-    };
-
     zramMemoryMax = lib.mkOption {
       type = lib.types.ints.positive;
       default = 2 * 1024 * 1024 * 1024 + 1024 * 1024;
@@ -67,15 +61,9 @@ in
       journalRuntimeMaxUse = lib.mkDefault "16M";
     };
 
-    hardware' = {
-      disko = {
-        enable = true;
-        device = cfg.diskDevice;
-        tmpfsSize = lib.mkDefault "512M";
-        bios.enable = true;
-      };
-      persistence.enable = true;
-    };
+    # 磁碟佈局由各主機的 disko.nix 定義,與 nixos-bootstrap 的鏡像逐字
+    # 對應;實體機續用 hardware'.disko。
+    hardware'.persistence.enable = true;
 
     # 宿主機透過 balloon 回收記憶體時,會讓記憶體本來就少的 VM 不夠用。
     # 只靠 blacklist 擋不住明確的 modprobe,要同時有 install 規則。
