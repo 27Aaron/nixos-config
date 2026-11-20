@@ -15,7 +15,6 @@
   hardware'.lanzaboote.enable = true;
 
   boot = {
-    # Motorcomm YT6801 乙太網路需要 Linux 7.0 以上。
     kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = [ "kvm-amd" ];
 

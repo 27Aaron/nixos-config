@@ -1,5 +1,4 @@
 {
-  # kvm-guest 基線已啟用 networkd 並關閉 resolved;系統解析器直接指向上游。
   networking.nameservers = [ "192.168.2.2" ];
 
   systemd.network.networks."10-eth0" = {
