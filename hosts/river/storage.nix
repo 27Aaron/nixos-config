@@ -4,6 +4,7 @@
     device = "/dev/disk/by-id/nvme-CT1000P3PSSD8_24364AD5D8E0";
     espSize = "1G";
     swapSize = "32769M";
+    snapshots.enable = true;
     games.enable = true;
     luks.enable = true;
     # 不設 PIN,見 WA-023。

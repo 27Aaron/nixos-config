@@ -1,10 +1,14 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
   cfg = config.server'.initrd-ssh;
+
+  ssh-keygen = lib.getExe' pkgs.openssh "ssh-keygen";
+  coreutils = "${pkgs.coreutils}/bin";
 in
 {
   options.server'.initrd-ssh = {
@@ -41,7 +45,32 @@ in
     boot.initrd.systemd.users.root.shell = "/bin/systemd-tty-ask-password-agent";
 
     # initrd 的主機私鑰會以明文附加到未加密 ESP 上的 initrd,必須與系統的
-    # 主機金鑰分開,不可共用。
+    # 主機金鑰分開,不可共用。開機載入程式在 activation 之前就把私鑰附加進
+    # initrd,缺檔時要在 pre-switch 補上;持久目錄此時可能還沒 bind 上來,
+    # 先寫進 /persistent,再供本次安裝讀取。
+    system.preSwitchChecks.initrd-ssh-host-key = lib.concatMapStrings (path: ''
+      key=${lib.escapeShellArg path}
+      if [ ! -f "$key" ]; then
+        dir=$(${coreutils}/dirname "$key")
+        name=$(${coreutils}/basename "$key")
+        ${coreutils}/install -d -m 0700 "$dir"
+        if [ -d /persistent ]; then
+          stored="/persistent$dir"
+          ${coreutils}/install -d -m 0700 "$stored"
+          if [ ! -f "$stored/$name" ]; then
+            ${ssh-keygen} -q -t ed25519 -N "" -f "$stored/$name"
+          fi
+          if [ ! -f "$key" ]; then
+            ${coreutils}/cp -a "$stored/$name" "$key"
+            ${coreutils}/cp -a "$stored/$name.pub" "$key.pub"
+          fi
+        else
+          ${ssh-keygen} -q -t ed25519 -N "" -f "$key"
+        fi
+        ${coreutils}/chmod 0600 "$key"
+      fi
+    '') (lib.filter (path: lib.isString path && !lib.hasPrefix "/nix/store/" path) cfg.hostKeys);
+
     preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
         directory = "/etc/secrets/initrd";

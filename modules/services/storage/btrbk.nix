@@ -19,7 +19,7 @@ in
       }
       {
         assertion = builtins.hasAttr "/snapshots" config.fileSystems;
-        message = "the btrbk snapshot directory must be a configured filesystem mount";
+        message = "the btrbk snapshot directory must be a configured filesystem mount; on disko hosts enable hardware'.disko.snapshots.enable.";
       }
     ];
 
