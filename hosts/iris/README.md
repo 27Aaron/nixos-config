@@ -1,6 +1,6 @@
 # iris
 
-Proxmox 上的 NixOS 虛擬機，擔任區網的 DNS 伺服器：AdGuard Home 對區網監聽 53，過濾廣告後轉給本機的 mosdns 做中國/國外分流。國外解析經 janus 的 mihomo SOCKS5（`192.168.2.1:7890`）查 Google 與 Cloudflare DoH；janus 或代理不通時，這路會失敗。
+Proxmox 上的 NixOS 虛擬機，擔任區網的 DNS 伺服器：AdGuard Home 對區網監聽 53，過濾廣告後轉給本機的 mosdns 做中國/國外分流。國外解析直連 Google 與 Cloudflare DoH。
 
 ## 硬體
 
