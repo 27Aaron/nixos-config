@@ -27,10 +27,9 @@
       rootLogin = true;
     };
 
-    mihomo = {
+    mihomo-proxy = {
       enable = true;
       allowLan = true;
-      tun.enable = true;
     };
     tailscale.enable = true;
 

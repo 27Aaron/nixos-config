@@ -85,6 +85,7 @@ let
     "/var/lib/sbctl"
     "/var/lib/tailscale"
     "/etc/NetworkManager/system-connections"
+    "/etc/mihomo"
   ];
 
   kernelSysctl = {
