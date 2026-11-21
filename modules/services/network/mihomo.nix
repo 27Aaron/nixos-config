@@ -67,7 +67,6 @@ let
     empty-fallback = "REJECT";
     include-all = true;
     exclude-type = "DIRECT";
-    hidden = true;
     icon = "${iconBase}/${icon}.png";
   };
 
