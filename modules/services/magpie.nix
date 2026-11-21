@@ -120,16 +120,6 @@ in
 
       Service = {
         Type = "simple";
-        # 使用者單元的 After= 看不到系統的 dae.service。dae 是 Type=notify,
-        # 要等 eBPF 掛上才算啟動;在那之前連線會走實體路由。
-        ExecStartPre = lib.mkIf config.services'.dae.enable (
-          pkgs.writeShellScript "magpie-wait-for-dae" ''
-            while ! ${lib.getExe' pkgs.systemd "systemctl"} is-active --quiet dae.service; do
-              ${pkgs.coreutils}/bin/sleep 1
-            done
-          ''
-        );
-        TimeoutStartSec = lib.mkIf config.services'.dae.enable "infinity";
         ExecStart = lib.concatStringsSep " " (
           [
             (lib.getExe cfg.package)
