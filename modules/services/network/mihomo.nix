@@ -178,6 +178,7 @@ let
 
     dns = {
       enable = true;
+      ipv6 = cfg.ipv6;
       default-nameserver = [
         "223.5.5.5"
         "119.29.29.29"
@@ -193,7 +194,6 @@ let
       cache-algorithm = "arc";
     }
     // lib.optionalAttrs cfg.tun.enable {
-      ipv6 = true;
       enhanced-mode = "fake-ip";
       fake-ip-range = "198.18.0.1/16";
       fake-ip-filter = [ "rule-set:private" ];

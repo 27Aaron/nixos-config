@@ -38,134 +38,163 @@ let
     "::ffff:0:0:0/96"
   ];
 
-  yamlItems = indent: values: lib.concatMapStrings (value: "${indent}- ${value}\n") values;
+  # behavior 是必填欄位,缺少會在啟動時直接失敗;geosite 的 .mrs 是
+  # domain 集合,geoip 的 .mrs 是 ipcidr 集合,兩種二進位格式不能混用。
+  mrsProvider = name: behavior: url: {
+    inherit name behavior url;
+    type = "http";
+    format = "mrs";
+    interval = 86400;
+    path = "./ruleset/${name}.mrs";
+  };
 
-  tunBlock = lib.optionalString cfg.tun.enable (
-    ''
-      tun:
-        enable: true
-        stack: system
-        auto-route: true
-        strict-route: true
-        auto-redirect: true
-        auto-detect-interface: true
-        dns-hijack:
-          - any:53
-          - tcp://any:53
-        # 區網與鏈路本地位址不進 TUN,SSH 與內部服務才不會被繞進代理。
-        route-exclude-address:
-    ''
-    + yamlItems "    " tunExcludes
-  );
+  mihomoConfig = lib.generators.toYAML { } {
+    mixed-port = cfg.port;
+    allow-lan = cfg.allowLan;
+    bind-address = if cfg.allowLan then "*" else "127.0.0.1";
+    mode = "rule";
+    log-level = "info";
+    ipv6 = cfg.ipv6;
+    unified-delay = true;
+    tcp-concurrent = true;
+    keep-alive-idle = 30;
+    keep-alive-interval = 15;
+    external-controller =
+      if cfg.allowLan then
+        "0.0.0.0:${toString cfg.controllerPort}"
+      else
+        "127.0.0.1:${toString cfg.controllerPort}";
+    secret = "27Aaron";
+    profile.store-selected = true;
+    profile.store-fake-ip = cfg.tun.enable;
 
-  # 種子內容不含訂閱連結等機密,可以放進所有人可讀的 store;控制器密鑰
-  # 是跟著種子走的固定值。
+    tun = lib.optionalAttrs cfg.tun.enable {
+      enable = true;
+      stack = "system";
+      auto-route = true;
+      strict-route = true;
+      auto-redirect = true;
+      auto-detect-interface = true;
+      dns-hijack = [
+        "any:53"
+        "tcp://any:53"
+      ];
+      # 區網與鏈路本地位址不進 TUN,SSH 與內部服務才不會被繞進代理。
+      route-exclude-address = tunExcludes;
+    };
+
+    geox-url = {
+      geoip = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat";
+      geosite = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat";
+      mmdb = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb";
+    };
+    geo-auto-update = true;
+    geo-update-interval = 24;
+
+    ntp = {
+      enable = true;
+      write-to-system = false;
+      server = "ntp.aliyun.com";
+      port = 123;
+      interval = 60;
+    };
+
+    sniffer = {
+      enable = true;
+      sniff = {
+        HTTP = {
+          ports = [
+            "80"
+            "8080-8880"
+          ];
+          override-destination = true;
+        };
+        TLS.ports = [
+          "443"
+          "8443"
+        ];
+        QUIC.ports = [
+          "443"
+          "8443"
+        ];
+      };
+      skip-domain = [
+        "Mijia Cloud"
+        "+.push.apple.com"
+        "captive.apple.com"
+      ];
+    };
+
+    dns = {
+      enable = true;
+      ipv6 = cfg.ipv6;
+      default-nameserver = [
+        "223.5.5.5"
+        "119.29.29.29"
+      ];
+      proxy-server-nameserver = chinaDNS;
+      nameserver = foreignDNS;
+      nameserver-policy."geosite:cn" = chinaDNS;
+      direct-nameserver = [
+        "223.5.5.5"
+        "119.29.29.29"
+      ];
+      use-system-hosts = true;
+      cache-algorithm = "arc";
+    }
+    // lib.optionalAttrs cfg.tun.enable {
+      enhanced-mode = "fake-ip";
+      fake-ip-range = "198.18.0.1/16";
+      fake-ip-filter = [ "rule-set:private" ];
+    };
+
+    # 沒有訂閱。節點之後直接寫進種下的檔案,include-all 會帶進 Proxy。
+    proxy-groups = [
+      {
+        name = "Proxy";
+        type = "select";
+        include-all = true;
+        url = testUrl;
+        icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Proxy.png";
+        proxies = [ "DIRECT" ];
+      }
+    ];
+
+    rule-providers = {
+      ads =
+        mrsProvider "ads" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.mrs";
+      private =
+        mrsProvider "private" "domain"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs";
+      private_ip =
+        mrsProvider "private_ip" "ipcidr"
+          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs";
+    };
+
+    # 擋廣告與境外 QUIC,私有網域與中國大陸直連,其餘全部走 Proxy。
+    rules = [
+      "RULE-SET,ads,REJECT"
+      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,cn),(GEOIP,CN,no-resolve)))))),REJECT"
+      "RULE-SET,private,DIRECT"
+      "RULE-SET,private_ip,DIRECT,no-resolve"
+      "GEOSITE,cn,DIRECT"
+      "GEOIP,CN,DIRECT,no-resolve"
+      "MATCH,Proxy"
+    ];
+  };
+
+  # 檔首說明留給之後手動改的人;本體與宣告式模組同一種產生器。
   initialConfig = pkgs.writeText "mihomo-proxy-initial.yaml" ''
     # 首次部署自動生成,之後以這份檔案為準,直接手動編輯,rebuild 不會覆蓋。
     # 修改後執行 `systemctl restart mihomo` 生效。
-    mixed-port: ${toString cfg.port}
-    allow-lan: ${if cfg.allowLan then "true" else "false"}
-    bind-address: "${if cfg.allowLan then "*" else "127.0.0.1"}"
-    mode: rule
-    log-level: info
-    ipv6: ${if cfg.ipv6 then "true" else "false"}
-    # 延遲測試先完成握手再計 RTT,否則面板會把協議握手算進去,數字比實際往返高。
-    unified-delay: true
-    external-controller: ${
-      if cfg.allowLan then "0.0.0.0" else "127.0.0.1"
-    }:${toString cfg.controllerPort}
-    secret: "27Aaron"
-    profile:
-      store-selected: true
-      store-fake-ip: true
-
-    # GEOSITE/GEOIP 規則要用的 geo 檔;jsdelivr 鏡像在直連網路也拉得到。
-    geox-url:
-      geoip: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat
-      geosite: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat
-      mmdb: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb
-    geo-auto-update: true
-    geo-update-interval: 24
-
-    # 加節點只需在下面貼 proxies:,或改用 proxy-providers 訂閱;Proxy 群組的
-    # include-all 會自動帶入,群組本身不用動。DIRECT 先放著當保底,沒有節點
-    # 也開得起來。
-    # proxies:
-    #   - name: my-node
-    #     type: ss
-    #     server: example.com
-    #     port: 8388
-    #     cipher: aes-256-gcm
-    #     password: "secret"
-    proxy-groups:
-      - name: Proxy
-        type: select
-        include-all: true
-        url: ${testUrl}
-        proxies:
-          - DIRECT
-
-    ${tunBlock}
-    # behavior 必填:geosite 的 .mrs 是 domain 集合,geoip 的是 ipcidr 集合,
-    # 兩種二進位格式不能混用。
-    rule-providers:
-      ads:
-        type: http
-        behavior: domain
-        format: mrs
-        url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.mrs
-        interval: 86400
-        path: ./ruleset/ads.mrs
-      private:
-        type: http
-        behavior: domain
-        format: mrs
-        url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs
-        interval: 86400
-        path: ./ruleset/private.mrs
-      private_ip:
-        type: http
-        behavior: ipcidr
-        format: mrs
-        url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs
-        interval: 86400
-        path: ./ruleset/private_ip.mrs
-
-    dns:
-      enable: true
-      ipv6: ${if cfg.ipv6 then "true" else "false"}
-      enhanced-mode: fake-ip
-      fake-ip-range: 198.18.0.1/16
-      fake-ip-filter:
-        - rule-set:private
-      default-nameserver:
-        - 223.5.5.5
-        - 119.29.29.29
-      proxy-server-nameserver:
-    ${yamlItems "    " chinaDNS}
-      nameserver:
-    ${yamlItems "    " foreignDNS}
-      nameserver-policy:
-        geosite:cn:
-    ${yamlItems "      " chinaDNS}
-
-    # 基本規則:擋廣告與境外 QUIC、私有網域直連,其餘全部走 Proxy;要更
-    # 細的分流再自己往上加。
-    rules:
-      # > Ads
-      - RULE-SET,ads,REJECT
-      # > Block foreign QUIC
-      - AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,cn),(GEOIP,CN,no-resolve)))))),REJECT
-      # > Private
-      - RULE-SET,private,DIRECT
-      - RULE-SET,private_ip,DIRECT,no-resolve
-      # > Final
-      - MATCH,Proxy
+    # 加節點寫在 proxies: 或 proxy-providers:;Proxy 群組的 include-all 會帶入。
+    ${mihomoConfig}
   '';
 in
 {
   options.services'.mihomo-proxy = {
-    enable = lib.mkEnableOption "mihomo as a plain global proxy (basic ad and private rules, everything else into a single Proxy group); the config is seeded once at /etc/mihomo/config.yaml and hand-edited afterwards";
+    enable = lib.mkEnableOption "mihomo as a plain global proxy (basic ad, private, and China-direct rules, everything else into a single Proxy group); the config is seeded once at /etc/mihomo/config.yaml and hand-edited afterwards";
 
     port = lib.mkOption {
       type = lib.types.port;
@@ -220,10 +249,10 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 與 mihomo.nix 分工:那份是完整分流規則的宣告式設定;這份種下基本規
-    # 則加單一 Proxy 群組,之後由手動編輯維護。兩者同時啟用
-    # 會在 configFile 等選項直接合併衝突,錯誤訊息會點名兩個檔案,因此
-    # 不另加互斥斷言。
+    # 與 mihomo.nix 分工:那份用 sops 的訂閱做完整分流;這份種下同一套基礎
+    # 設定,但只有廣告、私有網域與中國大陸直連,以及單一 Proxy 群組,之後手動編輯。
+    # 兩者同時啟用會在 configFile 等選項直接合併衝突,錯誤訊息會點名兩個
+    # 檔案,因此不另加互斥斷言。
 
     # 只種一次,之後 /etc/mihomo/config.yaml 是權威設定,rebuild 與重開機都
     # 不會覆寫。上游模組以 LoadCredential 在啟動時請 root 讀取 configFile,
