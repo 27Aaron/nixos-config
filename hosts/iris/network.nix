@@ -8,7 +8,10 @@
   systemd.network.networks."10-eth0" = {
     matchConfig.Name = "eth0";
     address = [ "10.10.10.9/24" ];
-    networkConfig.DHCP = "ipv6";
+    networkConfig = {
+      DHCP = "ipv6";
+      IPv6AcceptRA = true;
+    };
     routes = [
       {
         Destination = "0.0.0.0/0";
