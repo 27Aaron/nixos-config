@@ -50,6 +50,8 @@ let
     mode: rule
     log-level: info
     ipv6: ${if cfg.ipv6 then "true" else "false"}
+    # 延遲測試先完成握手再計 RTT,否則面板會把協議握手算進去,數字比實際往返高。
+    unified-delay: true
     external-controller: ${
       if cfg.allowLan then "0.0.0.0" else "127.0.0.1"
     }:${toString cfg.controllerPort}
