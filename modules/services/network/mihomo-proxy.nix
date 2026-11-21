@@ -203,12 +203,24 @@ in
     # 不會覆寫。上游模組以 LoadCredential 在啟動時請 root 讀取 configFile,
     # 再交給 DynamicUser 的 mihomo,因此 0600 的檔案與 0700 的目錄不影響
     # 服務讀取;訂閱連結等機密只存在 LUKS 加密的持久卷上,不走 sops。
-    system.activationScripts.mihomo-proxy-initial-config.text = ''
-      if [ ! -e /etc/mihomo/config.yaml ]; then
-        install -d -m 0700 /etc/mihomo
-        install -D -m 0600 ${initialConfig} /etc/mihomo/config.yaml
-      fi
-    '';
+    # 種子不走 activationScripts:live switch 時 preservation 的 bind mount
+    # 晚於 activation 啟動,種下的檔案會被掛載遮蔽,LoadCredential 讀不到;
+    # 改用 oneshot,明確排在掛載之後、mihomo 之前。
+    systemd.services.mihomo-config = {
+      description = "Seed the hand-edited mihomo config once";
+      wantedBy = [ "mihomo.service" ];
+      before = [ "mihomo.service" ];
+      after = lib.optionals config.hardware'.persistence.enable [ "etc-mihomo.mount" ];
+      wants = lib.optionals config.hardware'.persistence.enable [ "etc-mihomo.mount" ];
+      path = [ pkgs.coreutils ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        if [ ! -e /etc/mihomo/config.yaml ]; then
+          install -d -m 0700 /etc/mihomo
+          install -D -m 0600 ${initialConfig} /etc/mihomo/config.yaml
+        fi
+      '';
+    };
 
     services.mihomo = {
       enable = true;
