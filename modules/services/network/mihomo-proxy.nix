@@ -7,37 +7,56 @@
 let
   cfg = config.services'.mihomo-proxy;
 
-  tunBlock = lib.optionalString cfg.tun.enable ''
-    tun:
-      enable: true
-      stack: system
-      auto-route: true
-      strict-route: true
-      auto-redirect: true
-      auto-detect-interface: true
-      dns-hijack:
-        - any:53
-        - tcp://any:53
-      # 區網與鏈路本地位址不進 TUN,SSH 與內部服務才不會被繞進代理。
-      route-exclude-address:
-        - 10.0.0.0/8
-        - 100.64.0.0/10
-        - 127.0.0.0/8
-        - 169.254.0.0/16
-        - 172.16.0.0/12
-        - 192.0.0.0/24
-        - 192.0.2.0/24
-        - 192.168.0.0/16
-        - 198.51.100.0/24
-        - 203.0.113.0/24
-        - 224.0.0.0/4
-        - 255.255.255.255/32
-        - ::1/128
-        - fc00::/7
-        - fe80::/10
-        - ff00::/8
-        - ::ffff:0:0:0/96
-  '';
+  testUrl = "http://cp.cloudflare.com/generate_204";
+
+  chinaDNS = [
+    "https://dns.alidns.com/dns-query#DIRECT"
+    "https://doh.pub/dns-query#DIRECT"
+  ];
+  foreignDNS = [
+    "https://dns.cloudflare.com/dns-query#Proxy"
+    "https://dns.google/dns-query#Proxy"
+  ];
+
+  tunExcludes = [
+    "10.0.0.0/8"
+    "100.64.0.0/10"
+    "127.0.0.0/8"
+    "169.254.0.0/16"
+    "172.16.0.0/12"
+    "192.0.0.0/24"
+    "192.0.2.0/24"
+    "192.168.0.0/16"
+    "198.51.100.0/24"
+    "203.0.113.0/24"
+    "224.0.0.0/4"
+    "255.255.255.255/32"
+    "::1/128"
+    "fc00::/7"
+    "fe80::/10"
+    "ff00::/8"
+    "::ffff:0:0:0/96"
+  ];
+
+  yamlItems = indent: values: lib.concatMapStrings (value: "${indent}- ${value}\n") values;
+
+  tunBlock = lib.optionalString cfg.tun.enable (
+    ''
+      tun:
+        enable: true
+        stack: system
+        auto-route: true
+        strict-route: true
+        auto-redirect: true
+        auto-detect-interface: true
+        dns-hijack:
+          - any:53
+          - tcp://any:53
+        # 區網與鏈路本地位址不進 TUN,SSH 與內部服務才不會被繞進代理。
+        route-exclude-address:
+    ''
+    + yamlItems "    " tunExcludes
+  );
 
   # 種子內容不含訂閱連結等機密,可以放進所有人可讀的 store;控制器密鑰
   # 是跟著種子走的固定值。
@@ -82,6 +101,7 @@ let
       - name: Proxy
         type: select
         include-all: true
+        url: ${testUrl}
         proxies:
           - DIRECT
 
@@ -121,9 +141,13 @@ let
       default-nameserver:
         - 223.5.5.5
         - 119.29.29.29
+      proxy-server-nameserver:
+    ${yamlItems "    " chinaDNS}
       nameserver:
-        - https://dns.cloudflare.com/dns-query
-        - https://dns.google/dns-query
+    ${yamlItems "    " foreignDNS}
+      nameserver-policy:
+        geosite:cn:
+    ${yamlItems "      " chinaDNS}
 
     # 基本規則:擋廣告與境外 QUIC、私有網域直連,其餘全部走 Proxy;要更
     # 細的分流再自己往上加。

@@ -54,7 +54,6 @@
     avahi.enable = true;
     networkmanager.enable = true;
     openssh.enable = true;
-    dae.enable = true;
     logrotate.enable = true;
     podman.enable = true;
     vnstat.enable = true;
