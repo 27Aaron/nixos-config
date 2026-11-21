@@ -5,9 +5,10 @@
   ...
 }:
 let
-  cfg = config.services'.mihomo-proxy;
+  cfg = config.services'.mihomo-lite;
 
-  testUrl = "http://cp.cloudflare.com/generate_204";
+  proxyTestUrl = "http://cp.cloudflare.com/generate_204";
+  directTestUrl = "http://wifi.vivo.com.cn/generate_204";
 
   chinaDNS = [
     "https://dns.alidns.com/dns-query#DIRECT"
@@ -151,10 +152,17 @@ let
     # 沒有訂閱。節點之後直接寫進種下的檔案,include-all 會帶進 Proxy。
     proxy-groups = [
       {
+        name = "Direct";
+        type = "select";
+        url = directTestUrl;
+        proxies = [ "DIRECT" ];
+        icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png";
+      }
+      {
         name = "Proxy";
         type = "select";
         include-all = true;
-        url = testUrl;
+        url = proxyTestUrl;
         icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Proxy.png";
         proxies = [ "DIRECT" ];
       }
@@ -185,7 +193,7 @@ let
   };
 
   # 檔首說明留給之後手動改的人;本體與宣告式模組同一種產生器。
-  initialConfig = pkgs.writeText "mihomo-proxy-initial.yaml" ''
+  initialConfig = pkgs.writeText "mihomo-lite-initial.yaml" ''
     # 首次部署自動生成,之後以這份檔案為準,直接手動編輯,rebuild 不會覆蓋。
     # 修改後執行 `systemctl restart mihomo` 生效。
     # 加節點寫在 proxies: 或 proxy-providers:;Proxy 群組的 include-all 會帶入。
@@ -193,7 +201,7 @@ let
   '';
 in
 {
-  options.services'.mihomo-proxy = {
+  options.services'.mihomo-lite = {
     enable = lib.mkEnableOption "mihomo as a plain global proxy (basic ad, private, and China-direct rules, everything else into a single Proxy group); the config is seeded once at /etc/mihomo/config.yaml and hand-edited afterwards";
 
     port = lib.mkOption {

@@ -10,7 +10,8 @@ let
 
   secretFile = "${inputs.secrets}/services/mihomo.yaml";
 
-  testUrl = "http://cp.cloudflare.com/generate_204";
+  proxyTestUrl = "http://cp.cloudflare.com/generate_204";
+  directTestUrl = "http://wifi.vivo.com.cn/generate_204";
 
   chinaDNS = [
     "https://dns.alidns.com/dns-query#DIRECT"
@@ -57,7 +58,7 @@ let
     name = region;
     inherit filter;
     type = "url-test";
-    url = testUrl;
+    url = proxyTestUrl;
     interval = 300;
     timeout = 3000;
     tolerance = 20;
@@ -74,7 +75,7 @@ let
   serviceGroup = name: icon: proxies: {
     inherit name proxies;
     type = "select";
-    url = testUrl;
+    url = proxyTestUrl;
     interval = 600;
     timeout = 3000;
     max-failed-times = 3;
@@ -206,7 +207,7 @@ let
       path = "./providers/subscription.yaml";
       health-check = {
         enable = true;
-        url = testUrl;
+        url = proxyTestUrl;
         interval = 600;
         timeout = 3000;
         lazy = true;
@@ -214,6 +215,13 @@ let
     };
 
     proxy-groups = [
+      {
+        name = "Direct";
+        type = "select";
+        url = directTestUrl;
+        proxies = [ "DIRECT" ];
+        icon = "${iconBase}/Direct.png";
+      }
       {
         name = "Manual";
         type = "select";
