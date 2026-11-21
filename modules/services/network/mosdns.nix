@@ -55,9 +55,45 @@ let
 
   # 中國/國外分流:
   #   geosite:cn    -> 中國 UDP DNS(ali + dnspod,並發)
-  #   geosite:proxy -> 遠端 DoH(阿里,加密且不依賴代理)
+  #   geosite:proxy -> 遠端 DoH。remoteSocks5 有值時經該 SOCKS5 問
+  #                    Google 與 Cloudflare;否則直連阿里 DoH。
   #   其餘          -> 先問中國上游;答案沒有 CN IP(被污染/國外主機)
   #                    就改走遠端 DoH。
+  #
+  # 走 SOCKS 時不用阿里:mihomo 會把阿里判成中國直連,查詢出不了代理。
+  # 網域由 SOCKS5 遠端解析,不能加 bootstrap(那是本機 UDP)。
+  # udp:// 與 HTTP/3 不支援 socks5。
+  remoteForwardArgs =
+    if cfg.remoteSocks5 == null then
+      {
+        upstreams = [
+          {
+            tag = "ali_doh";
+            addr = "https://dns.alidns.com/dns-query";
+            bootstrap = "223.5.5.5";
+          }
+          {
+            tag = "ali_doh_ip";
+            addr = "https://223.5.5.5/dns-query";
+          }
+        ];
+      }
+    else
+      {
+        concurrent = 2;
+        socks5 = cfg.remoteSocks5;
+        upstreams = [
+          {
+            tag = "google_doh";
+            addr = "https://dns.google/dns-query";
+          }
+          {
+            tag = "cf_doh";
+            addr = "https://dns.cloudflare.com/dns-query";
+          }
+        ];
+      };
+
   mosdnsConfig = lib.generators.toYAML { } {
     log.level = "info";
     plugins = [
@@ -100,19 +136,7 @@ let
       {
         tag = "remote_forward";
         type = "forward";
-        args = {
-          upstreams = [
-            {
-              tag = "ali_doh";
-              addr = "https://dns.alidns.com/dns-query";
-              bootstrap = "223.5.5.5";
-            }
-            {
-              tag = "ali_doh_ip";
-              addr = "https://223.5.5.5/dns-query";
-            }
-          ];
-        };
+        args = remoteForwardArgs;
       }
 
       {
@@ -216,6 +240,17 @@ in
       default = 5335;
       description = "Loopback UDP/TCP port mosdns listens on.";
     };
+
+    remoteSocks5 = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      example = "192.168.2.1:7890";
+      description = ''
+        `host:port` of a SOCKS5 proxy for the foreign DoH upstreams
+        (`dns.google`, `dns.cloudflare.com`). The proxy resolves those
+        names. Null keeps direct AliDNS DoH, which does not leave China.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -278,6 +313,13 @@ in
         Persistent = true;
       };
     };
+
+    assertions = [
+      {
+        assertion = cfg.remoteSocks5 == null || lib.match ".*:[0-9]+" cfg.remoteSocks5 != null;
+        message = "services'.mosdns.remoteSocks5 must be host:port";
+      }
+    ];
 
     preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
       {
