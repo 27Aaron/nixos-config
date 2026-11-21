@@ -10,8 +10,7 @@ let
 
   secretFile = "${inputs.secrets}/services/mihomo.yaml";
 
-  proxyTestUrl = "http://cp.cloudflare.com/generate_204";
-  directTestUrl = "http://wifi.vivo.com.cn/generate_204";
+  testUrl = "http://cp.cloudflare.com/generate_204";
 
   chinaDNS = [
     "https://dns.alidns.com/dns-query#DIRECT"
@@ -58,7 +57,7 @@ let
     name = region;
     inherit filter;
     type = "url-test";
-    url = proxyTestUrl;
+    url = testUrl;
     interval = 300;
     timeout = 3000;
     tolerance = 20;
@@ -75,7 +74,7 @@ let
   serviceGroup = name: icon: proxies: {
     inherit name proxies;
     type = "select";
-    url = proxyTestUrl;
+    url = testUrl;
     interval = 600;
     timeout = 3000;
     max-failed-times = 3;
@@ -85,20 +84,20 @@ let
 
   regionFallback = [
     "Manual"
-    "HK"
-    "JP"
-    "KR"
-    "SG"
-    "TW"
-    "US"
+    "HKG"
+    "JPN"
+    "KOR"
+    "SGP"
+    "TWN"
+    "USA"
   ];
   aiFallback = [
     "Manual"
-    "JP"
-    "KR"
-    "SG"
-    "TW"
-    "US"
+    "JPN"
+    "KOR"
+    "SGP"
+    "TWN"
+    "USA"
   ];
 
   mihomoConfig = lib.generators.toYAML { } {
@@ -207,7 +206,7 @@ let
       path = "./providers/subscription.yaml";
       health-check = {
         enable = true;
-        url = proxyTestUrl;
+        url = testUrl;
         interval = 600;
         timeout = 3000;
         lazy = true;
@@ -215,13 +214,6 @@ let
     };
 
     proxy-groups = [
-      {
-        name = "Direct";
-        type = "select";
-        url = directTestUrl;
-        proxies = [ "DIRECT" ];
-        icon = "${iconBase}/Direct.png";
-      }
       {
         name = "Manual";
         type = "select";
@@ -235,12 +227,12 @@ let
       (serviceGroup "Proxies" "Proxy" regionFallback)
     ]
     ++ [
-      (regionGroup "HK" "Hong_Kong" "(?i)(🇭🇰|香港|Hong.?Kong|\\bHKG\\b|\\bHK\\b)")
-      (regionGroup "JP" "Japan" "(?i)(🇯🇵|日本|东京|東京|大阪|Japan|\\bJPN\\b|\\bJP\\b)")
-      (regionGroup "KR" "Korea" "(?i)(🇰🇷|韩国|韓國|首尔|首爾|Korea|Seoul|\\bKOR\\b|\\bKR\\b)")
-      (regionGroup "SG" "Singapore" "(?i)(🇸🇬|新加坡|狮城|Singapore|\\bSGP\\b|\\bSG\\b)")
-      (regionGroup "TW" "Taiwan" "(?i)(🇹🇼|台湾|台灣|臺灣|Taiwan|\\bTWN\\b|\\bTW\\b)")
-      (regionGroup "US" "United_States" "(?i)(🇺🇸|美国|美國|United.?States|America|\\bUSA\\b|\\bUS\\b)")
+      (regionGroup "HKG" "Hong_Kong" "(?i)(🇭🇰|香港|Hong.?Kong|\\bHKG\\b|\\bHK\\b)")
+      (regionGroup "JPN" "Japan" "(?i)(🇯🇵|日本|东京|東京|大阪|Japan|\\bJPN\\b|\\bJP\\b)")
+      (regionGroup "KOR" "Korea" "(?i)(🇰🇷|韩国|韓國|首尔|首爾|Korea|Seoul|\\bKOR\\b|\\bKR\\b)")
+      (regionGroup "SGP" "Singapore" "(?i)(🇸🇬|新加坡|狮城|Singapore|\\bSGP\\b|\\bSG\\b)")
+      (regionGroup "TWN" "Taiwan" "(?i)(🇹🇼|台湾|台灣|臺灣|Taiwan|\\bTWN\\b|\\bTW\\b)")
+      (regionGroup "USA" "United_States" "(?i)(🇺🇸|美国|美國|United.?States|America|\\bUSA\\b|\\bUS\\b)")
     ];
 
     rule-providers = {
@@ -324,6 +316,22 @@ let
       "MATCH,Proxies"
     ];
   };
+
+  # toYAML 在這版 nixpkgs 就是 toJSON,模板會是一行。sops 讀的是 file,
+  # 佔位符在啟動時才替換,所以建置期轉成區塊式 YAML 不用 IFD。
+  # yj 不會給 <SOPS:…> 加引號,替換進來的網址或密鑰若含冒號會弄壞 YAML。
+  mihomoConfigFile =
+    pkgs.runCommand "mihomo.yaml"
+      {
+        nativeBuildInputs = [ pkgs.yj ];
+        passAsFile = [ "json" ];
+        json = mihomoConfig;
+      }
+      ''
+        yj -jy < "$jsonPath" \
+          | sed -e 's/<SOPS:\([0-9a-f]\{64\}\):PLACEHOLDER>/"<SOPS:\1:PLACEHOLDER>"/g' \
+          > "$out"
+      '';
 in
 {
   options.services'.mihomo = {
@@ -385,7 +393,7 @@ in
     };
 
     sops.templates."mihomo.yaml" = {
-      content = mihomoConfig;
+      file = mihomoConfigFile;
       restartUnits = [ "mihomo.service" ];
     };
 
