@@ -5,6 +5,9 @@
     matchConfig.Name = "eth0";
     address = [ "192.168.2.1/24" ];
     gateway = [ "192.168.2.2" ];
-    networkConfig.DHCP = "ipv6";
+    networkConfig = {
+      DHCP = "ipv6";
+      IPv6AcceptRA = true;
+    };
   };
 }

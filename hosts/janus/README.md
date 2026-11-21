@@ -1,6 +1,6 @@
 # janus
 
-Proxmox 上的 NixOS 虛擬機。mihomo 以 TUN 接管本機流量，區網機器把代理指到這臺。
+Proxmox 上的 NixOS 虛擬機。mihomo 以 TUN 接管本機流量。區網機器可以把這臺設成閘道，也可以把代理指到這臺。
 
 ## 硬體
 

@@ -376,6 +376,19 @@ in
         when the host itself has working IPv6 at the kernel level.
       '';
     };
+
+    gateway = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = ''
+        Act as the gateway for other LAN hosts. Turns on
+        `net.ipv4.ip_forward`, and `net.ipv6.conf.all.forwarding` when
+        `ipv6` is on, and accepts mihomo's redirected TCP in the
+        firewall. Requires `tun.enable`. IPv6 forwarding makes
+        systemd-networkd ignore router advertisements unless the
+        interface sets `IPv6AcceptRA`.
+      '';
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -409,12 +422,39 @@ in
       wants = [ "sops-install-secrets.service" ];
     };
 
-    networking.firewall = lib.mkIf cfg.allowLan {
-      allowedTCPPorts = [
-        cfg.port
-        cfg.controllerPort
-      ];
-    };
+    networking.firewall = lib.mkMerge [
+      (lib.mkIf cfg.allowLan {
+        allowedTCPPorts = [
+          cfg.port
+          cfg.controllerPort
+        ];
+      })
+      # auto-redirect 在 PREROUTING 把區網客戶端的 TCP 轉到本機臨時埠。
+      # 那個埠不在 allowedTCPPorts,防火牆會在 INPUT 丟掉;只開 ip_forward
+      # 不夠。UDP 與 DNS 則要轉送進 TUN,服務被 ProtectKernelTunables 擋住,
+      # 自己寫不了 sysctl。
+      (lib.mkIf cfg.gateway {
+        extraInputRules = ''
+          ct status dnat accept
+        '';
+      })
+    ];
+
+    boot.kernel.sysctl = lib.mkIf cfg.gateway (
+      {
+        "net.ipv4.ip_forward" = 1;
+      }
+      // lib.optionalAttrs cfg.ipv6 {
+        "net.ipv6.conf.all.forwarding" = 1;
+      }
+    );
+
+    assertions = [
+      {
+        assertion = !cfg.gateway || cfg.tun.enable;
+        message = "services'.mihomo.gateway requires tun.enable";
+      }
+    ];
 
     # 不需要另外登記持久化:上游模組用 DynamicUser,狀態在
     # /var/lib/private/mihomo,已由 hardware'.persistence 涵蓋。
