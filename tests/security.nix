@@ -22,6 +22,8 @@ let
         9090
       ];
       udp = [ 5353 ];
+      # mihomo 的 auto-redirect 把閘道客戶端的 TCP 轉進本機臨時埠。
+      rules = [ "ct status dnat accept" ];
     };
     elaina = {
       tcp = [ 233 ];

@@ -10,6 +10,7 @@
     mihomo = {
       enable = true;
       allowLan = true;
+      gateway = true;
       ipv6 = true;
     };
     openssh = {
