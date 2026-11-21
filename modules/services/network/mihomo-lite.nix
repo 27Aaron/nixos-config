@@ -7,8 +7,7 @@
 let
   cfg = config.services'.mihomo-lite;
 
-  proxyTestUrl = "http://cp.cloudflare.com/generate_204";
-  directTestUrl = "http://wifi.vivo.com.cn/generate_204";
+  testUrl = "http://cp.cloudflare.com/generate_204";
 
   chinaDNS = [
     "https://dns.alidns.com/dns-query#DIRECT"
@@ -152,17 +151,10 @@ let
     # 沒有訂閱。節點之後直接寫進種下的檔案,include-all 會帶進 Proxy。
     proxy-groups = [
       {
-        name = "Direct";
-        type = "select";
-        url = directTestUrl;
-        proxies = [ "DIRECT" ];
-        icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Direct.png";
-      }
-      {
         name = "Proxy";
         type = "select";
         include-all = true;
-        url = proxyTestUrl;
+        url = testUrl;
         icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Proxy.png";
         proxies = [ "DIRECT" ];
       }
@@ -192,13 +184,26 @@ let
     ];
   };
 
-  # 檔首說明留給之後手動改的人;本體與宣告式模組同一種產生器。
-  initialConfig = pkgs.writeText "mihomo-lite-initial.yaml" ''
-    # 首次部署自動生成,之後以這份檔案為準,直接手動編輯,rebuild 不會覆蓋。
-    # 修改後執行 `systemctl restart mihomo` 生效。
-    # 加節點寫在 proxies: 或 proxy-providers:;Proxy 群組的 include-all 會帶入。
-    ${mihomoConfig}
-  '';
+  # 檔首說明留給之後手動改的人。toYAML 在這版 nixpkgs 就是 toJSON,
+  # 種下去會是一行;這份是給人改的,建置時轉成區塊式 YAML。屬性集沒有
+  # 書寫順序,鍵會按名稱排序。
+  initialConfig =
+    pkgs.runCommand "mihomo-lite-initial.yaml"
+      {
+        nativeBuildInputs = [ pkgs.yj ];
+        passAsFile = [ "json" ];
+        json = mihomoConfig;
+      }
+      ''
+        {
+          cat <<'EOF'
+        # 首次部署自動生成,之後以這份檔案為準,直接手動編輯,rebuild 不會覆蓋。
+        # 修改後執行 `systemctl restart mihomo` 生效。
+        # 加節點寫在 proxies: 或 proxy-providers:;Proxy 群組的 include-all 會帶入。
+        EOF
+          yj -jy < "$jsonPath"
+        } > "$out"
+      '';
 in
 {
   options.services'.mihomo-lite = {
