@@ -12,10 +12,7 @@
       enable = true;
       webPort = 80;
     };
-    mosdns = {
-      enable = true;
-      remoteSocks5 = "192.168.2.1:7890";
-    };
+    mosdns.enable = true;
 
     openssh = {
       enable = true;
