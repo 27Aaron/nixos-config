@@ -7,9 +7,9 @@
 
   services' = {
     avahi.enable = true;
-    dae = {
+    mihomo = {
       enable = true;
-      lanInterface = "eth0";
+      allowLan = true;
     };
     openssh = {
       enable = true;

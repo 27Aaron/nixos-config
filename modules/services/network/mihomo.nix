@@ -342,10 +342,15 @@ in
       '';
     };
 
-    tun.enable = lib.mkEnableOption ''
-      TUN mode for a client host taking over its own routing and DNS
-      (fake-ip); leave off for a mixed-port proxy server
-    '';
+    tun.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        Take over this host's routing and DNS with TUN and fake-ip.
+        Turn off for a mixed-port proxy that should not redirect the
+        host's own traffic.
+      '';
+    };
 
     ipv6 = lib.mkOption {
       type = lib.types.bool;

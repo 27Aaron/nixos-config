@@ -16,7 +16,11 @@ let
       };
     };
     janus = {
-      tcp = [ 233 ];
+      tcp = [
+        233
+        7890
+        9090
+      ];
       udp = [ 5353 ];
     };
     elaina = {
@@ -90,7 +94,7 @@ let
 
   kernelSysctl = {
     "kernel.dmesg_restrict" = 1;
-    "kernel.kptr_restrict" = 1;
+    "kernel.kptr_restrict" = 2;
     "kernel.yama.ptrace_scope" = 1;
     "kernel.perf_event_paranoid" = 2;
     "kernel.unprivileged_bpf_disabled" = 2;

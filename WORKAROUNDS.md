@@ -27,7 +27,6 @@
 | WA-005 | `programs.ssh.systemd-ssh-proxy.enable = false`：[`modules/core/cli/ssh.nix`](modules/core/cli/ssh.nix) | 被 include 的 systemd drop-in 在 store 裡的擁有者是 `nobody`；OpenSSH 10 因此拒絕整份 `ssh_config`，每個 `ssh` 與 `git` 呼叫都會失敗。 | nixpkgs 或 OpenSSH 不再因這個 include 失敗。 | 2026-10-20 (#164) |
 | WA-006 | `~/.ssh/config` 在啟用時複製，而不是由 `home.file` 建立連結：[`modules/core/cli/ssh.nix`](modules/core/cli/ssh.nix) | OpenSSH 10 要求 `~/.ssh/config` 由使用者擁有；Home Manager 的連結指向 root 擁有的 store 檔案。 | Home Manager 或 OpenSSH 接受 store 連結。 | 2026-10-19 (#157) |
 | WA-008 | keyd 把 `rightcontrol` 對應到它自己：[`hosts/river/keyboard.nix`](hosts/river/keyboard.nix) | keyd 預設會把右 Ctrl 併入左 Ctrl。 | keyd 會區分右手的修飾鍵。 | 2026-10-19 (#160) |
-| WA-009 | dae 設定由強制的 `ExecStartPre` 組合到 `/etc/dae`：[`modules/services/network/dae.nix`](modules/services/network/dae.nix) | 上游模組只複製入口檔，遺漏被 include 的 `config.d`；dae 也拒絕其他人可讀的 include 檔案，因此不能放在 store。 | nixpkgs 的 dae 模組支援含 include 的設定目錄。 | 2026-10-17 (#131) |
 | WA-010 | 空的 `tmpfiles.d/lastlog2-tmpfiles.conf`：[`modules/hardware/persistence.nix`](modules/hardware/persistence.nix) | 它的規則與持久化的 `/var/lib/lastlog` 衝突。 | NixOS 或 preservation 不再衝突；確認移除覆寫後開機沒有 tmpfiles 錯誤。 | 2026-10-16 (#125) |
 | WA-011 | 空的 `plugdev` 群組：[`modules/hardware/yubikey.nix`](modules/hardware/yubikey.nix) | libfido2 的 udev 規則寫了 `GROUP="plugdev"`，而 NixOS 沒有這個群組；每次開機都會記錄數百則解析錯誤。存取權本來就由 `TAG+="uaccess"` 授予。 | nixpkgs 裡的 libfido2 規則拿掉 `plugdev`。 | 2026-10-20 (#163) |
 | WA-012 | 為 `vinput-daemon` 設定 `VINPUT_ASR_LIBOPUS_PATH`：[`modules/desktop/input-method/vinput.nix`](modules/desktop/input-method/vinput.nix) | 命令列辨識器忽略 `LD_LIBRARY_PATH`，找不到 libopus 就會結束。 | 上游不需要這個變數也能找到 libopus。 | 2026-10-18 (#152) |
@@ -38,7 +37,6 @@
 
 | 編號 | 內容與位置 | 原因 | 移除條件 | 新增日期 |
 |---|---|---|---|---|
-| WA-013 | `kernel.kptr_restrict` 維持 1 而不是 2：[`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | dae 的 eBPF 函式庫會讀取 `/proc/kallsyms`，設為 2 時連 root 看到的都是零。 | `sudo sysctl kernel.kptr_restrict=2 && sudo systemctl restart dae` 後 dae 仍正常運作；屆時調高並更新測試。 | 2026-10-22 (#191) |
 | WA-016 | sops 以使用者自己的 SSH 金鑰解密，而不是只有 root 能讀的金鑰，而且所有機密共用同一組收件人：[`modules/core/sops.nix`](modules/core/sops.nix)、nix-secrets 的 `.sops.yaml` | 為了簡單而選擇。 | 整理 nix-secrets 時重新檢討。 | 2026-10-22 |
 | WA-021 | 擁有者在 `gamemode` 群組裡：[`modules/desktop/game/gamemode.nix`](modules/desktop/game/gamemode.nix) | GameMode 的調整輔助程式需要它。 | 不再使用 GameMode，或它不再需要整個群組的授權。 | 2026-10-22 |
 | WA-022 | elaina 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/elaina/storage.nix`](hosts/elaina/storage.nix)，登記指令在 [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 這臺主機沒有鍵盤。它不執行桌面工作階段，而 Secure Boot 會讓遭竄改的開機鏈拿不到金鑰。 | 主機接上鍵盤時重新檢討。 | 2026-10-23 |
