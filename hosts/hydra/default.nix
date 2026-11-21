@@ -27,7 +27,7 @@
       rootLogin = true;
     };
 
-    mihomo-proxy = {
+    mihomo-lite = {
       enable = true;
       allowLan = true;
     };
