@@ -1,4 +1,3 @@
-{ ... }:
 {
   networking.nameservers = [
     "223.5.5.5"

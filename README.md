@@ -31,6 +31,7 @@ A flake for NixOS hosts.
 | `janus` | Proxmox VM, 4 vCPU, 1 GB | headless server, LAN proxy with mihomo |
 | `elaina` | Beelink SER6 Pro VEST, Ryzen 7 7735HS | headless home server |
 | `hydra` | Proxmox VM, home lab | headless AI gateway with magpie and mihomo |
+| `iris` | Proxmox VM | headless LAN DNS server with AdGuard Home and mosdns |
 
 ## Layout
 

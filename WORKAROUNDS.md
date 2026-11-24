@@ -21,7 +21,6 @@
 | 編號 | 內容與位置 | 原因 | 移除條件 | 新增日期 |
 |---|---|---|---|---|
 | WA-002 | 休眠後以 `lid_init_state=open` 重新綁定 `acpi-button`：[`hosts/river/power.nix`](hosts/river/power.nix) | `HibernateMode=shutdown` 會切斷電源，所以打開上蓋不會送出事件，而 `_LID` 會從映像還原成關閉狀態；logind 於是一再重新進入睡眠。 | 移除這個 hook 後，從休眠恢復不再重新進入睡眠。BIOS 或核心更新後檢查。 | 2026-10-22 (#177) |
-| WA-024 | 開機與睡眠、休眠恢復後以 `acpi_call` 呼叫 EC 的 `ECRW` 關掉鍵盤背光：[`hosts/river/keyboard-backlight.nix`](hosts/river/keyboard-backlight.nix) | EC 每次上電都會打開背光。上游的 `uniwill-laptop` 驅動能提供 `kbd_backlight` 裝置，但 NixOS 核心沒有啟用 `CONFIG_X86_PLATFORM_DRIVERS_UNIWILL`，它的 DMI 清單也只有 TUXEDO 的 `GXxHRXx`，不含這張 `WUJIE14-GX4HRXL`。 | NixOS 核心提供 `uniwill-laptop` 且不需 `force` 就能支援這張主機板；屆時改用 `kbd_backlight` 裝置，由 systemd-backlight 記住狀態。核心更新後檢查。 | 2026-10-29 |
 | WA-003 | 恢復後重新綁定 I2C 觸控板（`UNIW0001`、`i2c_hid_acpi`）：[`hosts/river/power.nix`](hosts/river/power.nix) | 休眠後觸控板不會重新列舉。 | 不重新綁定，恢復後觸控板也能運作。BIOS 或核心更新後檢查。 | 2026-10-22 (#176) |
 | WA-004 | `boot.consoleLogLevel = 3`：[`hosts/river/hardware.nix`](hosts/river/hardware.nix) | 韌體的 ACPI 錯誤會洗滿開機畫面；它們仍保留在 journal 裡。 | BIOS 更新修好 ACPI 表。 | 2026-10-18 (#148) |
 | WA-005 | `programs.ssh.systemd-ssh-proxy.enable = false`：[`modules/core/cli/ssh.nix`](modules/core/cli/ssh.nix) | 被 include 的 systemd drop-in 在 store 裡的擁有者是 `nobody`；OpenSSH 10 因此拒絕整份 `ssh_config`，每個 `ssh` 與 `git` 呼叫都會失敗。 | nixpkgs 或 OpenSSH 不再因這個 include 失敗。 | 2026-10-20 (#164) |
@@ -30,6 +29,7 @@
 | WA-010 | 空的 `tmpfiles.d/lastlog2-tmpfiles.conf`：[`modules/hardware/persistence.nix`](modules/hardware/persistence.nix) | 它的規則與持久化的 `/var/lib/lastlog` 衝突。 | NixOS 或 preservation 不再衝突；確認移除覆寫後開機沒有 tmpfiles 錯誤。 | 2026-10-16 (#125) |
 | WA-011 | 空的 `plugdev` 群組：[`modules/hardware/yubikey.nix`](modules/hardware/yubikey.nix) | libfido2 的 udev 規則寫了 `GROUP="plugdev"`，而 NixOS 沒有這個群組；每次開機都會記錄數百則解析錯誤。存取權本來就由 `TAG+="uaccess"` 授予。 | nixpkgs 裡的 libfido2 規則拿掉 `plugdev`。 | 2026-10-20 (#163) |
 | WA-012 | 為 `vinput-daemon` 設定 `VINPUT_ASR_LIBOPUS_PATH`：[`modules/desktop/input-method/vinput.nix`](modules/desktop/input-method/vinput.nix) | 命令列辨識器忽略 `LD_LIBRARY_PATH`，找不到 libopus 就會結束。 | 上游不需要這個變數也能找到 libopus。 | 2026-10-18 (#152) |
+| WA-024 | 開機與睡眠、休眠恢復後以 `acpi_call` 呼叫 EC 的 `ECRW` 關掉鍵盤背光：[`hosts/river/keyboard-backlight.nix`](hosts/river/keyboard-backlight.nix) | EC 每次上電都會打開背光。上游的 `uniwill-laptop` 驅動能提供 `kbd_backlight` 裝置，但 NixOS 核心沒有啟用 `CONFIG_X86_PLATFORM_DRIVERS_UNIWILL`，它的 DMI 清單也只有 TUXEDO 的 `GXxHRXx`，不含這張 `WUJIE14-GX4HRXL`。 | NixOS 核心提供 `uniwill-laptop` 且不需 `force` 就能支援這張主機板；屆時改用 `kbd_backlight` 裝置，由 systemd-backlight 記住狀態。核心更新後檢查。 | 2026-10-29 |
 
 ## Security exceptions
 

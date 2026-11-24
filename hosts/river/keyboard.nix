@@ -1,5 +1,10 @@
+let
+  # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
+  keepRightControl = "rightcontrol";
+in
 {
   services.keyd.enable = true;
+
   services.keyd.keyboards = {
     # 內建鍵盤(AT Translated Set 2 keyboard)。
     default = {
@@ -7,9 +12,8 @@
       settings = {
         main = {
           # Copilot 鍵(位於右 Ctrl)送出 meta+shift+F23,整組映射為右 Ctrl。
-          "leftshift+leftmeta+f23" = "rightcontrol";
-          # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
-          rightcontrol = "rightcontrol";
+          "leftshift+leftmeta+f23" = keepRightControl;
+          rightcontrol = keepRightControl;
           # 用 overloadt2 而非 overloadt:快速按 Caps+C 時,C 在 100 毫秒內放開也算按住。
           capslock = "overloadt2(caps, capslock, 100)";
         };
@@ -25,9 +29,8 @@
     hhkb = {
       ids = [ "04fe:0021" ];
       settings.main = {
-        rightmeta = "rightcontrol";
-        # keyd 預設把右 Ctrl 轉成左 Ctrl,這裡還原;見 WA-008。
-        rightcontrol = "rightcontrol";
+        rightmeta = keepRightControl;
+        rightcontrol = keepRightControl;
       };
     };
 

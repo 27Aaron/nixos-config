@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-unstable";
-      # url = "github:NixOS/nixpkgs/nixos-unstable-small";
     };
 
     disko = {
@@ -12,9 +11,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    preservation = {
-      url = "github:nix-community/preservation";
-    };
+    preservation.url = "github:nix-community/preservation";
 
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.2.0";
