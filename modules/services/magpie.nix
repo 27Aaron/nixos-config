@@ -23,7 +23,7 @@ in
     enable = lib.mkEnableOption "the magpie gateway as a systemd user service";
 
     package =
-      lib.mkPackageOption inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system} "magpie-cli"
+      lib.mkPackageOption inputs.magpie.packages.${pkgs.stdenv.hostPlatform.system} "magpie-cli"
         { };
 
     address = lib.mkOption {

@@ -260,6 +260,26 @@
         "type": "github"
       }
     },
+    "magpie": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795499371,
+        "narHash": "sha256-NwgYrKP6D31E3NhKcktYkna8LKE/39MZ69iu/W/tjLI=",
+        "owner": "yetone",
+        "repo": "magpie-releases",
+        "rev": "9ab73cef78e8ffdd1100a035898efeec3106fd15",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yetone",
+        "repo": "magpie-releases",
+        "type": "github"
+      }
+    },
     "nagram": {
       "inputs": {
         "nixpkgs": [
@@ -399,6 +419,7 @@
         "home-manager": "home-manager",
         "lanzaboote": "lanzaboote",
         "llm-agents": "llm-agents",
+        "magpie": "magpie",
         "nagram": "nagram",
         "nixpak": "nixpak",
         "nixpkgs": "nixpkgs_2",

@@ -8,7 +8,7 @@
 let
   cfg = config.desktop'.magpie;
 
-  magpie = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.magpie;
+  magpie = inputs.magpie.packages.${pkgs.stdenv.hostPlatform.system}.magpie;
 in
 {
   options.desktop'.magpie.enable = lib.mkEnableOption "magpie and its tray service";

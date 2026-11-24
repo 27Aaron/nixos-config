@@ -60,6 +60,7 @@ sudo sbctl verify                                  # Secure Boot 主機：每個
 | `nagram` | Nagram 桌面版 | 預設分支 |
 | `fcitx5-vinput` | fcitx5 附加元件；受信任快取 | 標籤（[WA-001](WORKAROUNDS.md#pins)） |
 | `nixpak` | 程式沙箱包裝 | 預設分支 |
+| `magpie` | 官方發行的 magpie 二進位 | 預設分支 |
 | `nur-packages`、`fonts`、`secrets` | 擁有者自己的儲存庫 | 預設分支 |
 
 ## Secrets

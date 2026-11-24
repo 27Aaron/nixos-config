@@ -51,6 +51,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    magpie = {
+      url = "github:yetone/magpie-releases";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixpak = {
       url = "github:nixpak/nixpak";
       inputs.nixpkgs.follows = "nixpkgs";
