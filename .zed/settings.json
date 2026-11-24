@@ -7,7 +7,7 @@
     "Nix": {
       "formatter": "language_server",
       "format_on_save": "on",
-      "language_servers": [ "nixd",  "!nil"]
+      "language_servers": [ "nixd", "!nil"]
     }
   }
 }
