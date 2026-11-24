@@ -9,10 +9,19 @@ let
   cfg = config.hardware'.kvm-guest;
 in
 {
-  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
+  imports = [
+    (modulesPath + "/profiles/qemu-guest.nix")
+    ./disko.nix
+  ];
 
   options.hardware'.kvm-guest = {
     enable = lib.mkEnableOption "the shared KVM guest baseline";
+
+    disk.enable = lib.mkEnableOption ''
+      the disk layout of the nixos-bootstrap image: one plain Btrfs disk
+      on /dev/sda with GRUB and no encryption. Physical machines keep
+      using hardware'.disko
+    '';
 
     zramMemoryMax = lib.mkOption {
       type = lib.types.ints.positive;
@@ -61,8 +70,6 @@ in
       journalRuntimeMaxUse = lib.mkDefault "16M";
     };
 
-    # 磁碟佈局由各主機的 disko.nix 定義,與 nixos-bootstrap 的鏡像逐字
-    # 對應;實體機續用 hardware'.disko。
     hardware'.persistence.enable = true;
 
     # 宿主機透過 balloon 回收記憶體時,會讓記憶體本來就少的 VM 不夠用。

@@ -1,3 +1,6 @@
 {
-  hardware'.kvm-guest.enable = true;
+  hardware'.kvm-guest = {
+    enable = true;
+    disk.enable = true;
+  };
 }
