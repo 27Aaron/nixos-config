@@ -6,183 +6,51 @@
 }:
 let
   cfg = config.services'.mihomo-lite;
+  inherit (import ./common.nix { inherit lib; })
+    testUrl
+    base
+    rejectRuleProviders
+    rejectRules
+    directRuleProviders
+    directRules
+    ;
 
-  testUrl = "http://cp.cloudflare.com/generate_204";
-
-  chinaDNS = [
-    "https://dns.alidns.com/dns-query#DIRECT"
-    "https://doh.pub/dns-query#DIRECT"
-  ];
   foreignDNS = [
     "https://dns.cloudflare.com/dns-query#Proxy"
     "https://dns.google/dns-query#Proxy"
   ];
 
-  tunExcludes = [
-    "10.0.0.0/8"
-    "100.64.0.0/10"
-    "127.0.0.0/8"
-    "169.254.0.0/16"
-    "172.16.0.0/12"
-    "192.0.0.0/24"
-    "192.0.2.0/24"
-    "192.168.0.0/16"
-    "198.51.100.0/24"
-    "203.0.113.0/24"
-    "224.0.0.0/4"
-    "255.255.255.255/32"
-    "::1/128"
-    "fc00::/7"
-    "fe80::/10"
-    "ff00::/8"
-    "::ffff:0:0:0/96"
-  ];
-
-  # behavior 是必填欄位,缺少會在啟動時直接失敗;geosite 的 .mrs 是
-  # domain 集合,geoip 的 .mrs 是 ipcidr 集合,兩種二進位格式不能混用。
-  mrsProvider = name: behavior: url: {
-    inherit name behavior url;
-    type = "http";
-    format = "mrs";
-    interval = 86400;
-    path = "./ruleset/${name}.mrs";
-  };
-
-  mihomoConfig = lib.generators.toYAML { } {
-    mixed-port = cfg.port;
-    allow-lan = cfg.allowLan;
-    bind-address = if cfg.allowLan then "*" else "127.0.0.1";
-    mode = "rule";
-    log-level = "info";
-    ipv6 = cfg.ipv6;
-    unified-delay = true;
-    tcp-concurrent = true;
-    keep-alive-idle = 30;
-    keep-alive-interval = 15;
-    external-controller =
-      if cfg.allowLan then
-        "0.0.0.0:${toString cfg.controllerPort}"
-      else
-        "127.0.0.1:${toString cfg.controllerPort}";
-    secret = "27Aaron";
-    profile.store-selected = true;
-    profile.store-fake-ip = cfg.tun.enable;
-
-    tun = lib.optionalAttrs cfg.tun.enable {
-      enable = true;
-      stack = "system";
-      auto-route = true;
-      strict-route = true;
-      auto-redirect = true;
-      auto-detect-interface = true;
-      dns-hijack = [
-        "any:53"
-        "tcp://any:53"
-      ];
-      # 區網與鏈路本地位址不進 TUN,SSH 與內部服務才不會被繞進代理。
-      route-exclude-address = tunExcludes;
-    };
-
-    geox-url = {
-      geoip = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat";
-      geosite = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat";
-      mmdb = "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.metadb";
-    };
-    geo-auto-update = true;
-    geo-update-interval = 24;
-
-    ntp = {
-      enable = true;
-      write-to-system = false;
-      server = "ntp.aliyun.com";
-      port = 123;
-      interval = 60;
-    };
-
-    sniffer = {
-      enable = true;
-      sniff = {
-        HTTP = {
-          ports = [
-            "80"
-            "8080-8880"
-          ];
-          override-destination = true;
-        };
-        TLS.ports = [
-          "443"
-          "8443"
-        ];
-        QUIC.ports = [
-          "443"
-          "8443"
-        ];
-      };
-      skip-domain = [
-        "Mijia Cloud"
-        "+.push.apple.com"
-        "captive.apple.com"
-      ];
-    };
-
-    dns = {
-      enable = true;
-      ipv6 = cfg.ipv6;
-      default-nameserver = [
-        "223.5.5.5"
-        "119.29.29.29"
-      ];
-      proxy-server-nameserver = chinaDNS;
-      nameserver = foreignDNS;
-      nameserver-policy."geosite:cn" = chinaDNS;
-      direct-nameserver = [
-        "223.5.5.5"
-        "119.29.29.29"
-      ];
-      use-system-hosts = true;
-      cache-algorithm = "arc";
+  mihomoConfig = lib.generators.toYAML { } (
+    base {
+      inherit (cfg)
+        port
+        allowLan
+        controllerPort
+        ipv6
+        tun
+        ;
+      inherit foreignDNS;
+      secret = "27Aaron";
     }
-    // lib.optionalAttrs cfg.tun.enable {
-      enhanced-mode = "fake-ip";
-      fake-ip-range = "198.18.0.1/16";
-      fake-ip-filter = [ "rule-set:private" ];
-    };
+    // {
+      # 沒有訂閱。節點之後直接寫進種下的檔案,include-all 會帶進 Proxy。
+      proxy-groups = [
+        {
+          name = "Proxy";
+          type = "select";
+          include-all = true;
+          url = testUrl;
+          icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Proxy.png";
+          proxies = [ "DIRECT" ];
+        }
+      ];
 
-    # 沒有訂閱。節點之後直接寫進種下的檔案,include-all 會帶進 Proxy。
-    proxy-groups = [
-      {
-        name = "Proxy";
-        type = "select";
-        include-all = true;
-        url = testUrl;
-        icon = "https://github.com/Koolson/Qure/raw/master/IconSet/Color/Proxy.png";
-        proxies = [ "DIRECT" ];
-      }
-    ];
+      rule-providers = rejectRuleProviders // directRuleProviders;
 
-    rule-providers = {
-      ads =
-        mrsProvider "ads" "domain"
-          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ads-all.mrs";
-      private =
-        mrsProvider "private" "domain"
-          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs";
-      private_ip =
-        mrsProvider "private_ip" "ipcidr"
-          "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs";
-    };
-
-    # 擋廣告與境外 QUIC,私有網域與中國大陸直連,其餘全部走 Proxy。
-    rules = [
-      "RULE-SET,ads,REJECT"
-      "AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((GEOSITE,cn),(GEOIP,CN,no-resolve)))))),REJECT"
-      "RULE-SET,private,DIRECT"
-      "RULE-SET,private_ip,DIRECT,no-resolve"
-      "GEOSITE,cn,DIRECT"
-      "GEOIP,CN,DIRECT,no-resolve"
-      "MATCH,Proxy"
-    ];
-  };
+      # 其餘全部走 Proxy。
+      rules = rejectRules ++ directRules ++ [ "MATCH,Proxy" ];
+    }
+  );
 
   # 檔首說明留給之後手動改的人。toYAML 在這版 nixpkgs 就是 toJSON,
   # 種下去會是一行;這份是給人改的,建置時轉成區塊式 YAML。屬性集沒有
@@ -262,7 +130,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # 與 mihomo.nix 分工:那份用 sops 的訂閱做完整分流;這份種下同一套基礎
+    # 與 full.nix 分工:那份用 sops 的訂閱做完整分流;這份種下同一套基礎
     # 設定,但只有廣告、私有網域與中國大陸直連,以及單一 Proxy 群組,之後手動編輯。
     # 兩者同時啟用會在 configFile 等選項直接合併衝突,錯誤訊息會點名兩個
     # 檔案,因此不另加互斥斷言。
