@@ -39,5 +39,5 @@
 |---|---|---|---|---|
 | WA-016 | sops 以使用者自己的 SSH 金鑰解密，而不是只有 root 能讀的金鑰，而且所有機密共用同一組收件人：[`modules/core/sops.nix`](modules/core/sops.nix)、nix-secrets 的 `.sops.yaml` | 為了簡單而選擇。 | 整理 nix-secrets 時重新檢討。 | 2026-10-22 |
 | WA-021 | 擁有者在 `gamemode` 群組裡：[`modules/desktop/game/gamemode.nix`](modules/desktop/game/gamemode.nix) | GameMode 的調整輔助程式需要它。 | 不再使用 GameMode，或它不再需要整個群組的授權。 | 2026-10-22 |
-| WA-022 | elaina 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/elaina/storage.nix`](hosts/elaina/storage.nix)，登記指令在 [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 這臺主機沒有鍵盤。它不執行桌面工作階段，而 Secure Boot 會讓遭竄改的開機鏈拿不到金鑰。 | 主機接上鍵盤時重新檢討。 | 2026-10-23 |
+| WA-022 | selene 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/selene/storage.nix`](hosts/selene/storage.nix)，登記指令在 [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 這臺主機沒有鍵盤。它不執行桌面工作階段，而 Secure Boot 會讓遭竄改的開機鏈拿不到金鑰。 | 主機接上鍵盤時重新檢討。 | 2026-10-23 |
 | WA-023 | river 的 TPM2 金鑰登記時沒有 PIN；磁碟在開機時不需任何秘密就會解鎖：[`hosts/river/storage.nix`](hosts/river/storage.nix)，登記指令在 [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 為了方便而選擇。風險由三點抵銷：Secure Boot 讓遭竄改的開機鏈拿不到金鑰；greetd 要求帳號密碼；Noctalia 在睡眠與休眠前鎖定工作階段（`[lockscreen].lock_before_suspend`，預設為 `true`，在它的 UI 裡設定，不在 Nix 裡）。 | river 改回自動登入，或不再於睡眠前鎖定時重新檢討。 | 2026-10-23 |

@@ -5,6 +5,7 @@
     espSize = "1G";
     swapSize = "65537M";
     snapshots.enable = true;
+    games.enable = true;
     luks.enable = true;
     # 不設 PIN,見 WA-022。
     luks.tpm2.enable = true;

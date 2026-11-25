@@ -13,12 +13,5 @@
     vnstat.enable = true;
   };
 
-  server'.fail2ban.enable = true;
-
-  dev' = {
-    project-env.enable = true;
-    toolchain.enable = true;
-  };
-
   system.stateVersion = "23.05";
 }

@@ -15,7 +15,7 @@
 | 設定裡沒有密碼或雜湊；密碼在建立使用者之前解密 | [`modules/core/users.nix`](modules/core/users.nix) | `password-source` |
 | sops 只用使用者的 SSH 金鑰解密，沒有金鑰檔 | [`modules/core/sops.nix`](modules/core/sops.nix) | `sops-key` |
 | systemd-boot 編輯器關閉（lanzaboote 下也是），使用者不可變更 | [`modules/hardware/boot/`](modules/hardware/boot/)、[`users.nix`](modules/core/users.nix) | `boot-and-accounts` |
-| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、elaina） | [`modules/hardware/boot/lanzaboote.nix`](modules/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
+| 以 lanzaboote 搭配擁有者自行產生的金鑰做 Secure Boot；金鑰以 `0700` 持久化（river、selene） | [`modules/hardware/boot/lanzaboote.nix`](modules/hardware/boot/lanzaboote.nix) | `boot-and-accounts`、`private-state` |
 | TPM2 磁碟解鎖只用於 Secure Boot 主機，綁定 PCR 7 | [`modules/hardware/disko.nix`](modules/hardware/disko.nix) | 模組 assertion |
 | 核心 sysctl 基準、禁止載入的模組、保留 user namespace、相容休眠 | [`modules/core/kernel-hardening.nix`](modules/core/kernel-hardening.nix) | `kernel` |
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
