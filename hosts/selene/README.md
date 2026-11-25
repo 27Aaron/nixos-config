@@ -1,6 +1,6 @@
 # selene
 
-Beelink SER6 Pro VEST 迷你主機，當作沒有螢幕的家用伺服器。
+Beelink SER6 Pro VEST 迷你主機，當作開發與娛樂機，接上螢幕以 niri 桌面登入；平常也以 SSH 遠端使用。
 
 ## 硬體
 
