@@ -19,6 +19,12 @@
     mime-apps.enable = true;
     user-dirs.enable = true;
 
+    chrome.enable = true;
+    firefox.enable = true;
+
+    zed.enable = true;
+    vscode.enable = true;
+
     fcitx5.enable = true;
 
     magpie.enable = true;
