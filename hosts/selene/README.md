@@ -1,4 +1,4 @@
-# elaina
+# selene
 
 Beelink SER6 Pro VEST 迷你主機，當作沒有螢幕的家用伺服器。
 
@@ -9,7 +9,7 @@ Beelink SER6 Pro VEST 迷你主機，當作沒有螢幕的家用伺服器。
 | 型號 | Beelink SER6 Pro VEST |
 | CPU | AMD Ryzen 7 7735HS |
 | 記憶體 | 64 GB DDR5 |
-| 磁碟 | 2 TB NVMe，UncertainTruth LX700（ESP 1G，LUKS，TPM2 解鎖） |
+| 磁碟 | 2 TB NVMe，UncertainTruth LX700（ESP 1G，LUKS，TPM2 解鎖，含不進快照的 `/games` 子volume） |
 
 ## Secure Boot 與磁碟解鎖
 
