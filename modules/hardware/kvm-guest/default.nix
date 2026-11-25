@@ -9,18 +9,14 @@ let
   cfg = config.hardware'.kvm-guest;
 in
 {
-  imports = [
-    (modulesPath + "/profiles/qemu-guest.nix")
-    ./disko.nix
-  ];
+  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
 
   options.hardware'.kvm-guest = {
     enable = lib.mkEnableOption "the shared KVM guest baseline";
 
     disk.enable = lib.mkEnableOption ''
       the disk layout of the nixos-bootstrap image: one plain Btrfs disk
-      on /dev/sda with GRUB and no encryption. Physical machines keep
-      using hardware'.disko
+      on /dev/sda with GRUB and no encryption, built by hardware'.disko
     '';
 
     zramMemoryMax = lib.mkOption {
@@ -57,6 +53,13 @@ in
     };
 
     hardware'.grub.enable = true;
+
+    hardware'.disko = lib.mkIf cfg.disk.enable {
+      enable = true;
+      device = "/dev/sda";
+      bios.enable = true;
+      tmpfsSize = "512M";
+    };
 
     services'.zram = {
       enable = true;
