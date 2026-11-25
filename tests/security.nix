@@ -366,7 +366,7 @@ in
         modules = lib.genAttrs blockedModules blocked;
         # Nix 的建置沙箱需要 user namespaces;休眠需要可寫入的核心映像。
         inherit (config.security) allowUserNamespaces;
-        protectKernelImage = config.boot.resumeDevice != "" && config.security.protectKernelImage;
+        inherit (config.security) protectKernelImage;
         # 一般的主機設定就能覆寫基準,不需要 mkForce。
         hostOverride =
           (host.extendModules {

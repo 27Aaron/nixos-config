@@ -1,15 +1,11 @@
 { pkgs, ... }:
 {
-  # 從加密的 swapfile 恢復。Btrfs 上要用物理偏移,重建或 balance 後重測:
-  # sudo btrfs inspect-internal map-swapfile -r /swap/swapfile
-  boot = {
-    resumeDevice = "/dev/mapper/crypted";
-    kernelParams = [ "resume_offset=533760" ];
-    # 預設只把記憶體回收到 RAM 的 2/5;之後凍結裝置時(多半是 amdgpu 把 VRAM
-    # 搬回系統記憶體)還會再多用 2-3 GiB,超過快照能用的一半 RAM 就以 ENOMEM
-    # 失敗。設為 0 讓核心盡量回收到磁碟 swap,代價是恢復後程式要從 swap 讀回。
-    kernel.sysfs.power.image_size = 0;
-  };
+  # 恢復位置由 systemd 休眠時寫進 EFI 變數 HibernateLocation,不必寫死 Btrfs
+  # swapfile 的 resume_offset;重新安裝後也不用重新量測。
+  # 預設只把記憶體回收到 RAM 的 2/5;之後凍結裝置時(多半是 amdgpu 把 VRAM
+  # 搬回系統記憶體)還會再多用 2-3 GiB,超過快照能用的一半 RAM 就以 ENOMEM
+  # 失敗。設為 0 讓核心盡量回收到磁碟 swap,代價是恢復後程式要從 swap 讀回。
+  boot.kernel.sysfs.power.image_size = 0;
 
   # 韌體只有 s2idle,沒有 S3,所以合蓋後一小時改為休眠。
   systemd.sleep.settings.Sleep = {
