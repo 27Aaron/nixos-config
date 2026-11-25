@@ -43,7 +43,7 @@
     user-dirs.enable = true;
   };
 
-  dev' = {
+  development' = {
     project-env.enable = true;
     toolchain.enable = true;
     claude-code.enable = true;

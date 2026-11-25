@@ -5,10 +5,10 @@
   ...
 }:
 let
-  cfg = config.dev'.toolchain;
+  cfg = config.development'.toolchain;
 in
 {
-  options.dev'.toolchain.enable = lib.mkEnableOption "language toolchains and language servers";
+  options.development'.toolchain.enable = lib.mkEnableOption "language toolchains and language servers";
 
   config = lib.mkIf cfg.enable {
     # 裝在使用者 PATH 上,供編輯器、終端機與腳本共用。這裡只放 nixpkgs 的

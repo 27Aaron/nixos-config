@@ -6,12 +6,12 @@
   ...
 }:
 let
-  cfg = config.dev'.claude-code;
+  cfg = config.development'.claude-code;
 
   claude-code = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
 in
 {
-  options.dev'.claude-code.enable = lib.mkEnableOption "Claude Code";
+  options.development'.claude-code.enable = lib.mkEnableOption "Claude Code";
 
   config = lib.mkIf cfg.enable {
     hm'.home.packages = [ claude-code ];

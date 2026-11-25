@@ -4,10 +4,10 @@
   ...
 }:
 let
-  cfg = config.dev'.project-env;
+  cfg = config.development'.project-env;
 in
 {
-  options.dev'.project-env.enable = lib.mkEnableOption "project environments with direnv, mise and uv";
+  options.development'.project-env.enable = lib.mkEnableOption "project environments with direnv, mise and uv";
 
   config = lib.mkIf cfg.enable {
     hm'.programs.direnv = {
