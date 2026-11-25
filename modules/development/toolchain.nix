@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  vars,
   ...
 }:
 let
@@ -42,12 +43,16 @@ in
       package-version-server
     ];
 
-    # 根目錄是 tmpfs,這些快取沒登記的話每次開機都要重下。Go 模組在
-    # ~/go/pkg/mod,建置快取在 ~/.cache/go-build。pnpm 的 node_modules 以
-    # 硬連結指回 ~/.local/share/pnpm/store。~/.cargo 可能含 credentials.toml。
+    # 預設 GOPATH 是 ~/go,家目錄頂層會多一個目錄。改到 XDG 資料目錄,
+    # 與 pnpm、mise 放在一起。模組快取與 go install 的二進位都在這個目錄裡。
+    environment.sessionVariables.GOPATH = "${config.users.users.${vars.username}.home}/.local/share/go";
+
+    # 根目錄是 tmpfs,這些快取沒登記的話每次開機都要重下。建置快取在
+    # ~/.cache/go-build,與 GOPATH 分開。pnpm 的 node_modules 以硬連結指回
+    # ~/.local/share/pnpm/store。~/.cargo 可能含 credentials.toml。
     preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".cache/go-build"
-      "go/pkg/mod"
+      ".local/share/go"
       {
         directory = ".cargo";
         mode = "0700";
