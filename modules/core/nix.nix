@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   lib,
   vars,
   ...
@@ -7,8 +8,14 @@
 {
   nix = {
     channel.enable = false;
+
+    # channels 已關。把 nixpkgs 釘在這份 lock,並停用全域 flake registry,
+    # `nix run nixpkgs#...` 才用同一份 nixpkgs,也不必每次上網查 registry。
+    registry.nixpkgs.flake = inputs.nixpkgs;
+
     optimise.automatic = true;
     settings = {
+      flake-registry = "";
       builders-use-substitutes = true;
       experimental-features = [
         "nix-command"

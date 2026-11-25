@@ -42,10 +42,16 @@ in
       package-version-server
     ];
 
-    # Go 的建置快取,以及 pnpm 的 store。pnpm 的 node_modules 以硬連結
-    # 指回 ~/.local/share/pnpm/store,store 不見就得整份重下。
+    # 根目錄是 tmpfs,這些快取沒登記的話每次開機都要重下。Go 模組在
+    # ~/go/pkg/mod,建置快取在 ~/.cache/go-build。pnpm 的 node_modules 以
+    # 硬連結指回 ~/.local/share/pnpm/store。~/.cargo 可能含 credentials.toml。
     preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".cache/go-build"
+      "go/pkg/mod"
+      {
+        directory = ".cargo";
+        mode = "0700";
+      }
       ".cache/pnpm"
       ".local/share/pnpm"
       ".local/state/pnpm"

@@ -41,14 +41,15 @@ in
       ];
 
       initrd = {
+        # -19 對這份 virtio initrd 只少幾個 MiB,每次重建卻慢一截。預設等級
+        # 加上 -T0 用滿核心即可。
         compressor = "zstd";
-        compressorArgs = [
-          "-19"
-          "-T0"
-        ];
+        compressorArgs = [ "-T0" ];
 
-        # 內容同 profiles/qemu-guest.nix。不直接匯入它:那份沒有條件,所有主機都會
-        # 帶進來,實體機的 initrd 就多了 virtio 驅動,並在開機時載入 virtio_gpu 等模組。
+        # 內容同 profiles/qemu-guest.nix,但拿掉 virtio_balloon:下方的 install
+        # 規則會讓 modprobe 成功卻不載入,留在清單裡只是每次開機空跑一次。
+        # 不直接匯入那份設定:它沒有條件,所有主機都會帶進來,實體機的 initrd
+        # 就多了 virtio 驅動,並在開機時載入 virtio_gpu 等模組。
         availableKernelModules = [
           "virtio_net"
           "virtio_pci"
@@ -60,7 +61,6 @@ in
           "virtiofs"
         ];
         kernelModules = [
-          "virtio_balloon"
           "virtio_console"
           "virtio_rng"
           "virtio_gpu"

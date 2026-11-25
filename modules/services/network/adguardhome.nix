@@ -20,12 +20,6 @@ in
         all interfaces and this same port.
       '';
     };
-
-    dnsUpstream = lib.mkOption {
-      type = lib.types.str;
-      default = "127.0.0.1:5335";
-      description = "Upstream DNS server AdGuard Home forwards to (mosdns).";
-    };
   };
 
   config = lib.mkIf cfg.enable {
