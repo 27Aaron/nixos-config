@@ -34,6 +34,7 @@ in
       rust-analyzer
 
       nodejs
+      pnpm
       typescript
       vtsls
 
@@ -41,7 +42,13 @@ in
       package-version-server
     ];
 
-    # Go 的建置快取;保留可免去重開機後重新編譯。
-    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [ ".cache/go-build" ];
+    # Go 的建置快取,以及 pnpm 的 store。pnpm 的 node_modules 以硬連結
+    # 指回 ~/.local/share/pnpm/store,store 不見就得整份重下。
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
+      ".cache/go-build"
+      ".cache/pnpm"
+      ".local/share/pnpm"
+      ".local/state/pnpm"
+    ];
   };
 }

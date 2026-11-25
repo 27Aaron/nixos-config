@@ -37,9 +37,6 @@ in
       ".local/share/direnv"
       ".local/share/mise"
       ".local/share/uv"
-
-      ".cache/pnpm"
-      ".cache/bun"
     ];
   };
 }
