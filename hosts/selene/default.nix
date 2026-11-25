@@ -27,8 +27,6 @@
 
     fcitx5.enable = true;
 
-    magpie.enable = true;
-
     pipewire.enable = true;
     kitty.enable = true;
     seahorse.enable = true;
@@ -50,6 +48,7 @@
 
   services' = {
     avahi.enable = true;
+    magpie.enable = true;
     networkmanager.enable = true;
     openssh.enable = true;
     openssh.rootLogin = true;
