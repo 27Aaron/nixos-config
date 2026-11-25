@@ -17,5 +17,10 @@ in
       # 每月 1 日 04:00,避開 btrbk 的 00:00/12:00 快照。
       interval = "*-*-01 04:00:00";
     };
+
+    # 上次掃描的結果存在這裡,重開機後 `btrfs scrub status` 才查得到。
+    preservation'.os.directories = lib.mkIf config.hardware'.persistence.enable [
+      "/var/lib/btrfs"
+    ];
   };
 }

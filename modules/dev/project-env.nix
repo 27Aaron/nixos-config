@@ -19,8 +19,6 @@ in
     # mise 只管專案層級的工具版本,全域版本見 toolchain.nix。
     hm'.programs.mise = {
       enable = true;
-      enableFishIntegration = true;
-      enableZshIntegration = true;
     };
 
     hm'.programs.uv.enable = true;
