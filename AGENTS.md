@@ -12,8 +12,8 @@
 | [`modules/`](modules/) | 所有可重用的模組，依用途分目錄 |
 | [`modules/core/`](modules/core/) | 每臺主機一律生效的模組，包括 shell、Git 等日常命令列工具 |
 | [`modules/hardware/`](modules/hardware/)、[`modules/services/`](modules/services/) | 伺服器也可能用到的系統模組，可開關 |
-| [`modules/dev/`](modules/dev/) | 開發環境、工具鏈與 AI agent，伺服器與桌面都能用，可開關 |
-| [`modules/desktop/`](modules/desktop/)、[`modules/server/`](modules/server/) | 只有桌面或只有伺服器才用的模組，可開關 |
+| [`modules/development/`](modules/development/) | 開發環境、工具鏈與 AI agent，伺服器與桌面都能用，可開關 |
+| [`modules/desktop/`](modules/desktop/) | 只有桌面才用的模組，可開關 |
 | [`tests/`](tests/) | `just check` 執行的 eval 測試 |
 | [`vars/`](vars/) | 共用的非機密值 |
 | [`SECURITY.md`](SECURITY.md) | 安全控制與對應測試、flake 輸入、機密與更新流程 |
@@ -110,7 +110,7 @@ type(scope): description
 - 標題連同 `type(scope): ` 不超過 50 個字元。GitHub 會截斷超過 72 個字元的標題，squash merge 還會再附加 ` (#123)`，50 個字元才有餘裕。標題只寫一個變更的結果，省略冠詞與贅字，清單與細節移到內文。
 - 內文在 72 個字元處換行。
 - pull request 標題會成為 squash merge 的提交標題，因此遵守相同規則。
-- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`dev`、`desktop`、`server`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
+- scope 反映變更的路徑或元件：主機專屬的變更用 `{host}` 或 `{host}/{service}`，共用模組用模組領域（`core`、`hardware`、`services`、`development`、`desktop`、`modules`），flake 層級的檔案、[`lib/`](lib/) 與主機探索用 `flake`，文件用 `docs`。
 - 描述變更的結果，而不是列出編輯過的檔案。
 
 ```text

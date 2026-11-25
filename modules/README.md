@@ -12,14 +12,13 @@ modules/
 │   ├── network/     # SSH、代理、DNS、mDNS、網路管理
 │   ├── monitoring/  # 主機與流量指標
 │   └── storage/     # 快照、scrub、磁碟健康
-├── dev/             # 開發環境、工具鏈與 AI agent(agents/),伺服器與桌面都能用
+├── development/     # 開發環境、工具鏈與 AI agent(agents/),伺服器與桌面都能用
 ├── desktop/         # 只有接螢幕的主機
 │   ├── session/     # 登入畫面、視窗管理器、桌面外殼
 │   ├── appearance/  # 字型、主題、游標
 │   ├── files/       # 檔案總管、回收桶、使用者目錄、預設程式
 │   ├── ai/          # AI 桌面程式
 │   └── browsers/、editors/、game/、input-method/、power/
-└── server/          # 只有伺服器
 ```
 
 每個目錄都由 `hosts/default.nix` 以 `lib/default.nix` 的 `listModules` 自動收集，不必手動匯入；子目錄若含 `default.nix`，只載入該檔。
@@ -31,11 +30,10 @@ modules/
 1. 每臺主機都需要，不該能關掉 → `core/`
 2. 硬體、開機、磁碟或持久化 → `hardware/`
 3. 伺服器也可能用到的服務，例如 SSH、快照、代理 → `services/`
-4. 開發用的工具，伺服器上也可能要 → `dev/`
+4. 開發用的工具，伺服器上也可能要 → `development/`
 5. 一定要有螢幕才有意義，例如登入畫面、視窗管理器、輸入法、瀏覽器 → `desktop/`
-6. 只有伺服器需要 → `server/`
 
-選項命名空間取自目錄，並加上單引號與上游選項區隔，例如 `hardware/` 定義在 `hardware'.*`、`dev/` 定義在 `development'.*`。底下的子目錄只用來分組，不增加命名空間層級。
+選項命名空間取自目錄，並加上單引號與上游選項區隔，例如 `hardware/` 定義在 `hardware'.*`、`development/` 定義在 `development'.*`。底下的子目錄只用來分組，不增加命名空間層級。
 
 ## 使用者層的設定
 
