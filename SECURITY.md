@@ -21,6 +21,7 @@
 | 編輯器與代理的信任提示保持開啟 | [`modules/desktop/editors/`](modules/desktop/editors/)、[`modules/dev/agents/`](modules/dev/agents/) | `editor-and-agent-trust` |
 | 監控端點只對 tailnet 開放，不對其他網路開放 | [`modules/services/monitoring/node-exporter.nix`](modules/services/monitoring/node-exporter.nix) | `firewall` |
 | magpie 的環境金鑰由 sops 以 `0400` 解密，網頁介面開的埠列入防火牆清單 | [`modules/services/magpie.nix`](modules/services/magpie.nix) | `firewall`、`private-state` |
+| dsh 網頁介面只綁指定的具體位址（selene 綁區網），開的埠列入防火牆清單；API key 留在 `~/.dsh/.credentials.yaml`，與 `0700` 的 `.dsh` 一起持久化 | [`modules/dev/agents/dsh.nix`](modules/dev/agents/dsh.nix) | `firewall`、`private-state` |
 | 憑證與歷史紀錄目錄以 `0700` 持久化 | 各模組的 `preservation'.user` 項目 | `private-state` |
 | 登入帳號不在 `podman`、`docker` 群組，不開放 `/run/docker.sock` | [`modules/services/podman.nix`](modules/services/podman.nix) | `container-socket` |
 | rootful 容器發布的埠不接受外部連線；rootless 的埠受一般防火牆規則管制 | [`modules/services/podman.nix`](modules/services/podman.nix) | 執行期檢查 |
