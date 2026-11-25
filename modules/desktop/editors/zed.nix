@@ -76,15 +76,20 @@ in
 
         # 語言伺服器優先使用 PATH 上的版本;Zed 自行下載的二進位在 NixOS 上
         # 通常無法執行。
-        lsp = {
-          nixd.binary.path_lookup = true;
-          basedpyright.binary.path_lookup = true;
-          ruff.binary.path_lookup = true;
-          gopls.binary.path_lookup = true;
-          rust-analyzer.binary.path_lookup = true;
-          vtsls.binary.path_lookup = true;
-          package-version-server.binary.path_lookup = true;
-        };
+        lsp =
+          lib.genAttrs
+            [
+              "nixd"
+              "basedpyright"
+              "ruff"
+              "gopls"
+              "rust-analyzer"
+              "vtsls"
+              "package-version-server"
+            ]
+            (_: {
+              binary.path_lookup = true;
+            });
 
         languages.Nix = {
           language_servers = [

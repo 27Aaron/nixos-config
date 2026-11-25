@@ -33,10 +33,13 @@ in
       eval "$(uvx --generate-shell-completion zsh)"
     '';
 
+    # 下載快取不在 share 目錄。tmpfs 根目錄不登記的話,重開機就整份重抓。
     preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
       ".local/share/direnv"
       ".local/share/mise"
+      ".cache/mise"
       ".local/share/uv"
+      ".cache/uv"
     ];
   };
 }

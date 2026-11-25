@@ -147,6 +147,11 @@ in
 
     boot.tmp.cleanOnBoot = true;
 
+    # 磁碟 swap 只給休眠用,執行期換頁走 zram。預設 image_size 只允許映像佔
+    # RAM 的 2/5;凍結裝置時 amdgpu 會把 VRAM 搬回系統記憶體,再多用數 GiB
+    # 就以 ENOMEM 失敗。0 表示盡量寫進 swap,代價是恢復後要從 swap 讀回。
+    boot.kernel.sysfs.power.image_size = lib.mkIf (cfg.swapSize != null) 0;
+
     # FIDO2 解鎖需要 USB HID 驅動。
     #
     # 登記對分割區操作,不是 /dev/mapper/crypted。開機依序嘗試 TPM2、FIDO2,

@@ -95,6 +95,7 @@ let
     ".local/state/zsh"
     ".cache/zsh"
     ".cache/thumbnails"
+    ".cargo"
     ".local/share/Steam"
     ".steam"
     "nixos-config"

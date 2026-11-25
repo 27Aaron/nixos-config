@@ -44,5 +44,10 @@ in
         emoji = [ "Noto Color Emoji" ];
       };
     };
+
+    # 系統字型快取在 store 裡,使用者快取仍會在第一次畫字時重建。
+    preservation'.user.directories = lib.mkIf config.hardware'.persistence.enable [
+      ".cache/fontconfig"
+    ];
   };
 }
