@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  modulesPath,
   pkgs,
   ...
 }:
@@ -9,8 +8,6 @@ let
   cfg = config.hardware'.kvm-guest;
 in
 {
-  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
-
   options.hardware'.kvm-guest = {
     enable = lib.mkEnableOption "the shared KVM guest baseline";
 
@@ -48,6 +45,25 @@ in
         compressorArgs = [
           "-19"
           "-T0"
+        ];
+
+        # 內容同 profiles/qemu-guest.nix。不直接匯入它:那份沒有條件,所有主機都會
+        # 帶進來,實體機的 initrd 就多了 virtio 驅動,並在開機時載入 virtio_gpu 等模組。
+        availableKernelModules = [
+          "virtio_net"
+          "virtio_pci"
+          "virtio_mmio"
+          "virtio_blk"
+          "virtio_scsi"
+          "9p"
+          "9pnet_virtio"
+          "virtiofs"
+        ];
+        kernelModules = [
+          "virtio_balloon"
+          "virtio_console"
+          "virtio_rng"
+          "virtio_gpu"
         ];
       };
     };

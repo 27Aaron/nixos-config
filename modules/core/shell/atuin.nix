@@ -2,8 +2,6 @@
 {
   hm'.programs.atuin = {
     enable = true;
-    enableFishIntegration = true;
-    enableZshIntegration = true;
     settings = {
       sync_frequency = 0;
       inline_height = 30;
