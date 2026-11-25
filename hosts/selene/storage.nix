@@ -14,7 +14,11 @@
   hardware'.persistence.enable = true;
 
   services' = {
-    zram.enable = true;
+    zram = {
+      enable = true;
+      memoryPercent = 100;
+      memoryMax = 32 * 1024 * 1024 * 1024;
+    };
 
     smartd.enable = true;
     btrfs-scrub.enable = true;
