@@ -24,21 +24,15 @@ let
       mountOptions = btrfsOptions;
     };
 
-    # /tmp 放在磁碟而非根 tmpfs,解壓大檔時才不會撐滿根目錄;開機時由
-    # cleanOnBoot 清空。nofail 讓尚未建立此 subvolume 的機器仍可開機:
-    #   sudo btrfs subvolume create /btr_pool/@tmp
+    # /tmp 放在磁碟而非根 tmpfs,解壓大檔時才不會撐滿根目錄;開機時由 cleanOnBoot 清空。
     "@tmp" = {
       mountpoint = "/tmp";
       mountOptions = btrfsOptions ++ [
         "nosuid"
         "nodev"
-        "nofail"
       ];
     };
   }
-  # btrbk 的快照目錄。只有啟用 snapshots 的主機才建立,其餘主機不多一個
-  # 掛載點;既有磁碟要先建立 subvolume:
-  #   sudo btrfs subvolume create /btr_pool/@snapshots
   // lib.optionalAttrs cfg.snapshots.enable {
     "@snapshots" = {
       mountpoint = "/snapshots";
@@ -46,9 +40,7 @@ let
     };
   }
   # 遊戲庫可以重新下載,獨立成 subvolume 才不會被 btrbk 隨 @persistent 快照,
-  # 每次遊戲更新都留下數十 GB 的舊版本。新 subvolume 的根目錄屬於 root,
-  # 建立後要交給使用者一次;擁有者存在 Btrfs 上,不必每次開機設定:
-  #   sudo btrfs subvolume create /btr_pool/@games
+  # 每次遊戲更新都留下數十 GB 的舊版本。安裝後要把根目錄交給使用者一次:
   #   sudo chown <user>:users /btr_pool/@games && sudo chmod 0700 /btr_pool/@games
   // lib.optionalAttrs cfg.games.enable {
     "@games" = {
@@ -83,8 +75,8 @@ let
     ];
     inherit subvolumes;
   };
-  # GPT partlabel 由屬性名生成(disk-main-<name>),改名會讓 crypttab 找不到裝置。
-  dataPartitionName = if cfg.luks.enable then "luks" else "data";
+  # GPT partlabel 由屬性名生成(disk-main-<name>),改名會讓 fstab 與 crypttab 找不到裝置。
+  dataPartitionName = if cfg.luks.enable then "luks" else "root";
 in
 {
   imports = [ inputs.disko.nixosModules.default ];
@@ -192,14 +184,14 @@ in
           type = "gpt";
           partitions =
             lib.optionalAttrs cfg.bios.enable {
-              BIOS = {
+              boot = {
                 priority = 0;
                 size = "1M";
                 type = "EF02";
               };
             }
             // {
-              ESP = {
+              esp = {
                 priority = 1;
                 size = cfg.espSize;
                 type = "EF00";
