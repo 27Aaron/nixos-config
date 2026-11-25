@@ -26,7 +26,11 @@ let
       rules = [ "ct status dnat accept" ];
     };
     selene = {
-      tcp = [ 233 ];
+      tcp = [
+        233
+        # dsh's web GUI binds a LAN address so other machines can reach it.
+        3080
+      ];
       udp = [ 5353 ];
     };
     iris = {

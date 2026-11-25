@@ -39,6 +39,13 @@
     project-env.enable = true;
     toolchain.enable = true;
     claude-code.enable = true;
+
+    dsh.enable = true;
+    dsh.web = {
+      enable = true;
+      bind = "10.10.10.20";
+      trustedHosts = [ "selene.local" ];
+    };
   };
 
   services' = {
