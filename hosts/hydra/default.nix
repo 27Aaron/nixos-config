@@ -6,7 +6,7 @@
 
   time.timeZone = "Asia/Tokyo";
 
-  dev'.claude-code.enable = true;
+  development'.claude-code.enable = true;
 
   services' = {
     avahi.enable = true;
