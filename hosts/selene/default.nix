@@ -5,6 +5,8 @@
     ./storage.nix
   ];
 
+  time.timeZone = "Asia/Tokyo";
+
   desktop' = {
     greetd.enable = true;
     niri.enable = true;
