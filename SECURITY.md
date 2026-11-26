@@ -72,7 +72,7 @@ sudo sbctl verify                                  # Secure Boot 主機：每個
 
 ```fish
 set -x SOPS_AGE_KEY (ssh-to-age -private-key -i ~/.ssh/id_ed25519)
-sops users/password.yaml
+sops users/hashed-password.yaml
 set -e SOPS_AGE_KEY
 ```
 

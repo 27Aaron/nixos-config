@@ -6,7 +6,7 @@
 }:
 let
   # 客戶端主機別名,來自 nix-secrets。檔案會複製進所有本機帳號都能讀取的 /nix/store,只能放別名,不可放金鑰或密碼。
-  sshConfig = inputs.secrets + "/openssh/config";
+  sshConfig = inputs.secrets + "/ssh/config";
 in
 {
   # 被 Include 的檔案在 store 裡屬於 nobody,OpenSSH 10 因此拒絕整份 ssh_config;見 WA-005。它只提供本機與 machined 的簡寫,關掉沒有損失。

@@ -46,7 +46,7 @@
 
 - [`SECURITY.md`](SECURITY.md) 記錄安全控制與對應測試、flake 輸入清單、執行期檢查，以及機密、更新與事件處理流程。新增或搬移控制、新增輸入，或把程式放進沙箱時，在同一個變更裡更新它。這個儲存庫是公開的：只寫控制做什麼、怎麼檢查，不寫個人設定細節，也不寫攻擊者用得上的弱點。
 - 憑證與機密放在私人的 `nix-secrets` 儲存庫，透過 sops-nix 送進系統。`inputs.secrets` 會被複製到所有人可讀的 `/nix/store`，所以求值時只能讀其中的加密檔案，或本來就不敏感的檔案（例如 SSH 主機別名）。[`vars/`](vars/) 只放非機密值。
-- 帳號密碼來自 nix-secrets 的 `users/password.yaml`，以 `neededForUsers` 在建立使用者之前解密；設定裡絕不放密碼或雜湊。每臺主機都靠 sops 做這件事，所以它是 core 模組。
+- 帳號密碼來自 nix-secrets 的 `users/hashed-password.yaml`，以 `neededForUsers` 在建立使用者之前解密；設定裡絕不放密碼或雜湊。每臺主機都靠 sops 做這件事，所以它是 core 模組。
 - 主機以使用者的 `~/.ssh/id_ed25519` 解密（`sops.age.sshKeyPaths`；NixOS 主機直接讀 `/persistent` 上的那份），絕不另外放 age 金鑰檔。更換金鑰前先讀 [`SECURITY.md` 的〈Secrets〉](SECURITY.md#secrets)。
 - 不要把使用者加進 `nix.settings.trusted-users`：受信任的使用者可以關閉簽章檢查、匯入任意 store 路徑，等同免密碼的 root。只有 `@wheel` 能連線到 daemon（`allowed-users`）。
 - root 的 SSH 登入由各主機透過 `services'.openssh.rootLogin` 自行開啟，只用於遠端部署目標；其他主機只接受使用者的金鑰，再以 `sudo` 提權。root 仍保留授權金鑰，供日後需要 root 直連的部署或救援情境使用。

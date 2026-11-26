@@ -12,7 +12,7 @@ let
 in
 {
   sops.secrets.hashedPassword = {
-    sopsFile = "${inputs.secrets}/users/password.yaml";
+    sopsFile = "${inputs.secrets}/users/hashed-password.yaml";
     neededForUsers = true;
   };
 
