@@ -36,6 +36,7 @@
   development' = {
     project-env.enable = true;
     toolchain.enable = true;
+    adb.enable = true;
     claude-code.enable = true;
 
     dsh.enable = true;

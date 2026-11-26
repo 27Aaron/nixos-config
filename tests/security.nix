@@ -66,6 +66,7 @@ let
   privateDirs = [
     ".ssh"
     ".gnupg"
+    ".android"
     ".config/gh"
     ".claude"
     ".dsh"
